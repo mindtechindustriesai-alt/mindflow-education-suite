@@ -1,5 +1,5 @@
 /**
- * Khensani AI — Cloud Functions
+ * Khensani AI — Cloud Functions (v2 API, firebase-functions v6)
  * Region: africa-south1 (Johannesburg)
  * Patent: SA 2026/05142
  *
@@ -8,34 +8,43 @@
  *   - luvunoChat : Proxy chat to Luvuno Backend (DeepSeek/OpenRouter)
  */
 
-const functions = require('firebase-functions');
+const { onCall, HttpsError } = require('firebase-functions/v2/https');
+const { setGlobalOptions } = require('firebase-functions/v2');
+const { defineSecret } = require('firebase-functions/params');
 const admin = require('firebase-admin');
 const fetch = require('node-fetch');
 
 admin.initializeApp();
 const db = admin.firestore();
 
-const REGION = 'africa-south1';
+setGlobalOptions({
+  region: 'africa-south1',
+  maxInstances: 10,
+});
+
+const MQOS_URL = defineSecret('MQOS_URL');
+const MQOS_SHARED_SECRET = defineSecret('MQOS_SHARED_SECRET');
+const LUVUNO_URL = defineSecret('LUVUNO_URL');
+const LUVUNO_SHARED_SECRET = defineSecret('LUVUNO_SHARED_SECRET');
 
 
 // ============================================================
 // mqosChsh — Khensani → MQOS TERERAI
 // ============================================================
 
-exports.mqosChsh = functions
-  .region(REGION)
-  .runWith({
-    secrets: ['MQOS_URL', 'MQOS_SHARED_SECRET'],
+exports.mqosChsh = onCall(
+  {
+    secrets: [MQOS_URL, MQOS_SHARED_SECRET],
     timeoutSeconds: 120,
     memory: '256MiB',
-  })
-  .https.onCall(async (data, context) => {
-    const fresh = data && data.fresh === true;
-    const mqosUrl = process.env.MQOS_URL;
-    const mqosKey = process.env.MQOS_SHARED_SECRET;
+  },
+  async (request) => {
+    const fresh = request.data && request.data.fresh === true;
+    const mqosUrl = MQOS_URL.value();
+    const mqosKey = MQOS_SHARED_SECRET.value();
 
     if (!mqosUrl) {
-      throw new functions.https.HttpsError('failed-precondition', 'MQOS_URL not configured');
+      throw new HttpsError('failed-precondition', 'MQOS_URL not configured');
     }
 
     const url = fresh
@@ -57,13 +66,13 @@ exports.mqosChsh = functions
       res = await fetch(url, fetchOpts);
     } catch (err) {
       console.error('[mqosChsh] fetch failed:', err);
-      throw new functions.https.HttpsError('internal', `MQOS fetch failed: ${err.message}`);
+      throw new HttpsError('internal', `MQOS fetch failed: ${err.message}`);
     }
 
     if (!res.ok) {
       const body = await res.text().catch(() => '');
       console.error(`[mqosChsh] ${res.status} body:`, body.slice(0, 200));
-      throw new functions.https.HttpsError('internal', `MQOS ${res.status}`);
+      throw new HttpsError('internal', `MQOS ${res.status}`);
     }
 
     const json = await res.json();
@@ -72,7 +81,7 @@ exports.mqosChsh = functions
       await db.collection('quantum_verifications').add({
         ...json,
         source: 'mqos',
-        fetchedBy: context.auth?.uid || 'anonymous',
+        fetchedBy: request.auth?.uid || 'anonymous',
         fetchedAt: new Date().toISOString(),
       });
     } catch (err) {
@@ -80,44 +89,44 @@ exports.mqosChsh = functions
     }
 
     return json;
-  });
+  }
+);
 
 
 // ============================================================
 // luvunoChat — Khensani → Luvuno Backend Proxy
 // ============================================================
 
-exports.luvunoChat = functions
-  .region(REGION)
-  .runWith({
-    secrets: ['LUVUNO_URL', 'LUVUNO_SHARED_SECRET'],
+exports.luvunoChat = onCall(
+  {
+    secrets: [LUVUNO_URL, LUVUNO_SHARED_SECRET],
     timeoutSeconds: 60,
     memory: '256MiB',
-  })
-  .https.onCall(async (data, context) => {
-    if (!context.auth) {
-      throw new functions.https.HttpsError('unauthenticated', 'Auth required');
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'Auth required');
     }
 
-    const luvunoUrl = process.env.LUVUNO_URL;
-    const luvunoKey = process.env.LUVUNO_SHARED_SECRET;
+    const luvunoUrl = LUVUNO_URL.value();
+    const luvunoKey = LUVUNO_SHARED_SECRET.value();
 
     if (!luvunoUrl) {
-      throw new functions.https.HttpsError('failed-precondition', 'LUVUNO_URL not configured');
+      throw new HttpsError('failed-precondition', 'LUVUNO_URL not configured');
     }
 
-    const message = (data && data.message) ? String(data.message) : '';
+    const message = (request.data && request.data.message) ? String(request.data.message) : '';
     if (!message) {
-      throw new functions.https.HttpsError('invalid-argument', 'message required');
+      throw new HttpsError('invalid-argument', 'message required');
     }
 
     const payload = {
       message,
-      portal: data.portal || 'khensani',
-      language: data.language || 'english',
-      session_id: context.auth.uid,
-      conversation_history: Array.isArray(data.history) ? data.history : [],
-      response_style: data.style || 'detailed',
+      portal: request.data.portal || 'khensani',
+      language: request.data.language || 'english',
+      session_id: request.auth.uid,
+      conversation_history: Array.isArray(request.data.history) ? request.data.history : [],
+      response_style: request.data.style || 'detailed',
     };
 
     let res;
@@ -132,20 +141,20 @@ exports.luvunoChat = functions
       });
     } catch (err) {
       console.error('[luvunoChat] fetch failed:', err);
-      throw new functions.https.HttpsError('internal', `Luvuno fetch failed: ${err.message}`);
+      throw new HttpsError('internal', `Luvuno fetch failed: ${err.message}`);
     }
 
     if (!res.ok) {
       const body = await res.text().catch(() => '');
       console.error(`[luvunoChat] ${res.status} body:`, body.slice(0, 200));
-      throw new functions.https.HttpsError('internal', `Luvuno ${res.status}`);
+      throw new HttpsError('internal', `Luvuno ${res.status}`);
     }
 
     const json = await res.json();
 
     try {
       await db.collection('ai_conversations').add({
-        uid: context.auth.uid,
+        uid: request.auth.uid,
         message: payload.message,
         reply: json.response || '',
         source: 'luvuno',
@@ -163,4 +172,5 @@ exports.luvunoChat = functions
     }
 
     return json;
-  });
+  }
+);
