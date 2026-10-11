@@ -1,27 +1,34 @@
 /**
- * Khensani AI — Cloud Functions (v2 API, firebase-functions v6)
+ * Khensani AI — Cloud Functions (v2 API, firebase-functions v7)
  * Region: africa-south1 (Johannesburg)
- * Patent: SA 2026/05142
+ * Patent: SA 2026/05142 · CHSH S=2.76 (Aer: 2.8284)
  *
  * Exports:
  *   - mqosChsh   : Fetch live CHSH from MQOS TERERAI
  *   - luvunoChat : Proxy chat to Luvuno Backend (DeepSeek/OpenRouter)
+ *
+ * Compatible with:
+ *   - firebase-functions@7.x
+ *   - firebase-admin@14.x (modular imports)
+ *   - Node.js 22 runtime
  */
 
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { setGlobalOptions } = require('firebase-functions/v2');
 const { defineSecret } = require('firebase-functions/params');
-const admin = require('firebase-admin');
+const { initializeApp } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 const fetch = require('node-fetch');
 
-admin.initializeApp();
-const db = admin.firestore();
+initializeApp();
+const db = getFirestore();
 
 setGlobalOptions({
   region: 'africa-south1',
   maxInstances: 10,
 });
 
+// Declare secrets (read from Firebase Secret Manager at runtime)
 const MQOS_URL = defineSecret('MQOS_URL');
 const MQOS_SHARED_SECRET = defineSecret('MQOS_SHARED_SECRET');
 const LUVUNO_URL = defineSecret('LUVUNO_URL');
