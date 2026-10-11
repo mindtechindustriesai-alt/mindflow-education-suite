@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Management | Principal Portal - MindFlow Education</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #FF6B6B;
+            --accent-glow: rgba(255, 107, 107, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(255, 107, 107, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --principal-primary: #FF6B6B;
+            --principal-secondary: #E05555;
+            --principal-accent: #FF8E8E;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Standardized Top Menu */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--principal-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--principal-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--principal-primary), var(--principal-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--principal-primary);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--principal-primary);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--principal-primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Back Button Navigation */
+        .portal-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, var(--principal-primary), var(--principal-secondary));
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .back-button:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--principal-primary), var(--ai-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Campus Management Layout */
+        .campus-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .map-container {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            position: relative;
+        }
+        
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+            z-index: 10;
+        }
+        
+        #campusMap {
+            height: 600px;
+            width: 100%;
+            border-radius: 10px;
+        }
+        
+        .campus-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .campus-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .campus-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--principal-primary);
+        }
+        
+        /* Facilities Grid */
+        .facilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .facility-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .facility-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .facility-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .facility-icon {
+            font-size: 2rem;
+            color: var(--principal-primary);
+        }
+        
+        .facility-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .facility-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .status-online {
+            color: var(--learning-green);
+        }
+        
+        .status-offline {
+            color: var(--danger);
+        }
+        
+        .status-maintenance {
+            color: var(--warning);
+        }
+        
+        .facility-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 6px;
+        }
+        
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        
+        /* Map Controls */
+        .map-controls {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .map-btn {
+            background: rgba(16, 16, 24, 0.9);
+            border: 2px solid var(--principal-primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .map-btn:hover {
+            background: rgba(255, 107, 107, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .map-btn.active {
+            background: rgba(255, 107, 107, 0.5);
+            border-color: var(--ai-gold);
+        }
+        
+        /* Alert System */
+        .alert-system {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--danger);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+        }
+        
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-icon {
+            font-size: 1.5rem;
+            color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .alert-item {
+            padding: 1rem;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--danger);
+            transition: all 0.3s ease;
+        }
+
+        .alert-item:hover {
+            background: rgba(255, 107, 107, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .alert-time {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, var(--principal-primary), #0066FF);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid var(--learning-green);
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: var(--ai-gold);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px var(--ai-gold);
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: var(--learning-green);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--learning-green);
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--learning-green);
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid var(--principal-primary);
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: var(--principal-primary);
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--principal-primary), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--principal-primary), 0 0 30px #0066FF, 0 0 40px #FF6B6B; }
+            100% { text-shadow: 0 0 10px var(--principal-primary), 0 0 20px #0066FF; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .campus-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .campus-sidebar {
+                grid-template-columns: repeat(2, 1fr);
+                display: grid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .portal-nav {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .facilities-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .campus-sidebar {
+                grid-template-columns: 1fr;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+
+            #campusMap {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- Standardized Top Menu -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="portal-title">
+                Principal Portal - Campus Management
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="ProfileManager.openUpload()">
+                <div class="avatar">PD</div>
+                <div class="upload-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <div>
+                <div class="user-name">Dr. Sarah Chen</div>
+                <div class="user-role">Principal • Academic Lead</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Back Button Navigation -->
+    <nav class="portal-nav">
+        <a href="principal.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <div class="page-title">Campus Management System</div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Campus Management Content -->
+        <div class="campus-layout">
+            <!-- Map Container -->
+            <div class="map-container">
+                <div id="campusMap"></div>
+                <div class="map-controls">
+                    <button class="map-btn active" data-layer="buildings">
+                        <i class="fas fa-building"></i> Buildings
+                    </button>
+                    <button class="map-btn" data-layer="security">
+                        <i class="fas fa-shield-alt"></i> Security
+                    </button>
+                    <button class="map-btn" data-layer="utilities">
+                        <i class="fas fa-bolt"></i> Utilities
+                    </button>
+                    <button class="map-btn" data-layer="events">
+                        <i class="fas fa-calendar"></i> Events
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Campus Sidebar -->
+            <div class="campus-sidebar">
+                <div class="campus-card">
+                    <div class="card-header">
+                        <div class="card-title">Campus Overview</div>
+                        <div class="card-icon">
+                            <i class="fas fa-school"></i>
+                        </div>
+                    </div>
+                    <div class="facility-metrics">
+                        <div class="metric">
+                            <div class="metric-value">24</div>
+                            <div class="metric-label">Buildings</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">18.5</div>
+                            <div class="metric-label">Hectares</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">94%</div>
+                            <div class="metric-label">Occupancy</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">98%</div>
+                            <div class="metric-label">Operational</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="campus-card">
+                    <div class="card-header">
+                        <div class="card-title">Live Monitoring</div>
+                        <div class="card-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                    </div>
+                    <div class="facility-status">
+                        <i class="fas fa-circle status-online"></i>
+                        <span>48/52 cameras online</span>
+                    </div>
+                    <div class="facility-status">
+                        <i class="fas fa-circle status-online"></i>
+                        <span>All access points secured</span>
+                    </div>
+                    <div class="facility-status">
+                        <i class="fas fa-circle status-maintenance"></i>
+                        <span>2 systems in maintenance</span>
+                    </div>
+                </div>
+                
+                <div class="campus-card">
+                    <div class="card-header">
+                        <div class="card-title">Quick Actions</div>
+                        <div class="card-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="map-btn" onclick="triggerEmergencyProtocol()">
+                            <i class="fas fa-exclamation-triangle"></i> Emergency Protocol
+                        </button>
+                        <button class="map-btn" onclick="generateCampusReport()">
+                            <i class="fas fa-file-alt"></i> Generate Report
+                        </button>
+                        <button class="map-btn" onclick="scheduleMaintenance()">
+                            <i class="fas fa-tools"></i> Schedule Maintenance
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Facilities Grid -->
+        <div class="facilities-grid">
+            <div class="facility-card">
+                <div class="facility-header">
+                    <div class="facility-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="facility-name">Academic Block A</div>
+                </div>
+                <div class="facility-status status-online">
+                    <i class="fas fa-circle"></i>
+                    <span>Fully Operational</span>
+                </div>
+                <div class="facility-metrics">
+                    <div class="metric">
+                        <div class="metric-value">24</div>
+                        <div class="metric-label">Classrooms</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">Utilization</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="facility-card">
+                <div class="facility-header">
+                    <div class="facility-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="facility-name">Science Complex</div>
+                </div>
+                <div class="facility-status status-maintenance">
+                    <i class="fas fa-circle"></i>
+                    <span>Maintenance Scheduled</span>
+                </div>
+                <div class="facility-metrics">
+                    <div class="metric">
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Labs</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">78%</div>
+                        <div class="metric-label">Utilization</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="facility-card">
+                <div class="facility-header">
+                    <div class="facility-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="facility-name">Dining Hall</div>
+                </div>
+                <div class="facility-status status-online">
+                    <i class="fas fa-circle"></i>
+                    <span>Lunch Service Active</span>
+                </div>
+                <div class="facility-metrics">
+                    <div class="metric">
+                        <div class="metric-value">450</div>
+                        <div class="metric-label">Capacity</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">68%</div>
+                        <div class="metric-label">Occupancy</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="facility-card">
+                <div class="facility-header">
+                    <div class="facility-icon">
+                        <i class="fas fa-basketball-ball"></i>
+                    </div>
+                    <div class="facility-name">Sports Complex</div>
+                </div>
+                <div class="facility-status status-online">
+                    <i class="fas fa-circle"></i>
+                    <span>Practice Sessions</span>
+                </div>
+                <div class="facility-metrics">
+                    <div class="metric">
+                        <div class="metric-value">6</div>
+                        <div class="metric-label">Courts</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">85%</div>
+                        <div class="metric-label">Utilization</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="alert-system">
+            <div class="alert-header">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Campus Security Alerts</h3>
+            </div>
+            <div class="alert-item">
+                <strong>Unauthorized Access - Building C</strong>
+                <p>Security gate triggered after hours. Security team dispatched.</p>
+                <div class="alert-time">45 minutes ago</div>
+            </div>
+            <div class="alert-item">
+                <strong>Maintenance Required - Science Lab 3</strong>
+                <p>Chemical storage temperature alert. Maintenance team notified.</p>
+                <div class="alert-time">2 hours ago</div>
+            </div>
+            <div class="alert-item">
+                <strong>Utility Alert - Power Fluctuation</strong>
+                <p>Backup generators activated in Academic Block B. Engineers investigating.</p>
+                <div class="alert-time">3 hours ago</div>
+            </div>
+        </div>
+
+        <!-- EXACT KDConcepts Ad Space -->
+        <div id="mindflow-universal-ad">
+            <div class="ad-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="ad-logo">KD</div>
+                    <div class="ad-text">
+                        <div class="ad-title">🚀 KDConcepts Premium</div>
+                        <div class="ad-subtitle">Educational Resources for African Families</div>
+                    </div>
+                </div>
+                <button class="ad-button" onclick="openKDConcepts()">
+                    Explore Resources
+                </button>
+            </div>
+        </div>
+
+        <!-- EXACT Universal Footer -->
+        <div id="mindflow-universal-footer">
+            <p>
+                <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                <span class="mindtech-glitch">MindTech</span>
+                <span style="color: #cccccc;">. Transforming African education through AI-powered quantum learning ecosystems.</span>
+            </p>
+            <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                Student Portal • Teacher Command • Parent Hub • Corporate Analytics
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // Log navigation to Firebase
+        function logNavigation(page) {
+            db.collection("navigation_logs").add({
+                portal: "principal",
+                page: page,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                userAgent: navigator.userAgent
+            }).catch(error => {
+                console.error("Error logging navigation: ", error);
+            });
+        }
+
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#FF6B6B" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#FF6B6B",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // Standardized Top Menu Functionality
+        const ProfileManager = {
+            openUpload: function() {
+                alert('📸 Profile Picture Upload\n\nChoose from: Camera 📷 or File Upload 📁');
+            }
+        };
+
+        // Campus Management Functions
+        function triggerEmergencyProtocol() {
+            alert('🚨 Emergency Protocol Activated\n\nAll security systems engaged. Notifications sent to staff and emergency services.');
+        }
+
+        function generateCampusReport() {
+            alert('📊 Generating Campus Report\n\nComprehensive campus status report will be downloaded.');
+        }
+
+        function scheduleMaintenance() {
+            alert('🔧 Maintenance Scheduling\n\nOpening maintenance scheduling interface...');
+        }
+
+        // Leaflet Map Implementation
+        let campusMap;
+        let activeLayer = 'buildings';
+        let buildingLayer, securityLayer, utilitiesLayer, eventsLayer;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Log navigation to Firebase
+                logNavigation('campus-management');
+                
+                initializeCampusMap();
+                console.log('✅ Campus map initialized successfully');
+                
+                // Initialize map controls
+                initializeMapControls();
+                
+                // Simulate real-time updates
+                setInterval(updateCampusData, 15000);
+                
+            } catch (error) {
+                console.error('❌ Map initialization failed:', error);
+            }
+        });
+
+        function initializeCampusMap() {
+            // Initialize map centered on school location (Johannesburg coordinates)
+            campusMap = L.map('campusMap').setView([-26.2041, 28.0473], 17);
+
+            // Add satellite tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 20
+            }).addTo(campusMap);
+
+            // Initialize layers
+            initializeBuildingLayer();
+            initializeSecurityLayer();
+            initializeUtilitiesLayer();
+            initializeEventsLayer();
+
+            // Show buildings layer by default
+            campusMap.addLayer(buildingLayer);
+        }
+
+        function initializeBuildingLayer() {
+            buildingLayer = L.layerGroup();
+            
+            // Sample building data
+            const buildings = [
+                {
+                    name: "Academic Block A",
+                    coords: [-26.2040, 28.0470],
+                    type: "academic",
+                    status: "operational",
+                    capacity: "24 classrooms"
+                },
+                {
+                    name: "Science Complex",
+                    coords: [-26.2043, 28.0475],
+                    type: "science",
+                    status: "maintenance",
+                    capacity: "8 laboratories"
+                },
+                {
+                    name: "Library",
+                    coords: [-26.2038, 28.0468],
+                    type: "library",
+                    status: "operational",
+                    capacity: "300 seats"
+                },
+                {
+                    name: "Administration",
+                    coords: [-26.2042, 28.0465],
+                    type: "admin",
+                    status: "operational",
+                    capacity: "Offices"
+                },
+                {
+                    name: "Sports Complex",
+                    coords: [-26.2050, 28.0480],
+                    type: "sports",
+                    status: "operational",
+                    capacity: "6 courts"
+                },
+                {
+                    name: "Dining Hall",
+                    coords: [-26.2035, 28.0478],
+                    type: "dining",
+                    status: "operational",
+                    capacity: "450 seats"
+                }
+            ];
+
+            buildings.forEach(building => {
+                let iconColor;
+                switch(building.status) {
+                    case 'operational': iconColor = 'green'; break;
+                    case 'maintenance': iconColor = 'orange'; break;
+                    case 'offline': iconColor = 'red'; break;
+                    default: iconColor = 'blue';
+                }
+
+                const icon = L.divIcon({
+                    html: `<div style="background-color: ${iconColor}; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>`,
+                    className: 'building-marker',
+                    iconSize: [20, 20]
+                });
+
+                const marker = L.marker(building.coords, { icon: icon })
+                    .bindPopup(`
+                        <div style="min-width: 200px;">
+                            <h3 style="color: #FF6B6B; margin: 0 0 10px 0;">${building.name}</h3>
+                            <p><strong>Type:</strong> ${building.type}</p>
+                            <p><strong>Status:</strong> <span style="color: ${iconColor}">${building.status}</span></p>
+                            <p><strong>Capacity:</strong> ${building.capacity}</p>
+                            <button onclick="viewBuildingDetails('${building.name}')" style="background: #FF6B6B; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                                View Details
+                            </button>
+                        </div>
+                    `);
+
+                buildingLayer.addLayer(marker);
+            });
+        }
+
+        function initializeSecurityLayer() {
+            securityLayer = L.layerGroup();
+            
+            // Sample security points
+            const securityPoints = [
+                { coords: [-26.2041, 28.0471], type: "camera", status: "online" },
+                { coords: [-26.2039, 28.0472], type: "gate", status: "online" },
+                { coords: [-26.2044, 28.0473], type: "camera", status: "offline" },
+                { coords: [-26.2040, 28.0469], type: "access", status: "online" }
+            ];
+
+            securityPoints.forEach(point => {
+                const icon = L.divIcon({
+                    html: `<div style="background-color: ${point.status === 'online' ? '#00FFAA' : '#FF3366'}; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white;"></div>`,
+                    className: 'security-marker',
+                    iconSize: [15, 15]
+                });
+
+                const marker = L.marker(point.coords, { icon: icon })
+                    .bindPopup(`<strong>${point.type.toUpperCase()}</strong><br>Status: ${point.status}`);
+                
+                securityLayer.addLayer(marker);
+            });
+        }
+
+        function initializeUtilitiesLayer() {
+            utilitiesLayer = L.layerGroup();
+            // Similar implementation for utilities
+        }
+
+        function initializeEventsLayer() {
+            eventsLayer = L.layerGroup();
+            // Similar implementation for events
+        }
+
+        function initializeMapControls() {
+            document.querySelectorAll('.map-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const layer = this.getAttribute('data-layer');
+                    
+                    // Update button states
+                    document.querySelectorAll('.map-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Switch layers
+                    switchLayer(layer);
+                });
+            });
+        }
+
+        function switchLayer(newLayer) {
+            // Remove all layers
+            campusMap.removeLayer(buildingLayer);
+            campusMap.removeLayer(securityLayer);
+            campusMap.removeLayer(utilitiesLayer);
+            campusMap.removeLayer(eventsLayer);
+
+            // Add selected layer
+            switch(newLayer) {
+                case 'buildings':
+                    campusMap.addLayer(buildingLayer);
+                    break;
+                case 'security':
+                    campusMap.addLayer(securityLayer);
+                    break;
+                case 'utilities':
+                    campusMap.addLayer(utilitiesLayer);
+                    break;
+                case 'events':
+                    campusMap.addLayer(eventsLayer);
+                    break;
+            }
+            
+            activeLayer = newLayer;
+        }
+
+        function viewBuildingDetails(buildingName) {
+            alert(`🏫 Building Details: ${buildingName}\n\nOpening detailed building management interface...`);
+        }
+
+        function updateCampusData() {
+            // Simulate real-time data updates
+            console.log('🔄 Updating campus data...');
+            
+            // Randomly update some status indicators
+            const statusIndicators = document.querySelectorAll('.facility-status');
+            statusIndicators.forEach(indicator => {
+                if (Math.random() < 0.1) { // 10% chance to change status
+                    const currentStatus = indicator.querySelector('i').className;
+                    if (currentStatus.includes('status-online')) {
+                        indicator.innerHTML = '<i class="fas fa-circle status-maintenance"></i><span>Maintenance Required</span>';
+                    } else {
+                        indicator.innerHTML = '<i class="fas fa-circle status-online"></i><span>Fully Operational</span>';
+                    }
+                }
+            });
+        }
+
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            setTimeout(() => {
+                campusMap.invalidateSize();
+            }, 100);
+        });
+
+        // System status logging
+        console.log("MindFlow Principal Portal - Campus Management Active");
+        console.log("Firebase Integration: Connected");
+        console.log("Leaflet Map: Fully Operational");
+        console.log("Khensani AI: Campus Monitoring Systems Ready");
+    </script>
+</body>
+</html>

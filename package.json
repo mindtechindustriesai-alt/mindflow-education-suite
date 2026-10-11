@@ -1,0 +1,48 @@
+{
+  "name": "mindflow-ai-education-suite",
+  "version": "1.0.0",
+  "description": "Quantum-powered AI education platform with multi-role portals and advanced security",
+  "type": "module",
+  "scripts": {
+    "dev": "firebase emulators:start --import=./emulator-data --export-on-exit",
+    "deploy:hosting": "firebase deploy --only hosting",
+    "deploy:firestore": "firebase deploy --only firestore",
+    "deploy:storage": "firebase deploy --only storage",
+    "deploy:rules": "firebase deploy --only firestore:rules,storage:rules",
+    "deploy:all": "firebase deploy",
+    "build": "node scripts/build.js",
+    "test": "node scripts/test-runner.js",
+    "lint": "eslint assets/js/**/*.js",
+    "security:audit": "node scripts/security-audit.js",
+    "backup:data": "node scripts/backup-data.js"
+  },
+  "keywords": [
+    "education",
+    "ai",
+    "quantum",
+    "firebase",
+    "security",
+    "machine-learning"
+  ],
+  "author": "MindFlow AI Team",
+  "license": "Proprietary",
+  "dependencies": {
+    "firebase": "^9.6.0",
+    "chart.js": "^4.0.0",
+    "particles.js": "^2.0.0"
+  },
+  "devDependencies": {
+    "firebase-tools": "^11.0.0",
+    "eslint": "^8.0.0",
+    "live-server": "^1.2.0",
+    "webpack": "^5.0.0",
+    "webpack-cli": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mindflow-ai/education-suite.git"
+  }
+}

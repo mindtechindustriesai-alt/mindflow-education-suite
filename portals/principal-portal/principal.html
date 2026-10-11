@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principal Portal - MindFlow Education Suite</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #FF6B6B;
+            --accent-glow: rgba(255, 107, 107, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(255, 107, 107, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --principal-primary: #FF6B6B;
+            --principal-secondary: #E05555;
+            --principal-accent: #FF8E8E;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Standardized Top Menu */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--principal-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--principal-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--principal-primary), var(--principal-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--principal-primary);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--principal-primary);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--principal-primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .portal-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+            padding: 0 2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--text-dim);
+        }
+
+        .nav-tab.active {
+            border-bottom-color: var(--principal-primary);
+            color: var(--principal-primary);
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 107, 107, 0.05);
+            color: var(--text);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--principal-primary);
+            margin-right: 1rem;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--ai-gold), var(--principal-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .trend-up { color: var(--learning-green); }
+        .trend-down { color: var(--danger); }
+        
+        /* Enhanced Chart Grid */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+
+        /* Chart specific heights */
+        .performance-chart { height: 350px; }
+        .attendance-chart { height: 350px; }
+        .subject-chart { height: 320px; }
+        .wellbeing-chart { height: 320px; }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Alert System */
+        .alert-system {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--danger);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+        }
+        
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-icon {
+            font-size: 1.5rem;
+            color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .alert-item {
+            padding: 1rem;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--danger);
+            transition: all 0.3s ease;
+        }
+
+        .alert-item:hover {
+            background: rgba(255, 107, 107, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .alert-time {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+        
+        /* Staff Performance Section */
+        .staff-section {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            margin-bottom: 2rem;
+        }
+        
+        .staff-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .staff-icon {
+            font-size: 1.5rem;
+            color: var(--principal-primary);
+        }
+        
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .staff-card {
+            background: rgba(255, 107, 107, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--principal-primary);
+            transition: all 0.3s ease;
+        }
+
+        .staff-card:hover {
+            background: rgba(255, 107, 107, 0.15);
+            transform: translateY(-3px);
+        }
+        
+        .staff-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .staff-role {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .staff-performance {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .performance-high { color: var(--learning-green); }
+        .performance-medium { color: var(--ai-gold); }
+        .performance-low { color: var(--danger); }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-btn {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+        }
+        
+        .action-icon {
+            font-size: 1.8rem;
+            color: var(--principal-primary);
+        }
+        
+        .action-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, var(--principal-primary), #0066FF);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid var(--learning-green);
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: var(--ai-gold);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px var(--ai-gold);
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: var(--learning-green);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--learning-green);
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--learning-green);
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid var(--principal-primary);
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: var(--principal-primary);
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--principal-primary), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--principal-primary), 0 0 30px #0066FF, 0 0 40px #FF6B6B; }
+            100% { text-shadow: 0 0 10px var(--principal-primary), 0 0 20px #0066FF; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-tabs {
+                padding: 0 1rem;
+                overflow-x: auto;
+            }
+            
+            .nav-tab {
+                padding: 0.8rem 1rem;
+                min-width: 120px;
+                text-align: center;
+                font-size: 0.9rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+
+            .performance-chart,
+            .attendance-chart,
+            .subject-chart,
+            .wellbeing-chart {
+                height: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- Standardized Top Menu -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="portal-title">
+                Principal Portal - Institutional Overview
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="ProfileManager.openUpload()">
+                <div class="avatar">PD</div>
+                <div class="upload-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <div>
+                <div class="user-name">Dr. Sarah Chen</div>
+                <div class="user-role">Principal • Academic Lead</div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="portal-nav">
+        <ul class="nav-tabs">
+            <li class="nav-tab active" data-tab="dashboard">Dashboard</li>
+            <li class="nav-tab" data-tab="school-analytics">School Analytics</li>
+            <li class="nav-tab" data-tab="staff-management">Staff Management</li>
+            <li class="nav-tab" data-tab="financial-management">Financial Management</li>
+            <li class="nav-tab" data-tab="strategic-planning">Strategic Planning</li>
+        </ul>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="dashboard">
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-value">1,247</div>
+                    </div>
+                    <div class="stat-label">Total Students</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>5.2% from last term</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <div class="stat-value">84</div>
+                    </div>
+                    <div class="stat-label">Teaching Staff</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>3 new hires this quarter</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="stat-value">78.5%</div>
+                    </div>
+                    <div class="stat-label">Academic Performance</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>2.1% improvement</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-value">67.3%</div>
+                    </div>
+                    <div class="stat-label">Budget Utilization</div>
+                    <div class="stat-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>On track for Q3</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="principal-school-analytics.html" class="action-btn">
+                    <i class="fas fa-chart-bar action-icon"></i>
+                    <div class="action-text">School Analytics</div>
+                </a>
+                <a href="principal-staff-management.html" class="action-btn">
+                    <i class="fas fa-users action-icon"></i>
+                    <div class="action-text">Staff Management</div>
+                </a>
+                <a href="principal-financial-management.html" class="action-btn">
+                    <i class="fas fa-money-bill-wave action-icon"></i>
+                    <div class="action-text">Financial Management</div>
+                </a>
+                <a href="principal-strategic-planning.html" class="action-btn">
+                    <i class="fas fa-chess-board action-icon"></i>
+                    <div class="action-text">Strategic Planning</div>
+                </a>
+                <div class="action-btn" onclick="alert('🚀 Khensani AI: School announcements feature loading...')">
+                    <i class="fas fa-bullhorn action-icon"></i>
+                    <div class="action-text">School Announcements</div>
+                </div>
+                <div class="action-btn" onclick="alert('🚀 Khensani AI: System settings panel loading...')">
+                    <i class="fas fa-cog action-icon"></i>
+                    <div class="action-text">System Settings</div>
+                </div>
+            </div>
+            
+            <!-- Enhanced Chart Grid -->
+            <div class="chart-grid">
+                <!-- Performance Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Academic Performance by Department</div>
+                        <select id="performanceFilter" class="form-control">
+                            <option>This Year</option>
+                            <option>Last 90 Days</option>
+                            <option>Compare to Previous</option>
+                        </select>
+                    </div>
+                    <div class="chart-container performance-chart">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Attendance Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Student Enrollment Trends</div>
+                        <select id="attendanceFilter" class="form-control">
+                            <option>5 Years</option>
+                            <option>By Grade</option>
+                            <option>Projection</option>
+                        </select>
+                    </div>
+                    <div class="chart-container attendance-chart">
+                        <canvas id="attendanceChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Subject Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Department Performance Breakdown</div>
+                    </div>
+                    <div class="chart-container subject-chart">
+                        <canvas id="subjectChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Wellbeing Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Staff Performance Overview</div>
+                    </div>
+                    <div class="chart-container wellbeing-chart">
+                        <canvas id="wellbeingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Staff Performance Section -->
+            <div class="staff-section">
+                <div class="staff-header">
+                    <div class="staff-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <h3>Staff Performance Highlights</h3>
+                </div>
+                <div class="staff-grid">
+                    <div class="staff-card">
+                        <div class="staff-name">Thabo Mbeki</div>
+                        <div class="staff-role">Mathematics Department Head</div>
+                        <div class="staff-performance performance-high">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Performance: 92%</span>
+                        </div>
+                    </div>
+                    <div class="staff-card">
+                        <div class="staff-name">Nomsa Mthethwa</div>
+                        <div class="staff-role">Science Teacher</div>
+                        <div class="staff-performance performance-high">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Performance: 88%</span>
+                        </div>
+                    </div>
+                    <div class="staff-card">
+                        <div class="staff-name">Sipho Johnson</div>
+                        <div class="staff-role">English Literature</div>
+                        <div class="staff-performance performance-medium">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Performance: 76%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="alert-system">
+                <div class="alert-header">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>Priority Alerts</h3>
+                </div>
+                <div class="alert-item">
+                    <strong>Low Attendance - Grade 10B</strong>
+                    <p>Attendance rate dropped to 87% this week. Khensani AI detects potential bullying concerns.</p>
+                    <div class="alert-time">2 hours ago</div>
+                </div>
+                <div class="alert-item">
+                    <strong>Budget Overspend - Science Department</strong>
+                    <p>Science department has exceeded Q3 budget by 15%. Review required.</p>
+                    <div class="alert-time">5 hours ago</div>
+                </div>
+                <div class="alert-item">
+                    <strong>Math Performance Decline</strong>
+                    <p>Grade 8 mathematics scores dropped by 12% compared to last quarter.</p>
+                    <div class="alert-time">Yesterday</div>
+                </div>
+            </div>
+
+            <!-- EXACT KDConcepts Ad Space -->
+            <div id="mindflow-universal-ad">
+                <div class="ad-content">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="ad-logo">KD</div>
+                        <div class="ad-text">
+                            <div class="ad-title">🚀 KDConcepts Premium</div>
+                            <div class="ad-subtitle">Educational Resources for African Families</div>
+                        </div>
+                    </div>
+                    <button class="ad-button" onclick="openKDConcepts()">
+                        Explore Resources
+                    </button>
+                </div>
+            </div>
+
+            <!-- EXACT Universal Footer -->
+            <div id="mindflow-universal-footer">
+                <p>
+                    <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                    <span class="mindtech-glitch">MindTech</span>
+                    <span style="color: #cccccc;">. Transforming African education through AI-powered quantum learning ecosystems.</span>
+                </p>
+                <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                    Student Portal • Teacher Command • Parent Hub • Corporate Analytics
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // Log navigation to Firebase
+        function logNavigation(page) {
+            db.collection("navigation_logs").add({
+                portal: "principal",
+                page: page,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                userAgent: navigator.userAgent
+            }).catch(error => {
+                console.error("Error logging navigation: ", error);
+            });
+        }
+
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#FF6B6B" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#FF6B6B",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // Standardized Top Menu Functionality
+        const ProfileManager = {
+            openUpload: function() {
+                alert('📸 Profile Picture Upload\n\nChoose from: Camera 📷 or File Upload 📁');
+            }
+        };
+
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const tabName = this.getAttribute('data-tab');
+                console.log(`Switching to tab: ${tabName}`);
+                
+                // Log navigation to Firebase
+                logNavigation(tabName);
+                
+                // Navigate to sub-pages
+                if(tabName !== 'dashboard') {
+                    window.location.href = `principal-${tabName}.html`;
+                }
+            });
+        });
+        
+        // Chart initialization with proper error handling
+        let charts = {};
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Log initial navigation
+                logNavigation('dashboard');
+                
+                initializeCharts();
+                console.log('✅ All charts initialized successfully');
+                
+                // Khensani AI Welcome Message
+                setTimeout(() => {
+                    console.log('Khensani AI: Principal dashboard loaded. Institutional analytics running at maximum performance.');
+                }, 1000);
+                
+                loadPrincipalData();
+            } catch (error) {
+                console.error('❌ Chart initialization failed:', error);
+                // Fallback: Show error message
+                document.querySelectorAll('.chart-container').forEach(container => {
+                    container.innerHTML = '<div style="color: #FF6B6B; text-align: center; padding: 2rem;">Chart loading failed. Please refresh the page.</div>';
+                });
+            }
+        });
+        
+        function initializeCharts() {
+            // Performance Chart - Department Performance
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            charts.performance = new Chart(performanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mathematics', 'Science', 'Languages', 'Humanities', 'Arts', 'Technology'],
+                    datasets: [{
+                        label: 'Average Performance (%)',
+                        data: [85, 82, 78, 75, 80, 72],
+                        backgroundColor: [
+                            'rgba(255, 107, 107, 0.7)',
+                            'rgba(0, 168, 255, 0.7)',
+                            'rgba(0, 255, 170, 0.7)',
+                            'rgba(255, 215, 0, 0.7)',
+                            'rgba(255, 140, 66, 0.7)',
+                            'rgba(0, 206, 209, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 107, 107, 1)',
+                            'rgba(0, 168, 255, 1)',
+                            'rgba(0, 255, 170, 1)',
+                            'rgba(255, 215, 0, 1)',
+                            'rgba(255, 140, 66, 1)',
+                            'rgba(0, 206, 209, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Attendance Chart - Enrollment Trends
+            const attendanceCtx = document.getElementById('attendanceChart').getContext('2d');
+            charts.attendance = new Chart(attendanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['2018', '2019', '2020', '2021', '2022', '2023'],
+                    datasets: [{
+                        label: 'Student Enrollment',
+                        data: [980, 1020, 1050, 1120, 1180, 1247],
+                        borderColor: 'rgba(0, 168, 255, 1)',
+                        backgroundColor: 'rgba(0, 168, 255, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Subject Chart - Department Performance Breakdown
+            const subjectCtx = document.getElementById('subjectChart').getContext('2d');
+            charts.subject = new Chart(subjectCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Arts'],
+                    datasets: [{
+                        label: 'Current Performance',
+                        data: [88, 92, 85, 78, 82, 90],
+                        backgroundColor: 'rgba(255, 107, 107, 0.3)',
+                        borderColor: '#FF6B6B',
+                        pointBackgroundColor: '#FF6B6B',
+                        pointBorderColor: '#ffffff',
+                        pointHoverBackgroundColor: '#ffffff',
+                        pointHoverBorderColor: '#FF6B6B',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        borderWidth: 3
+                    }, {
+                        label: 'Previous Quarter',
+                        data: [82, 88, 80, 75, 78, 85],
+                        backgroundColor: 'rgba(255, 215, 0, 0.3)',
+                        borderColor: '#FFD700',
+                        pointBackgroundColor: '#FFD700',
+                        pointBorderColor: '#ffffff',
+                        pointHoverBackgroundColor: '#ffffff',
+                        pointHoverBorderColor: '#FFD700',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    size: 11,
+                                    weight: 'bold'
+                                },
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#00FFAA',
+                            bodyColor: 'white'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            pointLabels: {
+                                color: 'white',
+                                font: {
+                                    size: 11,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                color: 'white',
+                                backdropColor: 'transparent',
+                                font: {
+                                    size: 9
+                                },
+                                stepSize: 10
+                            },
+                            min: 70,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Wellbeing Chart - Staff Performance
+            const wellbeingCtx = document.getElementById('wellbeingChart').getContext('2d');
+            charts.wellbeing = new Chart(wellbeingCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excellent', 'Good', 'Average', 'Needs Support'],
+                    datasets: [{
+                        data: [45, 35, 15, 5],
+                        backgroundColor: [
+                            '#00FFAA',
+                            '#00A8FF',
+                            '#FFD700',
+                            '#FF6B6B'
+                        ],
+                        borderColor: [
+                            '#00FFAA',
+                            '#00A8FF',
+                            '#FFD700',
+                            '#FF6B6B'
+                        ],
+                        borderWidth: 3,
+                        hoverOffset: 20,
+                        spacing: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                padding: 15,
+                                font: {
+                                    size: 11
+                                },
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    return `${label}: ${value}% of staff`;
+                                }
+                            },
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#00FFAA',
+                            bodyColor: 'white'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function loadPrincipalData() {
+            // Simulate loading real data
+            setTimeout(() => {
+                console.log('✅ All chart data loaded successfully');
+                updateDashboardStats();
+                
+                // Simulate real-time updates
+                setInterval(() => {
+                    updateChartData();
+                }, 10000);
+            }, 2000);
+        }
+        
+        function updateDashboardStats() {
+            const stats = {
+                totalStudents: 1247,
+                teachingStaff: 84,
+                academicPerformance: 78.5,
+                budgetUtilization: 67.3
+            };
+            
+            document.querySelectorAll('.stat-value')[0].textContent = stats.totalStudents.toLocaleString();
+            document.querySelectorAll('.stat-value')[1].textContent = stats.teachingStaff;
+            document.querySelectorAll('.stat-value')[2].textContent = stats.academicPerformance + '%';
+            document.querySelectorAll('.stat-value')[3].textContent = stats.budgetUtilization + '%';
+        }
+        
+        function updateChartData() {
+            // Simulate real-time data updates
+            if (charts.performance) {
+                const newData = charts.performance.data.datasets[0].data.map(value => 
+                    Math.min(100, value + (Math.random() - 0.5) * 2)
+                );
+                charts.performance.data.datasets[0].data = newData;
+                charts.performance.update('none');
+            }
+        }
+
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            Object.values(charts).forEach(chart => {
+                if (chart) chart.resize();
+            });
+        });
+
+        // System status logging
+        console.log("MindFlow Principal Portal - System Active");
+        console.log("Firebase Integration: Connected");
+        console.log("Khensani AI: Ready for School-wide Insights");
+    </script>
+</body>
+</html>

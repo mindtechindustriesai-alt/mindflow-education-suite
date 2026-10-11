@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Management | Principal Portal - MindFlow Education</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #FF6B6B;
+            --accent-glow: rgba(255, 107, 107, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(255, 107, 107, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --principal-primary: #FF6B6B;
+            --principal-secondary: #E05555;
+            --principal-accent: #FF8E8E;
+            --finance-green: #00CC66;
+            --finance-blue: #0066FF;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Standardized Top Menu */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--principal-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--principal-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--principal-primary), var(--principal-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--principal-primary);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--principal-primary);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--principal-primary);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Back Button Navigation */
+        .portal-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(255, 107, 107, 0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, var(--principal-primary), var(--principal-secondary));
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .back-button:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--principal-primary), var(--ai-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Financial Overview Grid */
+        .financial-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .metric-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+        }
+        
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-icon {
+            font-size: 2rem;
+            color: var(--principal-primary);
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--ai-gold), var(--principal-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .metric-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .trend-up { color: var(--learning-green); }
+        .trend-down { color: var(--danger); }
+        
+        /* Budget Progress */
+        .budget-progress {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-safe { background: linear-gradient(90deg, var(--learning-green), var(--finance-green)); }
+        .progress-warning { background: linear-gradient(90deg, var(--warning), var(--safety-orange)); }
+        .progress-danger { background: linear-gradient(90deg, var(--danger), var(--principal-primary)); }
+        
+        /* Enhanced Chart Grid */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+
+        /* Chart specific heights */
+        .budget-chart { height: 350px; }
+        .expense-chart { height: 350px; }
+        .revenue-chart { height: 320px; }
+        .forecast-chart { height: 320px; }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px;
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Expense Tracking Section */
+        .expense-section {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-icon {
+            font-size: 1.5rem;
+            color: var(--principal-primary);
+        }
+        
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+        }
+        
+        .expense-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .expense-card {
+            background: rgba(255, 107, 107, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--finance-green);
+            transition: all 0.3s ease;
+        }
+
+        .expense-card.warning {
+            border-left-color: var(--warning);
+        }
+
+        .expense-card.danger {
+            border-left-color: var(--danger);
+        }
+
+        .expense-card:hover {
+            background: rgba(255, 107, 107, 0.15);
+            transform: translateY(-3px);
+        }
+        
+        .expense-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .expense-category {
+            font-weight: 600;
+            color: var(--finance-green);
+        }
+
+        .expense-category.warning {
+            color: var(--warning);
+        }
+
+        .expense-category.danger {
+            color: var(--danger);
+        }
+        
+        .expense-amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+        }
+        
+        .expense-content {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        
+        .expense-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-btn {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+        }
+        
+        .action-icon {
+            font-size: 1.8rem;
+            color: var(--principal-primary);
+        }
+        
+        .action-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Funding Sources */
+        .funding-section {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            margin-bottom: 2rem;
+        }
+        
+        .funding-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .funding-card {
+            background: rgba(255, 107, 107, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .funding-card:hover {
+            background: rgba(255, 107, 107, 0.15);
+            transform: translateY(-3px);
+        }
+        
+        .funding-icon {
+            font-size: 2.5rem;
+            color: var(--finance-blue);
+            margin-bottom: 1rem;
+        }
+        
+        .funding-amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .funding-source {
+            font-size: 1rem;
+            color: var(--text-dim);
+        }
+
+        /* Financial Alerts */
+        .alert-system {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--danger);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+        }
+        
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .alert-icon {
+            font-size: 1.5rem;
+            color: var(--danger);
+            animation: pulse 1.5s infinite;
+        }
+        
+        .alert-item {
+            padding: 1rem;
+            background: rgba(255, 107, 107, 0.1);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--danger);
+            transition: all 0.3s ease;
+        }
+
+        .alert-item:hover {
+            background: rgba(255, 107, 107, 0.15);
+            transform: translateX(5px);
+        }
+        
+        .alert-time {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, var(--principal-primary), #0066FF);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid var(--learning-green);
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: var(--ai-gold);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px var(--ai-gold);
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: var(--learning-green);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--learning-green);
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--learning-green);
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid var(--principal-primary);
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: var(--principal-primary);
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--principal-primary), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--principal-primary), 0 0 30px #0066FF, 0 0 40px #FF6B6B; }
+            100% { text-shadow: 0 0 10px var(--principal-primary), 0 0 20px #0066FF; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .portal-nav {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .financial-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .expense-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .funding-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+
+            .budget-chart,
+            .expense-chart,
+            .revenue-chart,
+            .forecast-chart {
+                height: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- Standardized Top Menu -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="portal-title">
+                Principal Portal - Financial Management
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="ProfileManager.openUpload()">
+                <div class="avatar">PD</div>
+                <div class="upload-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <div>
+                <div class="user-name">Dr. Sarah Chen</div>
+                <div class="user-role">Principal • Academic Lead</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Back Button Navigation -->
+    <nav class="portal-nav">
+        <a href="principal.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <div class="page-title">Financial Management & Budget Control</div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Financial Overview -->
+        <div class="financial-overview">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="metric-value">R24.5M</div>
+                </div>
+                <div class="metric-label">Annual Operating Budget</div>
+                <div class="metric-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8.2% increase from last year</span>
+                </div>
+                <div class="budget-progress">
+                    <div class="progress-fill progress-safe" style="width: 67.3%"></div>
+                </div>
+                <div class="metric-trend">
+                    <span>67.3% utilized • R8.0M remaining</span>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="metric-value">R16.5M</div>
+                </div>
+                <div class="metric-label">Total Expenses YTD</div>
+                <div class="metric-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>On track with projections</span>
+                </div>
+                <div class="budget-progress">
+                    <div class="progress-fill progress-warning" style="width: 82%"></div>
+                </div>
+                <div class="metric-trend">
+                    <span>82% of Q3 budget</span>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <div class="metric-value">R2.8M</div>
+                </div>
+                <div class="metric-label">Quarterly Revenue</div>
+                <div class="metric-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12.5% above target</span>
+                </div>
+                <div class="budget-progress">
+                    <div class="progress-fill progress-safe" style="width: 112%"></div>
+                </div>
+                <div class="metric-trend">
+                    <span>112% of revenue target</span>
+                </div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="metric-value">3</div>
+                </div>
+                <div class="metric-label">Budget Alerts</div>
+                <div class="metric-trend trend-down">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>Requires attention</span>
+                </div>
+                <div class="budget-progress">
+                    <div class="progress-fill progress-danger" style="width: 45%"></div>
+                </div>
+                <div class="metric-trend">
+                    <span>Science dept 15% over budget</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-btn" onclick="FinancialManagement.approveExpenses()">
+                <i class="fas fa-check-circle action-icon"></i>
+                <div class="action-text">Approve Expenses</div>
+            </div>
+            <div class="action-btn" onclick="FinancialManagement.budgetPlanning()">
+                <i class="fas fa-chart-pie action-icon"></i>
+                <div class="action-text">Budget Planning</div>
+            </div>
+            <div class="action-btn" onclick="FinancialManagement.financialReports()">
+                <i class="fas fa-file-invoice-dollar action-icon"></i>
+                <div class="action-text">Financial Reports</div>
+            </div>
+            <div class="action-btn" onclick="FinancialManagement.grantManagement()">
+                <i class="fas fa-hand-holding-usd action-icon"></i>
+                <div class="action-text">Grant Management</div>
+            </div>
+            <div class="action-btn" onclick="FinancialManagement.aiForecasting()">
+                <i class="fas fa-robot action-icon"></i>
+                <div class="action-text">Khensani AI Forecasting</div>
+            </div>
+            <div class="action-btn" onclick="FinancialManagement.auditLogs()">
+                <i class="fas fa-search-dollar action-icon"></i>
+                <div class="action-text">Audit & Compliance</div>
+            </div>
+        </div>
+        
+        <!-- Enhanced Chart Grid -->
+        <div class="chart-grid">
+            <!-- Budget Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Budget Allocation by Department</div>
+                    <select id="budgetFilter" class="form-control">
+                        <option>Q3 2024</option>
+                        <option>Year to Date</option>
+                        <option>Annual Overview</option>
+                    </select>
+                </div>
+                <div class="chart-container budget-chart">
+                    <canvas id="budgetChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Expense Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Expense Tracking & Trends</div>
+                    <select id="expenseFilter" class="form-control">
+                        <option>Last 6 Months</option>
+                        <option>Quarterly Comparison</option>
+                        <option>Annual Trend</option>
+                    </select>
+                </div>
+                <div class="chart-container expense-chart">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Revenue Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Revenue Sources Breakdown</div>
+                </div>
+                <div class="chart-container revenue-chart">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Forecast Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Financial Projections & Forecast</div>
+                </div>
+                <div class="chart-container forecast-chart">
+                    <canvas id="forecastChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Expense Tracking Section -->
+        <div class="expense-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <h3 class="section-title">Recent Major Expenses</h3>
+            </div>
+            <div class="expense-grid">
+                <div class="expense-card">
+                    <div class="expense-header">
+                        <div class="expense-category">Science Equipment</div>
+                        <div class="expense-amount">R450,000</div>
+                    </div>
+                    <div class="expense-content">
+                        Laboratory equipment upgrade and chemical supplies for advanced science curriculum.
+                    </div>
+                    <div class="expense-meta">
+                        <span>Science Department</span>
+                        <span>March 15, 2024</span>
+                    </div>
+                </div>
+                
+                <div class="expense-card warning">
+                    <div class="expense-header">
+                        <div class="expense-category warning">Infrastructure</div>
+                        <div class="expense-amount">R780,000</div>
+                    </div>
+                    <div class="expense-content">
+                        Classroom renovations and smart board installations in Academic Block A.
+                    </div>
+                    <div class="expense-meta">
+                        <span>Facilities Management</span>
+                        <span>March 10, 2024</span>
+                    </div>
+                </div>
+                
+                <div class="expense-card danger">
+                    <div class="expense-header">
+                        <div class="expense-category danger">Sports Complex</div>
+                        <div class="expense-amount">R1,200,000</div>
+                    </div>
+                    <div class="expense-content">
+                        Court resurfacing and equipment purchase for basketball and volleyball programs.
+                    </div>
+                    <div class="expense-meta">
+                        <span>Athletics Department</span>
+                        <span>March 5, 2024</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Funding Sources Section -->
+        <div class="funding-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <h3 class="section-title">Funding Sources & Allocations</h3>
+            </div>
+            <div class="funding-grid">
+                <div class="funding-card">
+                    <div class="funding-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="funding-amount">R12.8M</div>
+                    <div class="funding-source">Government Funding</div>
+                </div>
+                
+                <div class="funding-card">
+                    <div class="funding-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="funding-amount">R6.2M</div>
+                    <div class="funding-source">Tuition Fees</div>
+                </div>
+                
+                <div class="funding-card">
+                    <div class="funding-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <div class="funding-amount">R3.5M</div>
+                    <div class="funding-source">Grants & Donations</div>
+                </div>
+                
+                <div class="funding-card">
+                    <div class="funding-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="funding-amount">R2.0M</div>
+                    <div class="funding-source">Other Revenue</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Alerts -->
+        <div class="alert-system">
+            <div class="alert-header">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Financial Alerts & Notifications</h3>
+            </div>
+            <div class="alert-item">
+                <strong>Budget Overspend - Science Department</strong>
+                <p>Science department has exceeded Q3 budget by 15%. Additional R225,000 spent on equipment.</p>
+                <div class="alert-time">2 hours ago</div>
+            </div>
+            <div class="alert-item">
+                <strong>Grant Application Deadline</strong>
+                <p>STEM Education Grant application due in 7 days. Required documents pending review.</p>
+                <div class="alert-time">1 day ago</div>
+            </div>
+            <div class="alert-item">
+                <strong>Quarterly Audit Schedule</strong>
+                <p>Q3 financial audit scheduled for next week. Please ensure all expense reports are submitted.</p>
+                <div class="alert-time">2 days ago</div>
+            </div>
+        </div>
+
+        <!-- EXACT KDConcepts Ad Space -->
+        <div id="mindflow-universal-ad">
+            <div class="ad-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="ad-logo">KD</div>
+                    <div class="ad-text">
+                        <div class="ad-title">🚀 KDConcepts Premium</div>
+                        <div class="ad-subtitle">Educational Resources for African Families</div>
+                    </div>
+                </div>
+                <button class="ad-button" onclick="openKDConcepts()">
+                    Explore Resources
+                </button>
+            </div>
+        </div>
+
+        <!-- EXACT Universal Footer -->
+        <div id="mindflow-universal-footer">
+            <p>
+                <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                <span class="mindtech-glitch">MindTech</span>
+                <span style="color: #cccccc;">. Transforming African education through AI-powered quantum learning ecosystems.</span>
+            </p>
+            <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                Student Portal • Teacher Command • Parent Hub • Corporate Analytics
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        
+        // Log navigation to Firebase
+        function logNavigation(page) {
+            db.collection("navigation_logs").add({
+                portal: "principal",
+                page: page,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                userAgent: navigator.userAgent
+            }).catch(error => {
+                console.error("Error logging navigation: ", error);
+            });
+        }
+
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#FF6B6B" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#FF6B6B",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // Standardized Top Menu Functionality
+        const ProfileManager = {
+            openUpload: function() {
+                alert('📸 Profile Picture Upload\n\nChoose from: Camera 📷 or File Upload 📁');
+            }
+        };
+
+        // Financial Management Functions
+        const FinancialManagement = {
+            approveExpenses: function() {
+                this.showNotification('💰 Opening expense approval dashboard...', 'info');
+            },
+
+            budgetPlanning: function() {
+                this.showNotification('📊 Loading budget planning interface...', 'info');
+            },
+
+            financialReports: function() {
+                this.showNotification('📈 Generating comprehensive financial reports...', 'info');
+                setTimeout(() => {
+                    this.showNotification('✅ Financial reports generated successfully!', 'success');
+                }, 2000);
+            },
+
+            grantManagement: function() {
+                this.showNotification('🎓 Accessing grant management portal...', 'info');
+            },
+
+            aiForecasting: function() {
+                this.showNotification('🤖 Khensani AI analyzing financial patterns...', 'info');
+                setTimeout(() => {
+                    const insights = [
+                        "💰 Strong revenue performance - consider strategic investments in technology",
+                        "📊 Science department overspending - recommend budget review meeting",
+                        "🎯 Q4 projections show 8% growth potential - optimize resource allocation",
+                        "💡 Grant opportunities available for STEM infrastructure development"
+                    ];
+                    const randomInsight = insights[Math.floor(Math.random() * insights.length)];
+                    this.showNotification(`💡 Khensani AI Insight:\n${randomInsight}`, 'success');
+                }, 3000);
+            },
+
+            auditLogs: function() {
+                this.showNotification('🔍 Loading audit and compliance dashboard...', 'info');
+            },
+
+            showNotification: function(message, type) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: ${type === 'success' ? 'rgba(0, 255, 170, 0.9)' : 
+                                 type === 'info' ? 'rgba(255, 107, 107, 0.9)' : 
+                                 'rgba(255, 51, 102, 0.9)'};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    z-index: 10000;
+                    max-width: 400px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    border-left: 4px solid ${type === 'success' ? 'var(--learning-green)' : 
+                                         type === 'info' ? 'var(--principal-primary)' : 
+                                         'var(--danger)'};
+                    animation: slideInRight 0.3s ease;
+                    white-space: pre-line;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                                      type === 'info' ? 'fa-info-circle' : 
+                                      'fa-exclamation-triangle'}"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => notification.remove(), 500);
+                }, 4000);
+            }
+        };
+
+        // Chart initialization
+        let charts = {};
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Log navigation to Firebase
+                logNavigation('financial-management');
+                
+                initializeCharts();
+                console.log('✅ Financial Management charts initialized successfully');
+                
+                // Khensani AI Welcome Message
+                setTimeout(() => {
+                    console.log('Khensani AI: Financial management dashboard loaded. Budget analytics active.');
+                }, 1000);
+                
+            } catch (error) {
+                console.error('❌ Chart initialization failed:', error);
+                document.querySelectorAll('.chart-container').forEach(container => {
+                    container.innerHTML = '<div style="color: #FF6B6B; text-align: center; padding: 2rem;">Chart loading failed. Please refresh the page.</div>';
+                });
+            }
+        });
+        
+        function initializeCharts() {
+            // Budget Chart - Department Allocation
+            const budgetCtx = document.getElementById('budgetChart').getContext('2d');
+            charts.budget = new Chart(budgetCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mathematics', 'Science', 'Languages', 'Humanities', 'Arts', 'Technology', 'Sports', 'Admin'],
+                    datasets: [{
+                        label: 'Budget Allocation (R)',
+                        data: [3200000, 4500000, 2800000, 2200000, 1800000, 3500000, 2500000, 4000000],
+                        backgroundColor: [
+                            'rgba(255, 107, 107, 0.7)',
+                            'rgba(0, 168, 255, 0.7)',
+                            'rgba(0, 255, 170, 0.7)',
+                            'rgba(255, 215, 0, 0.7)',
+                            'rgba(255, 140, 66, 0.7)',
+                            'rgba(138, 43, 226, 0.7)',
+                            'rgba(0, 206, 209, 0.7)',
+                            'rgba(255, 99, 132, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 107, 107, 1)',
+                            'rgba(0, 168, 255, 1)',
+                            'rgba(0, 255, 170, 1)',
+                            'rgba(255, 215, 0, 1)',
+                            'rgba(255, 140, 66, 1)',
+                            'rgba(138, 43, 226, 1)',
+                            'rgba(0, 206, 209, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return 'R' + (value / 1000000).toFixed(1) + 'M';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Expense Chart - Trends
+            const expenseCtx = document.getElementById('expenseChart').getContext('2d');
+            charts.expense = new Chart(expenseCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Actual Expenses',
+                        data: [1200000, 1350000, 1420000, 1380000, 1450000, 1520000, 1480000, 1550000, 1620000, 1580000, 1650000, 1720000],
+                        borderColor: 'rgba(255, 107, 107, 1)',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Budgeted',
+                        data: [1250000, 1300000, 1350000, 1400000, 1450000, 1500000, 1550000, 1600000, 1650000, 1700000, 1750000, 1800000],
+                        borderColor: 'rgba(0, 168, 255, 1)',
+                        backgroundColor: 'rgba(0, 168, 255, 0.1)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return 'R' + (value / 1000000).toFixed(1) + 'M';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Revenue Chart - Sources
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            charts.revenue = new Chart(revenueCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Government Funding', 'Tuition Fees', 'Grants & Donations', 'Other Revenue'],
+                    datasets: [{
+                        data: [52, 25, 14, 9],
+                        backgroundColor: [
+                            'rgba(0, 168, 255, 0.7)',
+                            'rgba(0, 255, 170, 0.7)',
+                            'rgba(255, 215, 0, 0.7)',
+                            'rgba(255, 107, 107, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(0, 168, 255, 1)',
+                            'rgba(0, 255, 170, 1)',
+                            'rgba(255, 215, 0, 1)',
+                            'rgba(255, 107, 107, 1)'
+                        ],
+                        borderWidth: 3,
+                        hoverOffset: 20
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'white',
+                                padding: 15,
+                                font: {
+                                    size: 11
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Forecast Chart - Projections
+            const forecastCtx = document.getElementById('forecastChart').getContext('2d');
+            charts.forecast = new Chart(forecastCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4', 'Q1 2025', 'Q2 2025'],
+                    datasets: [{
+                        label: 'Revenue Forecast',
+                        data: [2800000, 3200000, 3500000, 3800000, 4000000, 4200000],
+                        borderColor: 'rgba(0, 255, 170, 1)',
+                        backgroundColor: 'rgba(0, 255, 170, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Expense Forecast',
+                        data: [2500000, 2700000, 2900000, 3100000, 3300000, 3500000],
+                        borderColor: 'rgba(255, 107, 107, 1)',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                callback: function(value) {
+                                    return 'R' + (value / 1000000).toFixed(1) + 'M';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // System status logging
+        console.log("MindFlow Principal Portal - Financial Management Active");
+        console.log("Firebase Integration: Connected");
+        console.log("Khensani AI: Financial Analytics & Forecasting Ready");
+    </script>
+</body>
+</html>

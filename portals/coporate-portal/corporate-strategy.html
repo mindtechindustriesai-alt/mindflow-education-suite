@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Planning | MindFlow Corporate</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #0066FF;
+            --accent-glow: rgba(0, 102, 255, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(0, 102, 255, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --corporate-primary: #0066FF;
+            --corporate-secondary: #0044CC;
+            --corporate-accent: #3388FF;
+            --strategy-purple: #8A2BE2;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Corporate Header */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--corporate-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--corporate-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .corporate-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(0, 102, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--corporate-primary);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--corporate-primary), var(--corporate-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--corporate-primary);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--corporate-primary);
+        }
+
+        /* Back Navigation */
+        .back-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(0, 102, 255, 0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--corporate-primary), var(--corporate-secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--corporate-primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Strategy Layout */
+        .strategy-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .strategy-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        /* Strategic Overview */
+        .strategy-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .strategy-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--strategy-purple);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .strategy-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--strategy-purple), var(--ai-gold));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .strategy-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .strategy-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.3);
+        }
+        
+        .strategy-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .strategy-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .strategy-icon {
+            font-size: 1.2rem;
+            color: var(--strategy-purple);
+        }
+        
+        .strategy-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .strategy-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--danger);
+        }
+        
+        /* Strategic Charts */
+        .strategy-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--strategy-purple);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(138, 43, 226, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--strategy-purple);
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        /* Strategic Initiatives */
+        .initiatives-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .initiative-card {
+            background: rgba(138, 43, 226, 0.05);
+            border: 1px solid var(--strategy-purple);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .initiative-card:hover {
+            background: rgba(138, 43, 226, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.2);
+        }
+        
+        .initiative-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.25rem;
+        }
+        
+        .initiative-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Strategy Sidebar */
+        .strategy-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .sidebar-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--strategy-purple);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* Active Projects */
+        .projects-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .project-item {
+            padding: 1rem;
+            background: rgba(255, 170, 0, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+            transition: all 0.3s ease;
+        }
+        
+        .project-item.critical {
+            background: rgba(255, 51, 102, 0.1);
+            border-left-color: var(--danger);
+        }
+        
+        .project-item.info {
+            background: rgba(138, 43, 226, 0.1);
+            border-left-color: var(--strategy-purple);
+        }
+        
+        .project-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .project-title {
+            font-weight: 600;
+            color: var(--ai-gold);
+            margin-bottom: 0.3rem;
+        }
+        
+        .project-message {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        
+        /* Quick Actions */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .action-btn {
+            background: rgba(138, 43, 226, 0.1);
+            border: 1px solid var(--strategy-purple);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn:hover {
+            background: rgba(138, 43, 226, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Strategic Goals */
+        .goals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .goal-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .goal-name {
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .goal-progress {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+        
+        .goal-bar {
+            height: 6px;
+            background: rgba(138, 43, 226, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .goal-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--strategy-purple), var(--ai-gold));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Roadmap Timeline */
+        .roadmap-container {
+            margin-top: 2rem;
+        }
+
+        .timeline {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: var(--strategy-purple);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--ai-gold);
+            border: 4px solid var(--strategy-purple);
+            top: 15px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .left {
+            left: 0;
+        }
+
+        .right {
+            left: 50%;
+        }
+
+        .right::after {
+            left: -10px;
+        }
+
+        .timeline-content {
+            padding: 20px;
+            background-color: rgba(16, 16, 24, 0.8);
+            border: 1px solid var(--strategy-purple);
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .timeline-content h3 {
+            color: var(--ai-gold);
+            margin-bottom: 10px;
+        }
+
+        .timeline-content p {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, var(--strategy-purple), #FF8C42);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid var(--learning-green);
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mindflow-universal-ad::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+        }
+
+        #mindflow-universal-ad:hover::before {
+            animation: shimmer 1.5s;
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: var(--ai-gold);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px var(--ai-gold);
+            transition: all 0.3s ease;
+        }
+
+        .ad-logo:hover {
+            transform: rotate(15deg) scale(1.1);
+            box-shadow: 0 0 25px var(--ai-gold);
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: var(--learning-green);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--learning-green);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .ad-button:hover::before {
+            left: 100%;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--learning-green);
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid var(--strategy-purple);
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mindflow-universal-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--strategy-purple), var(--ai-gold), var(--learning-green), var(--strategy-purple));
+            animation: gradientMove 3s infinite linear;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: var(--strategy-purple);
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--strategy-purple), 0 0 20px #8A2BE2; }
+            50% { text-shadow: 0 0 15px var(--strategy-purple), 0 0 30px #8A2BE2, 0 0 40px #FF8C42; }
+            100% { text-shadow: 0 0 10px var(--strategy-purple), 0 0 20px #8A2BE2; }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .strategy-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .strategy-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .strategy-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .initiatives-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .timeline::after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item::after {
+                left: 21px;
+            }
+            
+            .left::after, .right::after {
+                left: 21px;
+            }
+            
+            .right {
+                left: 0%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .back-nav {
+                padding: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .strategy-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .initiatives-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- Corporate Header -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-chess-queen"></i>
+            </div>
+            <div class="portal-title">
+                Strategic Command Center
+            </div>
+        </div>
+        <div class="corporate-status">
+            <div class="status-indicator"></div>
+            <span>Strategic Planning Active</span>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="StrategyManager.openProfile()">
+                <div class="avatar">SC</div>
+            </div>
+            <div>
+                <div class="user-name">Sarah Chen</div>
+                <div class="user-role">Chief Executive Officer</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Back Navigation -->
+    <nav class="back-nav">
+        <a href="corporate.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+        <div class="page-title">Strategic Planning & Roadmap</div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Strategic Overview -->
+        <div class="strategy-overview">
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <div class="strategy-title">Market Share</div>
+                    <div class="strategy-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                </div>
+                <div class="strategy-value">24.7%</div>
+                <div class="strategy-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>3.2% growth</span>
+                </div>
+            </div>
+            
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <div class="strategy-title">Revenue Growth</div>
+                    <div class="strategy-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="strategy-value">18.5%</div>
+                <div class="strategy-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Exceeding target</span>
+                </div>
+            </div>
+            
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <div class="strategy-title">Strategic Projects</div>
+                    <div class="strategy-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                </div>
+                <div class="strategy-value">42</div>
+                <div class="strategy-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8 new initiatives</span>
+                </div>
+            </div>
+            
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <div class="strategy-title">Goal Completion</div>
+                    <div class="strategy-icon">
+                        <i class="fas fa-flag-checkered"></i>
+                    </div>
+                </div>
+                <div class="strategy-value">78%</div>
+                <div class="strategy-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12% ahead of schedule</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Strategy Section -->
+        <div class="strategy-section">
+            <div class="chart-card">
+                <div class="card-header">
+                    <div class="card-title">Strategic Performance</div>
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="strategyChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="card-header">
+                    <div class="card-title">Market Analysis</div>
+                    <div class="card-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="marketChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Strategic Initiatives -->
+        <div class="initiatives-grid">
+            <div class="initiative-card">
+                <div class="initiative-value">15</div>
+                <div class="initiative-label">Q1 Initiatives</div>
+            </div>
+            <div class="initiative-card">
+                <div class="initiative-value">$4.2M</div>
+                <div class="initiative-label">Q1 Budget</div>
+            </div>
+            <div class="initiative-card">
+                <div class="initiative-value">92%</div>
+                <div class="initiative-label">On-Time Delivery</div>
+            </div>
+            <div class="initiative-card">
+                <div class="initiative-value">18</div>
+                <div class="initiative-label">Strategic Partners</div>
+            </div>
+        </div>
+        
+        <div class="strategy-layout">
+            <!-- Strategy Main Area -->
+            <div class="strategy-main">
+                <!-- Strategic Metrics -->
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="card-title">Strategic KPIs</div>
+                        <div class="card-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="kpiChart"></canvas>
+                    </div>
+                    <div class="action-buttons" style="margin-top: 1rem;">
+                        <button class="action-btn" onclick="StrategyManager.generateStrategicReport()">
+                            <i class="fas fa-file-pdf"></i> Generate Strategic Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Strategic Roadmap -->
+                <div class="chart-card roadmap-container">
+                    <div class="card-header">
+                        <div class="card-title">Strategic Roadmap 2025</div>
+                        <div class="card-icon">
+                            <i class="fas fa-road"></i>
+                        </div>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item left">
+                            <div class="timeline-content">
+                                <h3>Q1: Market Expansion</h3>
+                                <p>Launch in 3 new African markets. Establish partnerships with local educational institutions.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item right">
+                            <div class="timeline-content">
+                                <h3>Q2: Product Innovation</h3>
+                                <p>Release AI-powered adaptive learning features. Launch mobile learning platform.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item left">
+                            <div class="timeline-content">
+                                <h3>Q3: Strategic Partnerships</h3>
+                                <p>Form alliances with global tech companies. Expand corporate training programs.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item right">
+                            <div class="timeline-content">
+                                <h3>Q4: Global Scaling</h3>
+                                <p>Enter European and Asian markets. Achieve 2 million active users milestone.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Strategy Sidebar -->
+            <div class="strategy-sidebar">
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Active Projects</div>
+                        <div class="card-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                    </div>
+                    <div class="projects-list">
+                        <div class="project-item info">
+                            <div class="project-title">Market Research</div>
+                            <div class="project-message">West Africa expansion analysis in progress</div>
+                        </div>
+                        <div class="project-item">
+                            <div class="project-title">Product Development</div>
+                            <div class="project-message">AI tutor features 85% complete</div>
+                        </div>
+                        <div class="project-item">
+                            <div class="project-title">Partnership Negotiations</div>
+                            <div class="project-message">Discussions with 3 potential strategic partners</div>
+                        </div>
+                        <div class="project-item info">
+                            <div class="project-title">Funding Round</div>
+                            <div class="project-message">Series B preparation underway</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Strategic Goals</div>
+                        <div class="card-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                    </div>
+                    <div class="goals-list">
+                        <div class="goal-item">
+                            <div class="goal-header">
+                                <div class="goal-name">Market Expansion</div>
+                                <div class="goal-progress">75%</div>
+                            </div>
+                            <div class="goal-bar">
+                                <div class="goal-progress-bar" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <div class="goal-header">
+                                <div class="goal-name">Revenue Growth</div>
+                                <div class="goal-progress">82%</div>
+                            </div>
+                            <div class="goal-bar">
+                                <div class="goal-progress-bar" style="width: 82%"></div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <div class="goal-header">
+                                <div class="goal-name">User Acquisition</div>
+                                <div class="goal-progress">68%</div>
+                            </div>
+                            <div class="goal-bar">
+                                <div class="goal-progress-bar" style="width: 68%"></div>
+                            </div>
+                        </div>
+                        <div class="goal-item">
+                            <div class="goal-header">
+                                <div class="goal-name">Product Development</div>
+                                <div class="goal-progress">91%</div>
+                            </div>
+                            <div class="goal-bar">
+                                <div class="goal-progress-bar" style="width: 91%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Strategic Actions</div>
+                        <div class="card-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="StrategyManager.analyzeMarket()">
+                            <i class="fas fa-chart-bar"></i> Market Analysis
+                        </button>
+                        <button class="action-btn" onclick="StrategyManager.performanceReview()">
+                            <i class="fas fa-clipboard-check"></i> Performance Review
+                        </button>
+                        <button class="action-btn" onclick="StrategyManager.riskAssessment()">
+                            <i class="fas fa-shield-alt"></i> Risk Assessment
+                        </button>
+                        <button class="action-btn" onclick="StrategyManager.aiStrategicConsult()">
+                            <i class="fas fa-robot"></i> Consult Khensani AI
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXACT KDConcepts Ad Space -->
+        <div id="mindflow-universal-ad">
+            <div class="ad-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="ad-logo">KD</div>
+                    <div class="ad-text">
+                        <div class="ad-title">🚀 KDConcepts Premium</div>
+                        <div class="ad-subtitle">Strategic Educational Resources for African Markets</div>
+                    </div>
+                </div>
+                <button class="ad-button" onclick="openKDConcepts()">
+                    Explore Strategic Resources
+                </button>
+            </div>
+        </div>
+
+        <!-- EXACT Universal Footer -->
+        <div id="mindflow-universal-footer">
+            <p>
+                <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                <span class="mindtech-glitch">MindTech</span>
+                <span style="color: #cccccc;">. Transforming African education through AI-powered quantum learning ecosystems.</span>
+            </p>
+            <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                Strategic Planning • Market Analysis • Performance Tracking • Growth Initiatives
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#8A2BE2" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#8A2BE2",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Strategic Resources');
+        }
+
+        // Strategy Management Functions
+        const StrategyManager = {
+            openProfile: function() {
+                alert('👔 Strategic Leadership Profile\n\nExecutive: Sarah Chen\nRole: Chief Executive Officer\nTenure: 5 years\n\nStrategic Specializations:\n• Market Expansion\n• Growth Strategy\n• Strategic Partnerships\n• Innovation Management');
+            },
+
+            generateStrategicReport: function() {
+                alert('📊 Generating Strategic Report\n\nComprehensive strategic analysis and roadmap report will be compiled.');
+            },
+
+            analyzeMarket: function() {
+                alert('📈 Initiating Market Analysis\n\nComprehensive market analysis and competitive intelligence gathering initiated.');
+            },
+
+            performanceReview: function() {
+                alert('📋 Strategic Performance Review\n\nQuarterly strategic performance review dashboard launched.');
+            },
+
+            riskAssessment: function() {
+                alert('🛡️ Conducting Risk Assessment\n\nStrategic risk assessment and mitigation planning in progress.');
+            },
+
+            aiStrategicConsult: function() {
+                alert('🤖 Consulting Khensani AI for Strategy\n\nConnecting to Khensani AI for strategic insights and market intelligence...');
+            }
+        };
+
+        // Initialize Charts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Strategy Chart
+            const strategyCtx = document.getElementById('strategyChart').getContext('2d');
+            const strategyChart = new Chart(strategyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'],
+                    datasets: [{
+                        label: 'Market Share (%)',
+                        data: [15.2, 16.8, 18.5, 20.1, 21.5, 22.8, 23.7, 24.2, 24.7],
+                        borderColor: '#8A2BE2',
+                        backgroundColor: 'rgba(138, 43, 226, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Revenue Growth (%)',
+                        data: [12.5, 14.2, 15.8, 16.5, 17.2, 17.8, 18.1, 18.3, 18.5],
+                        borderColor: '#00FFAA',
+                        backgroundColor: 'rgba(0, 255, 170, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 10,
+                            max: 30,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0cc'
+                            }
+                        },
+                        y1: {
+                            position: 'right',
+                            beginAtZero: false,
+                            min: 10,
+                            max: 20,
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            ticks: {
+                                color: '#a0a0cc'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0cc'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Market Chart
+            const marketCtx = document.getElementById('marketChart').getContext('2d');
+            const marketChart = new Chart(marketCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['West Africa', 'East Africa', 'Southern Africa', 'North Africa', 'International'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            '#8A2BE2',
+                            '#00FFAA',
+                            '#FFD700',
+                            '#FF8C42',
+                            '#FF3366'
+                        ],
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e0e0ff',
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+
+            // KPI Chart
+            const kpiCtx = document.getElementById('kpiChart').getContext('2d');
+            const kpiChart = new Chart(kpiCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Market Share', 'Revenue', 'User Growth', 'Engagement', 'Retention', 'Satisfaction'],
+                    datasets: [{
+                        label: 'Current Performance (%)',
+                        data: [78, 82, 75, 88, 91, 85],
+                        backgroundColor: [
+                            'rgba(138, 43, 226, 0.8)',
+                            'rgba(0, 255, 170, 0.8)',
+                            'rgba(255, 215, 0, 0.8)',
+                            'rgba(255, 140, 66, 0.8)',
+                            'rgba(255, 51, 102, 0.8)',
+                            'rgba(0, 102, 255, 0.8)'
+                        ],
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0cc'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0cc'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Real-time data simulation for strategic goals
+        function simulateStrategicData() {
+            setInterval(() => {
+                // Simulate real-time updates to strategic goals
+                const goals = document.querySelectorAll('.goal-progress-bar');
+                goals.forEach(progress => {
+                    const currentWidth = parseInt(progress.style.width);
+                    const variation = Math.random() * 4 - 2; // -2% to +2% variation
+                    let newWidth = currentWidth + variation;
+                    newWidth = Math.max(5, Math.min(100, newWidth)); // Keep between 5% and 100%
+                    progress.style.width = newWidth + '%';
+                    
+                    // Update the percentage text
+                    const progressElement = progress.closest('.goal-item').querySelector('.goal-progress');
+                    progressElement.textContent = Math.round(newWidth) + '%';
+                });
+            }, 5000);
+        }
+
+        // Initialize real-time simulation
+        simulateStrategicData();
+    </script>
+</body>
+</html>

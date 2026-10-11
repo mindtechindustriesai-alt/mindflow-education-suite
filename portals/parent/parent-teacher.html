@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parent-Teacher Communications | MindFlow Education Suite</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #00A8FF;
+            --accent-glow: rgba(0, 168, 255, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(0, 168, 255, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --parent-blue: #00A8FF;
+            --analytics-pink: #FF69B4;
+            --billing-green: #00CC66;
+            --communication-teal: #00CED1;
+            --teacher-purple: #8A2BE2;
+            --meeting-orange: #FF6B35;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Standardized Portal Header */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 168, 255, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent), #0066FF);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--accent);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Enhanced Navigation with Clean Links */
+        .portal-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(0, 168, 255, 0.3);
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--text-dim);
+            text-decoration: none;
+            display: block;
+        }
+
+        .nav-tab.active {
+            border-bottom-color: var(--teacher-purple);
+            color: var(--teacher-purple);
+            background: rgba(138, 43, 226, 0.1);
+        }
+
+        .nav-tab:hover {
+            background: rgba(0, 168, 255, 0.05);
+            color: var(--text);
+        }
+
+        .back-button {
+            background: rgba(75, 0, 130, 0.3);
+            border: 1px solid var(--teacher-purple);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: rgba(75, 0, 130, 0.5);
+            transform: translateX(-3px);
+        }
+
+        /* MAIN CONTENT */
+        .main-container {
+            padding: 40px 20px 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: slideUp 1s ease-out;
+        }
+
+        .welcome-title {
+            font-size: 2.5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--teacher-purple), var(--ai-gold), var(--communication-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+        }
+
+        .welcome-subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            color: var(--text-dim);
+        }
+
+        /* TEACHER CONNECTIONS GRID */
+        .teacher-connections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .teacher-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--teacher-purple);
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .teacher-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.4);
+        }
+
+        .teacher-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--teacher-purple), var(--ai-gold));
+        }
+
+        .teacher-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .teacher-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--teacher-purple), var(--communication-teal));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            border: 3px solid;
+            box-shadow: 0 0 20px var(--teacher-purple);
+        }
+
+        .teacher-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--teacher-purple);
+        }
+
+        .teacher-role {
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .teacher-status {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: rgba(0, 255, 170, 0.2);
+            color: var(--learning-green);
+            border: 1px solid var(--learning-green);
+        }
+
+        .teacher-status.away {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        /* COMMUNICATION ACTIONS */
+        .communication-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .comms-btn {
+            background: rgba(138, 43, 226, 0.1);
+            border: 1px solid var(--teacher-purple);
+            color: var(--teacher-purple);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .comms-btn:hover {
+            background: rgba(138, 43, 226, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+        }
+
+        .comms-btn.video {
+            background: rgba(255, 107, 53, 0.1);
+            border-color: var(--meeting-orange);
+            color: var(--meeting-orange);
+        }
+
+        .comms-btn.video:hover {
+            background: rgba(255, 107, 53, 0.2);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        /* MEETING SCHEDULER */
+        .meeting-scheduler {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--meeting-orange);
+            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
+        }
+
+        .meeting-scheduler::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--meeting-orange), var(--ai-gold));
+        }
+
+        .scheduler-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .scheduler-icon {
+            font-size: 2rem;
+            color: var(--meeting-orange);
+        }
+
+        .scheduler-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--meeting-orange), var(--ai-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meeting-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--meeting-orange);
+            font-size: 0.9rem;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--meeting-orange);
+            border-radius: 10px;
+            padding: 12px 15px;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* PROGRESS UPDATES */
+        .progress-updates {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--learning-green);
+            margin-bottom: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 170, 0.5);
+        }
+
+        .progress-updates::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--learning-green), var(--ai-gold));
+        }
+
+        .progress-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .progress-icon {
+            font-size: 2rem;
+            color: var(--learning-green);
+        }
+
+        .progress-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--learning-green), var(--ai-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .update-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .update-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 170, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .update-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--learning-green);
+            box-shadow: 0 5px 20px rgba(0, 255, 170, 0.2);
+        }
+
+        .update-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .update-teacher {
+            font-weight: 600;
+            color: var(--learning-green);
+        }
+
+        .update-date {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .update-content {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .update-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        /* QUANTUM BUTTONS */
+        .quantum-btn {
+            background: linear-gradient(135deg, var(--teacher-purple), var(--communication-teal));
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+        }
+
+        .quantum-btn.meeting {
+            background: linear-gradient(135deg, var(--meeting-orange), var(--ai-gold));
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, #0066FF, #8A2BE2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid #00FFAA;
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.4);
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: #FFD700;
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px #FFD700;
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: #00FFAA;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px #00FFAA;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #00FFAA;
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid #0066FF;
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: #00A8FF;
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+
+        /* ANIMATIONS */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px #00A8FF, 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px #00A8FF, 0 0 30px #0066FF, 0 0 40px #8A2BE2; }
+            100% { text-shadow: 0 0 10px #00A8FF, 0 0 20px #0066FF; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 120px 15px 40px;
+            }
+            
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .portal-nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+                padding: 0.8rem 1rem;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .teacher-connections {
+                grid-template-columns: 1fr;
+            }
+            
+            .communication-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .meeting-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .update-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Background -->
+    <div id="particles-js"></div>
+
+    <!-- Standardized Top Menu -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <div class="portal-title">
+                Parent Portal
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="ProfileManager.openUpload()">
+                <div class="avatar">TD</div>
+                <div class="upload-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <div>
+                <div class="user-name">Thandi Dube</div>
+                <div class="user-role">Parent • 2 Children</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Enhanced Navigation with WORKING Links -->
+    <nav class="portal-nav">
+        <ul class="nav-tabs">
+            <li><a href="parent-dashboard.html" class="nav-tab">Dashboard</a></li>
+            <li><a href="communications.html" class="nav-tab">Communications</a></li>
+            <li><a href="parent-analytics.html" class="nav-tab">Progress Analytics</a></li>
+            <li><a href="parent-children.html" class="nav-tab">Children Profiles</a></li>
+            <li><a href="parent-teacher.html" class="nav-tab active">Teacher Connect</a></li>
+        </ul>
+        <a href="parent-dashboard.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <!-- WELCOME SECTION -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">PARENT-TEACHER COMMUNICATION HUB</h1>
+            <p class="welcome-subtitle">Direct communication, progress updates, and collaborative planning with your children's teachers</p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px; flex-wrap: wrap;">
+                <button class="quantum-btn" onclick="ParentTeacherComms.startVideoCall()">
+                    <i class="fas fa-video"></i> Start Video Call
+                </button>
+                <button class="quantum-btn meeting" onclick="ParentTeacherComms.scheduleMeeting()">
+                    <i class="fas fa-calendar-plus"></i> Schedule Meeting
+                </button>
+                <button class="quantum-btn" onclick="ParentTeacherComms.quickMessage()">
+                    <i class="fas fa-comment-medical"></i> Quick Message
+                </button>
+            </div>
+        </div>
+
+        <!-- TEACHER CONNECTIONS -->
+        <div class="teacher-connections">
+            <!-- LERATO'S TEACHER -->
+            <div class="teacher-card">
+                <div class="teacher-header">
+                    <div class="teacher-avatar" style="background: linear-gradient(135deg, #8A2BE2, #00CED1);">N</div>
+                    <div class="teacher-info">
+                        <h3>Mrs. Ndlovu</h3>
+                        <div class="teacher-role">Grade 5A Mathematics Teacher</div>
+                        <div class="teacher-status">Available Now</div>
+                    </div>
+                </div>
+                <div style="margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="opacity: 0.8;">Student:</span>
+                        <span style="color: var(--teacher-purple); font-weight: 600;">Lerato Dube</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="opacity: 0.8;">Current Grade:</span>
+                        <span style="color: var(--learning-green); font-weight: 600;">87%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="opacity: 0.8;">Last Contact:</span>
+                        <span style="opacity: 0.8;">2 days ago</span>
+                    </div>
+                </div>
+                <div class="communication-actions">
+                    <button class="comms-btn" onclick="ParentTeacherComms.messageTeacher('ndlovu')">
+                        <i class="fas fa-comment"></i> Message
+                    </button>
+                    <button class="comms-btn video" onclick="ParentTeacherComms.videoCall('ndlovu')">
+                        <i class="fas fa-video"></i> Video Call
+                    </button>
+                    <button class="comms-btn" onclick="ParentTeacherComms.viewProgress('lerato')">
+                        <i class="fas fa-chart-line"></i> Progress
+                    </button>
+                    <button class="comms-btn" onclick="ParentTeacherComms.scheduleWithTeacher('ndlovu')">
+                        <i class="fas fa-calendar"></i> Meeting
+                    </button>
+                </div>
+            </div>
+
+            <!-- TUMI'S TEACHER -->
+            <div class="teacher-card">
+                <div class="teacher-header">
+                    <div class="teacher-avatar" style="background: linear-gradient(135deg, #FF6B35, #FFD700);">V</div>
+                    <div class="teacher-info">
+                        <h3>Mr. Van der Merwe</h3>
+                        <div class="teacher-role">Grade 7B Science Teacher</div>
+                        <div class="teacher-status away">In Class</div>
+                    </div>
+                </div>
+                <div style="margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="opacity: 0.8;">Student:</span>
+                        <span style="color: var(--teacher-purple); font-weight: 600;">Tumi Dube</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="opacity: 0.8;">Current Grade:</span>
+                        <span style="color: var(--learning-green); font-weight: 600;">92%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="opacity: 0.8;">Last Contact:</span>
+                        <span style="opacity: 0.8;">1 week ago</span>
+                    </div>
+                </div>
+                <div class="communication-actions">
+                    <button class="comms-btn" onclick="ParentTeacherComms.messageTeacher('vandermerwe')">
+                        <i class="fas fa-comment"></i> Message
+                    </button>
+                    <button class="comms-btn video" onclick="ParentTeacherComms.videoCall('vandermerwe')">
+                        <i class="fas fa-video"></i> Video Call
+                    </button>
+                    <button class="comms-btn" onclick="ParentTeacherComms.viewProgress('tumi')">
+                        <i class="fas fa-chart-line"></i> Progress
+                    </button>
+                    <button class="comms-btn" onclick="ParentTeacherComms.scheduleWithTeacher('vandermerwe')">
+                        <i class="fas fa-calendar"></i> Meeting
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MEETING SCHEDULER -->
+        <div class="meeting-scheduler">
+            <div class="scheduler-header">
+                <div class="scheduler-icon">📅</div>
+                <h3 class="scheduler-title">Schedule Parent-Teacher Meeting</h3>
+            </div>
+            <div class="meeting-form">
+                <div class="form-group">
+                    <label class="form-label">Select Teacher</label>
+                    <select class="form-select" id="meetingTeacher">
+                        <option value="ndlovu">Mrs. Ndlovu (Mathematics - Lerato)</option>
+                        <option value="vandermerwe">Mr. Van der Merwe (Science - Tumi)</option>
+                        <option value="both">Both Teachers</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Meeting Date</label>
+                    <input type="date" class="form-input" id="meetingDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Preferred Time</label>
+                    <select class="form-select" id="meetingTime">
+                        <option value="08:00">8:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Meeting Type</label>
+                    <select class="form-select" id="meetingType">
+                        <option value="video">Video Conference</option>
+                        <option value="phone">Phone Call</option>
+                        <option value="inperson">In-Person Meeting</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Meeting Agenda / Topics to Discuss</label>
+                <textarea class="form-textarea" id="meetingAgenda" placeholder="What would you like to discuss in the meeting?"></textarea>
+            </div>
+            <button class="quantum-btn meeting" style="width: 100%; margin-top: 20px;" onclick="ParentTeacherComms.submitMeetingRequest()">
+                <i class="fas fa-paper-plane"></i> Schedule Meeting Request
+            </button>
+        </div>
+
+        <!-- PROGRESS UPDATES -->
+        <div class="progress-updates">
+            <div class="progress-header">
+                <div class="progress-icon">📈</div>
+                <h3 class="progress-title">Recent Teacher Updates & Progress Reports</h3>
+            </div>
+            <div class="update-cards">
+                <div class="update-card">
+                    <div class="update-header">
+                        <div>
+                            <div class="update-teacher">Mrs. Ndlovu - Mathematics</div>
+                            <div class="update-date">March 14, 2024 • 3 days ago</div>
+                        </div>
+                    </div>
+                    <div class="update-content">
+                        Lerato showed excellent problem-solving skills in our geometry unit. She successfully completed all advanced exercises and helped classmates understand complex concepts.
+                    </div>
+                    <div class="update-meta">
+                        <span><i class="fas fa-user-graduate"></i> Lerato Dube</span>
+                        <span><i class="fas fa-chart-line"></i> Current Grade: 87%</span>
+                    </div>
+                </div>
+
+                <div class="update-card">
+                    <div class="update-header">
+                        <div>
+                            <div class="update-teacher">Mr. Van der Merwe - Science</div>
+                            <div class="update-date">March 12, 2024 • 5 days ago</div>
+                        </div>
+                    </div>
+                    <div class="update-content">
+                        Tumi demonstrated exceptional curiosity in our chemistry lab. His experimental design was innovative and he documented his findings with scientific precision.
+                    </div>
+                    <div class="update-meta">
+                        <span><i class="fas fa-user-graduate"></i> Tumi Dube</span>
+                        <span><i class="fas fa-chart-line"></i> Current Grade: 92%</span>
+                    </div>
+                </div>
+
+                <div class="update-card">
+                    <div class="update-header">
+                        <div>
+                            <div class="update-teacher">Mrs. Ndlovu - Mathematics</div>
+                            <div class="update-date">March 8, 2024 • 1 week ago</div>
+                        </div>
+                    </div>
+                    <div class="update-content">
+                        Progress report: Lerato has improved her algebra skills significantly. She's now solving equations two grade levels above her current level. Consider advanced placement.
+                    </div>
+                    <div class="update-meta">
+                        <span><i class="fas fa-user-graduate"></i> Lerato Dube</span>
+                        <span><i class="fas fa-star"></i> Exceptional Progress</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXACT KDConcepts Ad Space -->
+        <div id="mindflow-universal-ad">
+            <div class="ad-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="ad-logo">KD</div>
+                    <div class="ad-text">
+                        <div class="ad-title">🚀 KDConcepts Premium</div>
+                        <div class="ad-subtitle">Educational Resources for African Families</div>
+                    </div>
+                </div>
+                <button class="ad-button" onclick="openKDConcepts()">
+                    Explore Resources
+                </button>
+            </div>
+        </div>
+
+        <!-- EXACT Universal Footer -->
+        <div id="mindflow-universal-footer">
+            <p>
+                <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                <span class="mindtech-glitch">MindTech</span>
+                <span style="color: #cccccc;">. PARENT-TEACHER COMMS ACTIVE - ALL SYSTEMS OPERATIONAL</span>
+            </p>
+            <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                Student Portal • Teacher Command • Parent Hub • Corporate Analytics
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        console.log('🔥 Firebase initialized for Parent-Teacher Communications');
+
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#8A2BE2" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#8A2BE2",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // Profile Manager
+        const ProfileManager = {
+            openUpload: function() {
+                alert('📸 Profile Picture Upload\n\nChoose from: Camera 📷 or File Upload 📁');
+            }
+        };
+
+        // Tab Navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const tabName = this.textContent;
+                console.log(`Switching to tab: ${tabName}`);
+            });
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // PARENT-TEACHER COMMUNICATIONS SYSTEM
+        const ParentTeacherComms = {
+            messageTeacher: function(teacherId) {
+                const teacher = teacherId === 'ndlovu' ? 'Mrs. Ndlovu' : 'Mr. Van der Merwe';
+                this.showNotification(`💬 Opening message interface with ${teacher}`, 'info');
+                
+                // Simulate opening messaging interface
+                setTimeout(() => {
+                    window.location.href = 'communications.html';
+                }, 1000);
+            },
+
+            videoCall: function(teacherId) {
+                const teacher = teacherId === 'ndlovu' ? 'Mrs. Ndlovu' : 'Mr. Van der Merwe';
+                this.showNotification(`📞 Starting video call with ${teacher}...`, 'info');
+                
+                // Simulate video call interface
+                const callModal = document.createElement('div');
+                callModal.style.cssText = `
+                    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                    background: rgba(0,0,0,0.9); z-index: 10000;
+                    display: flex; flex-direction: column; justify-content: center; align-items: center;
+                    color: white;
+                `;
+                callModal.innerHTML = `
+                    <div style="text-align: center; padding: 30px; background: var(--primary); border-radius: 20px; border: 3px solid var(--teacher-purple); max-width: 500px; width: 90%;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">📞</div>
+                        <h2 style="color: var(--teacher-purple); margin-bottom: 15px;">Video Call: ${teacher}</h2>
+                        <p style="margin-bottom: 25px; opacity: 0.8;">Connecting you with ${teacher}...</p>
+                        <div style="display: flex; gap: 15px;">
+                            <button onclick="this.parentElement.parentElement.remove()" 
+                                    style="background: var(--danger); color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer;">
+                                End Call
+                            </button>
+                            <button onclick="this.parentElement.parentElement.remove()" 
+                                    class="quantum-btn" style="background: var(--learning-green);">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(callModal);
+            },
+
+            viewProgress: function(child) {
+                const childName = child === 'lerato' ? 'Lerato' : 'Tumi';
+                this.showNotification(`📊 Loading ${childName}'s detailed progress report...`, 'info');
+            },
+
+            scheduleWithTeacher: function(teacherId) {
+                const teacher = teacherId === 'ndlovu' ? 'Mrs. Ndlovu' : 'Mr. Van der Merwe';
+                document.getElementById('meetingTeacher').value = teacherId;
+                document.querySelector('.meeting-scheduler').scrollIntoView({ behavior: 'smooth' });
+                this.showNotification(`📅 Opening scheduler for ${teacher}`, 'info');
+            },
+
+            startVideoCall: function() {
+                this.showNotification('📞 Starting group video call with available teachers...', 'info');
+            },
+
+            scheduleMeeting: function() {
+                document.querySelector('.meeting-scheduler').scrollIntoView({ behavior: 'smooth' });
+                this.showNotification('📅 Opening meeting scheduler...', 'info');
+            },
+
+            quickMessage: function() {
+                this.showNotification('💬 Opening quick message composer...', 'info');
+            },
+
+            submitMeetingRequest: function() {
+                const teacher = document.getElementById('meetingTeacher').value;
+                const date = document.getElementById('meetingDate').value;
+                const time = document.getElementById('meetingTime').value;
+                const type = document.getElementById('meetingType').value;
+                const agenda = document.getElementById('meetingAgenda').value;
+
+                if (!date) {
+                    this.showNotification('⚠️ Please select a meeting date', 'danger');
+                    return;
+                }
+
+                const teacherName = teacher === 'ndlovu' ? 'Mrs. Ndlovu' : 
+                                  teacher === 'vandermerwe' ? 'Mr. Van der Merwe' : 'Both Teachers';
+
+                this.showNotification(`✅ Meeting request sent to ${teacherName} for ${date} at ${time}`, 'success');
+                
+                // Clear form
+                document.getElementById('meetingDate').value = '';
+                document.getElementById('meetingAgenda').value = '';
+            },
+
+            showNotification: function(message, type) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: ${type === 'success' ? 'rgba(0, 255, 170, 0.9)' : 
+                                 type === 'info' ? 'rgba(138, 43, 226, 0.9)' : 
+                                 'rgba(255, 51, 102, 0.9)'};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    z-index: 10000;
+                    max-width: 400px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    border-left: 4px solid ${type === 'success' ? 'var(--learning-green)' : 
+                                         type === 'info' ? 'var(--teacher-purple)' : 
+                                         'var(--danger)'};
+                    animation: slideUp 0.3s ease;
+                    white-space: pre-line;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                                      type === 'info' ? 'fa-info-circle' : 
+                                      'fa-exclamation-triangle'}"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => notification.remove(), 500);
+                }, 4000);
+            }
+        };
+
+        // Firebase Data Management
+        async function loadTeacherCommunicationsData() {
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        console.log('👤 Parent teacher communications data loaded:', userData);
+                        
+                        // Update UI with parent data
+                        document.querySelector('.user-name').textContent = userData.fullName || 'Thandi Dube';
+                        document.querySelector('.user-role').textContent = `Parent • ${userData.childrenCount || 2} Children`;
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error loading teacher communications data:', error);
+            }
+        }
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load Firebase data
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log('👤 Parent authenticated:', user.email);
+                    loadTeacherCommunicationsData();
+                } else {
+                    console.log('👤 No user signed in');
+                    // Redirect to login if needed
+                    // window.location.href = 'login.html';
+                }
+            });
+
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('meetingDate').min = today;
+
+            console.log('👨‍🏫 Parent-Teacher Communications - Fully Operational');
+            console.log('💬 Messaging System: Active');
+            console.log('📞 Video Calls: Ready');
+            console.log('📅 Meeting Scheduler: Enabled');
+            console.log('📊 Progress Tracking: Live');
+        });
+    </script>
+</body>
+</html>

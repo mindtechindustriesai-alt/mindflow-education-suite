@@ -1,0 +1,1252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Command - MindFlow Education Suite</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #0066FF;
+            --accent-glow: rgba(0, 102, 255, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(0, 102, 255, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --corporate-primary: #0066FF;
+            --corporate-secondary: #0044CC;
+            --corporate-accent: #3388FF;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Corporate Header */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--corporate-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--corporate-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .corporate-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(0, 102, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--corporate-primary);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--corporate-primary), var(--corporate-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--corporate-primary);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--corporate-primary);
+        }
+
+        .portal-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(0, 102, 255, 0.3);
+            padding: 0 2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            gap: 0;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--text-dim);
+            text-decoration: none;
+            display: block;
+        }
+
+        .nav-tab.active {
+            border-bottom-color: var(--corporate-primary);
+            color: var(--corporate-primary);
+            background: rgba(0, 102, 255, 0.1);
+        }
+
+        .nav-tab:hover {
+            background: rgba(0, 102, 255, 0.05);
+            color: var(--text);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Corporate Dashboard Layout */
+        .corporate-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        /* KPI Dashboard */
+        .kpi-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .kpi-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .kpi-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+        
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .kpi-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .kpi-icon {
+            font-size: 1.2rem;
+            color: var(--corporate-primary);
+        }
+        
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--danger);
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        /* Corporate Sidebar */
+        .corporate-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .corporate-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .corporate-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--corporate-primary);
+        }
+        
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .action-btn {
+            background: rgba(0, 102, 255, 0.1);
+            border: 2px solid var(--corporate-primary);
+            color: white;
+            padding: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            text-align: center;
+            text-decoration: none;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .action-btn:hover::before {
+            left: 100%;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 102, 255, 0.3);
+        }
+        
+        .action-icon {
+            font-size: 2rem;
+            color: var(--corporate-primary);
+        }
+        
+        /* Performance Metrics */
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 102, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .metric:hover {
+            background: rgba(0, 102, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.2);
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.25rem;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        
+        /* Recent Activity */
+        .activity-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            padding: 0.8rem;
+            background: rgba(0, 102, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--corporate-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .activity-item:hover {
+            transform: translateX(5px);
+            background: rgba(0, 102, 255, 0.1);
+        }
+        
+        .activity-time {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.3rem;
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, var(--corporate-primary), #FF8C42);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid var(--learning-green);
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mindflow-universal-ad::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+        }
+
+        #mindflow-universal-ad:hover::before {
+            animation: shimmer 1.5s;
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: var(--ai-gold);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px var(--ai-gold);
+            transition: all 0.3s ease;
+        }
+
+        .ad-logo:hover {
+            transform: rotate(15deg) scale(1.1);
+            box-shadow: 0 0 25px var(--ai-gold);
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: var(--learning-green);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--learning-green);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .ad-button:hover::before {
+            left: 100%;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--learning-green);
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid var(--corporate-primary);
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mindflow-universal-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold), var(--learning-green), var(--corporate-primary));
+            animation: gradientMove 3s infinite linear;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: var(--corporate-primary);
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--corporate-primary), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--corporate-primary), 0 0 30px #0066FF, 0 0 40px #FF8C42; }
+            100% { text-shadow: 0 0 10px var(--corporate-primary), 0 0 20px #0066FF; }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .corporate-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpi-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-tabs {
+                padding: 0 1rem;
+                overflow-x: auto;
+            }
+            
+            .nav-tab {
+                padding: 0.8rem 1rem;
+                min-width: 120px;
+                text-align: center;
+                font-size: 0.9rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .kpi-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+            
+            .performance-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- Corporate Header -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="portal-title">
+                Corporate Command Center
+            </div>
+        </div>
+        <div class="corporate-status">
+            <div class="status-indicator"></div>
+            <span>All Systems Operational</span>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="CorporateManager.openProfile()">
+                <div class="avatar">CE</div>
+            </div>
+            <div>
+                <div class="user-name">Sarah Chen</div>
+                <div class="user-role">Chief Executive Officer</div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="portal-nav">
+        <ul class="nav-tabs">
+            <li><a href="corporate.html" class="nav-tab active">Corporate Dashboard</a></li>
+            <li><a href="corporate-analytics.html" class="nav-tab">Business Analytics</a></li>
+            <li><a href="corporate-finance.html" class="nav-tab">Financial Management</a></li>
+            <li><a href="corporate-operations.html" class="nav-tab">Operations</a></li>
+            <li><a href="corporate-strategy.html" class="nav-tab">Strategic Planning</a></li>
+        </ul>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Corporate Dashboard Tab -->
+        <div class="tab-content active" id="dashboard">
+            <!-- KPI Dashboard -->
+            <div class="kpi-dashboard">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Revenue</div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value">$2.8M</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>12.4% vs last month</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Active Students</div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value">12,458</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>8.2% growth</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Completion Rate</div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value">94.2%</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>3.1% improvement</span>
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Satisfaction</div>
+                        <div class="kpi-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value">4.8/5</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>0.2 points increase</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <a href="corporate-analytics.html" class="action-btn">
+                    <i class="fas fa-chart-bar action-icon"></i>
+                    <div>
+                        <div class="card-title">Business Analytics</div>
+                        <div class="stat-label">Performance insights & trends</div>
+                    </div>
+                </a>
+                <a href="corporate-finance.html" class="action-btn">
+                    <i class="fas fa-file-invoice-dollar action-icon"></i>
+                    <div>
+                        <div class="card-title">Financial Reports</div>
+                        <div class="stat-label">Revenue & expense analysis</div>
+                    </div>
+                </a>
+                <a href="corporate-operations.html" class="action-btn">
+                    <i class="fas fa-cogs action-icon"></i>
+                    <div>
+                        <div class="card-title">Operations</div>
+                        <div class="stat-label">Performance monitoring</div>
+                    </div>
+                </a>
+                <a href="corporate-strategy.html" class="action-btn">
+                    <i class="fas fa-chess-queen action-icon"></i>
+                    <div>
+                        <div class="card-title">Strategic Planning</div>
+                        <div class="stat-label">Growth initiatives</div>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="corporate-layout">
+                <!-- Main Dashboard Area -->
+                <div class="dashboard-main">
+                    <!-- Charts Section -->
+                    <div class="charts-section">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Revenue Trend</div>
+                                <div class="card-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <div class="chart-title">Student Distribution</div>
+                                <div class="card-icon">
+                                    <i class="fas fa-chart-pie"></i>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="studentChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Metrics -->
+                    <div class="corporate-card">
+                        <div class="card-header">
+                            <div class="card-title">Performance Metrics</div>
+                            <div class="card-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                        </div>
+                        <div class="performance-metrics">
+                            <div class="metric">
+                                <div class="metric-value">98.7%</div>
+                                <div class="metric-label">System Uptime</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">2.1min</div>
+                                <div class="metric-label">Avg Response Time</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">156</div>
+                                <div class="metric-label">Active Courses</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">87%</div>
+                                <div class="metric-label">Resource Utilization</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Corporate Sidebar -->
+                <div class="corporate-sidebar">
+                    <div class="corporate-card">
+                        <div class="card-header">
+                            <div class="card-title">Recent Activity</div>
+                            <div class="card-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                        </div>
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <strong>Quarterly Report Generated</strong>
+                                <p>Q3 financial performance analysis completed</p>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                            <div class="activity-item">
+                                <strong>New Partnership Signed</strong>
+                                <p>Agreement with TechEd Alliance finalized</p>
+                                <div class="activity-time">5 hours ago</div>
+                            </div>
+                            <div class="activity-item">
+                                <strong>System Update Completed</strong>
+                                <p>Platform performance optimization deployed</p>
+                                <div class="activity-time">Yesterday</div>
+                            </div>
+                            <div class="activity-item">
+                                <strong>Student Milestone Reached</strong>
+                                <p>10,000th student enrolled in AI courses</p>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="corporate-card">
+                        <div class="card-header">
+                            <div class="card-title">Quick Actions</div>
+                            <div class="card-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button class="action-btn" onclick="CorporateManager.generateReport()" style="flex-direction: row; justify-content: start; padding: 12px;">
+                                <i class="fas fa-file-alt"></i>
+                                <span>Generate Report</span>
+                            </button>
+                            <button class="action-btn" onclick="CorporateManager.scheduleMeeting()" style="flex-direction: row; justify-content: start; padding: 12px;">
+                                <i class="fas fa-calendar-plus"></i>
+                                <span>Schedule Meeting</span>
+                            </button>
+                            <button class="action-btn" onclick="CorporateManager.analyzeData()" style="flex-direction: row; justify-content: start; padding: 12px;">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Analyze Trends</span>
+                            </button>
+                            <button class="action-btn" onclick="CorporateManager.systemCheck()" style="flex-direction: row; justify-content: start; padding: 12px;">
+                                <i class="fas fa-cog"></i>
+                                <span>System Status</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="corporate-card">
+                        <div class="card-header">
+                            <div class="card-title">AI Insights</div>
+                            <div class="card-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                        </div>
+                        <div style="text-align: center; padding: 1rem;">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                            <div style="font-weight: 600; color: var(--ai-gold); margin-bottom: 0.5rem;">Khensani AI Active</div>
+                            <div style="color: var(--text-dim); font-size: 0.9rem;">
+                                Analyzing performance patterns and providing strategic recommendations
+                            </div>
+                            <button class="action-btn" onclick="CorporateManager.aiConsult()" style="margin-top: 1rem; width: 100%;">
+                                <i class="fas fa-comments"></i> Consult AI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- EXACT KDConcepts Ad Space -->
+            <div id="mindflow-universal-ad">
+                <div class="ad-content">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="ad-logo">KD</div>
+                        <div class="ad-text">
+                            <div class="ad-title">🚀 KDConcepts Premium</div>
+                            <div class="ad-subtitle">Educational Resources for African Families</div>
+                        </div>
+                    </div>
+                    <button class="ad-button" onclick="openKDConcepts()">
+                        Explore Resources
+                    </button>
+                </div>
+            </div>
+
+            <!-- EXACT Universal Footer -->
+            <div id="mindflow-universal-footer">
+                <p>
+                    <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                    <span class="mindtech-glitch">MindTech</span>
+                    <span style="color: #cccccc;">. Transforming African education through AI-powered quantum learning ecosystems.</span>
+                </p>
+                <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                    Student Portal • Teacher Command • Parent Hub • Security Command
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#0066FF" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#0066FF",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // Corporate Management Functions
+        const CorporateManager = {
+            openProfile: function() {
+                alert('👔 Corporate Profile\n\nExecutive: Sarah Chen\nRole: Chief Executive Officer\nTenure: 5 years\n\nSpecializations:\n• Strategic Leadership\n• Business Development\n• Educational Innovation');
+            },
+
+            generateReport: function() {
+                alert('📊 Generating Corporate Report\n\nQuarterly performance report will be compiled and distributed.');
+            },
+
+            scheduleMeeting: function() {
+                alert('📅 Opening Meeting Scheduler\n\nSchedule executive meeting with management team.');
+            },
+
+            analyzeData: function() {
+                alert('📈 Launching Data Analysis\n\nAdvanced analytics dashboard loading...');
+            },
+
+            systemCheck: function() {
+                alert('🔧 Running System Diagnostics\n\nAll corporate systems are operational and performing optimally.');
+            },
+
+            aiConsult: function() {
+                alert('🤖 Khensani AI Consultation\n\n"Based on current trends, I recommend focusing on AI course expansion and African market penetration for Q4 growth."');
+            }
+        };
+
+        // Initialize corporate dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Corporate dashboard initialized');
+            
+            // Log page view to Firebase
+            logPageView('corporate-dashboard');
+            
+            // Initialize charts
+            initializeCharts();
+        });
+
+        // Firebase page view logging
+        function logPageView(pageName) {
+            if (firebase.apps.length) {
+                const db = firebase.firestore();
+                db.collection('navigation_logs').add({
+                    page: pageName,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    user: 'CEO Sarah Chen',
+                    role: 'corporate',
+                    action: 'page_view'
+                }).then(() => {
+                    console.log(`📊 Logged page view: ${pageName}`);
+                }).catch(error => {
+                    console.error('Error logging page view:', error);
+                });
+            }
+        }
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Revenue Trend Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    datasets: [{
+                        label: 'Revenue (Millions)',
+                        data: [1.8, 2.1, 2.3, 2.4, 2.6, 2.5, 2.7, 2.8, 2.9],
+                        borderColor: '#0066FF',
+                        backgroundColor: 'rgba(0, 102, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0ff'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Student Distribution Chart
+            const studentCtx = document.getElementById('studentChart').getContext('2d');
+            new Chart(studentCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['K-12', 'University', 'Professional', 'Corporate Training'],
+                    datasets: [{
+                        data: [35, 40, 15, 10],
+                        backgroundColor: [
+                            '#0066FF',
+                            '#00FFAA',
+                            '#FFD700',
+                            '#FF8C42'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#0a0a2a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e0e0ff',
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC key for quick actions menu
+            if (e.key === 'Escape') {
+                alert('🚀 Quick Actions Menu\n\nPress:\n• R for Reports\n• M for Meetings\n• A for Analytics\n• S for System Check');
+            }
+            
+            // Quick action shortcuts
+            if (!e.target.matches('input, textarea')) {
+                switch(e.key.toLowerCase()) {
+                    case 'r':
+                        CorporateManager.generateReport();
+                        break;
+                    case 'm':
+                        CorporateManager.scheduleMeeting();
+                        break;
+                    case 'a':
+                        CorporateManager.analyzeData();
+                        break;
+                    case 's':
+                        CorporateManager.systemCheck();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

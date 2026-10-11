@@ -1,0 +1,206 @@
+/* =========================================================
+   KHENSANI AI — SENTINEL SAFETY MODULE STYLES
+   Patent SA 2026/05142 — Figures 1, 3, 7
+   ========================================================= */
+
+/* ===== SENTINEL PROMPT (Tier 1 + Tier 2 messages) ===== */
+.sentinel-prompt {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #1B4D3D 0%, #2A7A5E 100%);
+  color: #E8D5A3;
+  padding: 14px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  max-width: 90vw;
+  z-index: 10000;
+  animation: sentinel-slide-up 0.4s ease-out;
+  border: 1px solid rgba(200, 164, 80, 0.3);
+}
+
+@keyframes sentinel-slide-up {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to   { transform: translate(-50%, 0);    opacity: 1; }
+}
+
+/* ===== PANIC BUTTON (Student portal — always visible) ===== */
+.sentinel-panic-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #d32f2f, #8b0000);
+  color: #fff;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 24px rgba(211, 47, 47, 0.6);
+  font-size: 1.6rem;
+  cursor: pointer;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: sentinel-pulse 2.5s ease-in-out infinite;
+}
+
+.sentinel-panic-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 32px rgba(211, 47, 47, 0.9);
+}
+
+.sentinel-panic-button:active {
+  transform: scale(0.96);
+}
+
+.sentinel-panic-button[aria-pressed="true"] {
+  animation: none;
+  background: radial-gradient(circle at 30% 30%, #ff5252, #b71c1c);
+}
+
+@keyframes sentinel-pulse {
+  0%, 100% { box-shadow: 0 6px 24px rgba(211, 47, 47, 0.6); }
+  50%      { box-shadow: 0 6px 32px rgba(211, 47, 47, 1.0); }
+}
+
+/* ===== INCOGNITO MODE INDICATOR ===== */
+.sentinel-incognito-badge {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, #4a148c, #6a1b9a);
+  color: #E8D5A3;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(74, 20, 140, 0.5);
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+
+.sentinel-incognito-badge.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sentinel-incognito-badge::before {
+  content: "🌙";
+  font-size: 0.9rem;
+}
+
+/* ===== RISK LEVEL INDICATORS (used in Teacher + Security portals) ===== */
+.sentinel-risk-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sentinel-risk-indicator.tier-0 { background: #e8f5e9; color: #1b5e20; }
+.sentinel-risk-indicator.tier-1 { background: #fff9c4; color: #827717; }
+.sentinel-risk-indicator.tier-2 { background: #ffe0b2; color: #e65100; }
+.sentinel-risk-indicator.tier-3 { background: #ffccbc; color: #bf360c; }
+.sentinel-risk-indicator.tier-4 { background: #ffcdd2; color: #b71c1c; animation: sentinel-pulse 2s ease-in-out infinite; }
+
+/* ===== TIER 3 / TIER 4 FULL-SCREEN SUPPORT OVERLAY ===== */
+.sentinel-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 31, 24, 0.96);
+  color: #E8D5A3;
+  font-family: 'Inter', sans-serif;
+  z-index: 10002;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+  animation: sentinel-fade-in 0.4s ease-out;
+}
+
+@keyframes sentinel-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.sentinel-overlay h2 {
+  font-size: 1.6rem;
+  margin-bottom: 16px;
+  color: #C8A450;
+}
+
+.sentinel-overlay p {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 480px;
+  margin-bottom: 24px;
+}
+
+.sentinel-overlay button {
+  background: linear-gradient(135deg, #2A7A5E, #1B4D3D);
+  color: #E8D5A3;
+  border: 1px solid rgba(200, 164, 80, 0.4);
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sentinel-overlay button:hover {
+  transform: scale(1.04);
+}
+
+/* ===== EMERGENCY ACTION BUTTONS (Security Portal — Figure 7 ❷) ===== */
+.emergency-button {
+  padding: 14px 20px;
+  border-radius: 10px;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.emergency-button.lockdown  { background: #b71c1c; color: #fff; box-shadow: 0 4px 16px rgba(183, 28, 28, 0.5); }
+.emergency-button.evacuate  { background: #e65100; color: #fff; box-shadow: 0 4px 16px rgba(230, 81, 0, 0.5); }
+.emergency-button.panic     { background: #d32f2f; color: #fff; box-shadow: 0 4px 16px rgba(211, 47, 47, 0.5); }
+.emergency-button.backup    { background: #1565c0; color: #fff; box-shadow: 0 4px 16px rgba(21, 101, 192, 0.5); }
+
+.emergency-button:hover  { transform: translateY(-2px); }
+.emergency-button:active { transform: translateY(0); }
+
+/* ===== ACCESSIBILITY — REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .sentinel-prompt,
+  .sentinel-panic-button,
+  .sentinel-risk-indicator.tier-4,
+  .sentinel-overlay {
+    animation: none;
+  }
+}

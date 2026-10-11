@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communications | MindFlow Education Suite</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #00A8FF;
+            --accent-glow: rgba(0, 168, 255, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(0, 168, 255, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --parent-blue: #00A8FF;
+            --analytics-pink: #FF69B4;
+            --billing-green: #00CC66;
+            --communication-teal: #00CED1;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Standardized Portal Header */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 168, 255, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent), #0066FF);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--accent);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        /* Enhanced Navigation with Clean Links */
+        .portal-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(0, 168, 255, 0.3);
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 100;
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none;
+            gap: 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--text-dim);
+            text-decoration: none;
+            display: block;
+        }
+
+        .nav-tab.active {
+            border-bottom-color: var(--communication-teal);
+            color: var(--communication-teal);
+            background: rgba(0, 206, 209, 0.1);
+        }
+
+        .nav-tab:hover {
+            background: rgba(0, 168, 255, 0.05);
+            color: var(--text);
+        }
+
+        .back-button {
+            background: rgba(75, 0, 130, 0.3);
+            border: 1px solid var(--parent-indigo);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: rgba(75, 0, 130, 0.5);
+            transform: translateX(-3px);
+        }
+
+        /* MAIN CONTENT */
+        .main-container {
+            padding: 40px 20px 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: slideUp 1s ease-out;
+        }
+
+        .welcome-title {
+            font-size: 2.5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--communication-teal), var(--ai-gold), var(--parent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(0, 206, 209, 0.5);
+        }
+
+        .welcome-subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            color: var(--text-dim);
+        }
+
+        /* COMMUNICATIONS LAYOUT */
+        .communications-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 25px;
+            height: 70vh;
+        }
+
+        @media (max-width: 1024px) {
+            .communications-grid {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+        }
+
+        /* CONTACTS PANEL */
+        .contacts-panel {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid var(--communication-teal);
+            box-shadow: 0 0 25px rgba(0, 206, 209, 0.5);
+            overflow-y: auto;
+        }
+
+        .contacts-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--communication-teal), var(--parent-blue));
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .panel-icon {
+            font-size: 1.8rem;
+            color: var(--communication-teal);
+        }
+
+        .panel-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--communication-teal), var(--parent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--communication-teal);
+            border-radius: 25px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: white;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+        }
+
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .contact-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .contact-item:hover, .contact-item.active {
+            background: rgba(0, 206, 209, 0.1);
+            border-color: var(--communication-teal);
+            transform: translateX(5px);
+        }
+
+        .contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--communication-teal), var(--parent-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .contact-info {
+            flex: 1;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            color: var(--communication-teal);
+            margin-bottom: 5px;
+        }
+
+        .contact-role {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .contact-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .contact-status.away {
+            background: var(--warning);
+        }
+
+        .contact-status.offline {
+            background: var(--text-dim);
+        }
+
+        /* MESSAGING PANEL */
+        .messaging-panel {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border-radius: 20px;
+            border: 2px solid var(--parent-blue);
+            box-shadow: 0 0 25px rgba(0, 168, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .messaging-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--parent-blue), var(--ai-gold));
+        }
+
+        .message-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .message-contact-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--parent-blue), var(--communication-teal));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .message-contact-info h3 {
+            color: var(--parent-blue);
+            margin-bottom: 5px;
+        }
+
+        .message-contact-info p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .message-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            position: relative;
+            animation: messageSlide 0.3s ease;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background: rgba(0, 206, 209, 0.1);
+            border: 1px solid var(--communication-teal);
+            border-bottom-left-radius: 5px;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background: rgba(0, 168, 255, 0.1);
+            border: 1px solid var(--parent-blue);
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .message-input-container {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .message-input {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--communication-teal);
+            border-radius: 25px;
+            padding: 15px 20px;
+            color: white;
+            font-size: 0.9rem;
+            resize: none;
+            min-height: 50px;
+            max-height: 120px;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--parent-blue);
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, var(--communication-teal), var(--parent-blue));
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .send-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(0, 206, 209, 0.7);
+        }
+
+        /* ANNOUNCEMENTS SECTION */
+        .announcements-section {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--ai-gold);
+            margin-top: 30px;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .announcements-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, var(--ai-gold), var(--learning-green));
+        }
+
+        .announcements-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .announcements-icon {
+            font-size: 2rem;
+            color: var(--ai-gold);
+        }
+
+        .announcements-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--ai-gold), var(--learning-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .announcements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .announcement-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .announcement-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .announcement-card.urgent {
+            border-color: var(--danger);
+            background: rgba(255, 51, 102, 0.1);
+        }
+
+        .announcement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .announcement-title {
+            font-weight: 600;
+            color: var(--ai-gold);
+            margin-bottom: 5px;
+        }
+
+        .announcement-date {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .announcement-badge {
+            background: var(--ai-gold);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .announcement-badge.urgent {
+            background: var(--danger);
+            color: white;
+        }
+
+        .announcement-content {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        /* QUICK ACTIONS */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .action-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid var(--communication-teal);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--communication-teal);
+        }
+
+        .action-title {
+            font-weight: 600;
+            color: var(--communication-teal);
+            margin-bottom: 10px;
+        }
+
+        .action-desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* QUANTUM BUTTONS */
+        .quantum-btn {
+            background: linear-gradient(135deg, var(--communication-teal), var(--parent-blue));
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 206, 209, 0.4);
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, #0066FF, #8A2BE2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid #00FFAA;
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.4);
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: #FFD700;
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px #FFD700;
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: #00FFAA;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px #00FFAA;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px #00FFAA;
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid #0066FF;
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: #00A8FF;
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+
+        /* ANIMATIONS */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes messageSlide {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px #00A8FF, 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px #00A8FF, 0 0 30px #0066FF, 0 0 40px #8A2BE2; }
+            100% { text-shadow: 0 0 10px #00A8FF, 0 0 20px #0066FF; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 120px 15px 40px;
+            }
+            
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .portal-nav {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-tabs {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .nav-tab {
+                flex: 1;
+                min-width: 120px;
+                text-align: center;
+                padding: 0.8rem 1rem;
+            }
+            
+            .welcome-title {
+                font-size: 2rem;
+            }
+            
+            .communications-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .announcements-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Background -->
+    <div id="particles-js"></div>
+
+    <!-- Standardized Top Menu -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-comments"></i>
+            </div>
+            <div class="portal-title">
+                Parent Portal
+            </div>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="ProfileManager.openUpload()">
+                <div class="avatar">TD</div>
+                <div class="upload-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <div>
+                <div class="user-name">Thandi Dube</div>
+                <div class="user-role">Parent • 2 Children</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Enhanced Navigation with WORKING Links -->
+    <nav class="portal-nav">
+        <ul class="nav-tabs">
+            <li><a href="parent-dashboard.html" class="nav-tab">Dashboard</a></li>
+            <li><a href="communications.html" class="nav-tab active">Communications</a></li>
+            <li><a href="parent-analytics.html" class="nav-tab">Progress Analytics</a></li>
+            <li><a href="parent-children.html" class="nav-tab">Children Profiles</a></li>
+            <li><a href="parent-teacher.html" class="nav-tab">Teacher Connect</a></li>
+        </ul>
+        <a href="parent-dashboard.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <!-- WELCOME SECTION -->
+        <div class="welcome-section">
+            <h1 class="welcome-title">SCHOOL COMMUNICATIONS HUB</h1>
+            <p class="welcome-subtitle">Connect with teachers, receive announcements, and stay informed about your children's education</p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px; flex-wrap: wrap;">
+                <button class="quantum-btn" onclick="CommunicationsManager.newMessage()">
+                    <i class="fas fa-plus"></i> New Message
+                </button>
+                <button class="quantum-btn" onclick="CommunicationsManager.scheduleCall()">
+                    <i class="fas fa-phone"></i> Schedule Call
+                </button>
+                <button class="quantum-btn" onclick="CommunicationsManager.emergencyAlert()">
+                    <i class="fas fa-bell"></i> Emergency Alert
+                </button>
+            </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions">
+            <div class="action-card" onclick="CommunicationsManager.contactTeacher('lerato')">
+                <div class="action-icon">👩‍🏫</div>
+                <div class="action-title">Lerato's Teacher</div>
+                <div class="action-desc">Mrs. Ndlovu - Grade 5A</div>
+            </div>
+            <div class="action-card" onclick="CommunicationsManager.contactTeacher('tumi')">
+                <div class="action-icon">👨‍🏫</div>
+                <div class="action-title">Tumi's Teacher</div>
+                <div class="action-desc">Mr. Van der Merwe - Grade 7B</div>
+            </div>
+            <div class="action-card" onclick="CommunicationsManager.viewAnnouncements()">
+                <div class="action-icon">📢</div>
+                <div class="action-title">School Announcements</div>
+                <div class="action-desc">Latest updates & events</div>
+            </div>
+            <div class="action-card" onclick="CommunicationsManager.contactOffice()">
+                <div class="action-icon">🏫</div>
+                <div class="action-title">School Office</div>
+                <div class="action-desc">Administrative support</div>
+            </div>
+        </div>
+
+        <!-- COMMUNICATIONS GRID -->
+        <div class="communications-grid">
+            <!-- CONTACTS PANEL -->
+            <div class="contacts-panel">
+                <div class="panel-header">
+                    <div class="panel-icon">👥</div>
+                    <h3 class="panel-title">School Contacts</h3>
+                </div>
+
+                <div class="search-box">
+                    <i class="fas fa-search" style="color: var(--communication-teal);"></i>
+                    <input type="text" placeholder="Search contacts..." id="contactSearch">
+                </div>
+
+                <div class="contact-list">
+                    <div class="contact-item active" onclick="CommunicationsManager.selectContact('ndlovu')">
+                        <div class="contact-avatar" style="background: linear-gradient(135deg, #00CED1, #00A8FF);">N</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Mrs. Ndlovu</div>
+                            <div class="contact-role">Grade 5A Teacher - Mathematics</div>
+                        </div>
+                        <div class="contact-status"></div>
+                    </div>
+
+                    <div class="contact-item" onclick="CommunicationsManager.selectContact('vandermerwe')">
+                        <div class="contact-avatar" style="background: linear-gradient(135deg, #FFD700, #FF6B35);">V</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Mr. Van der Merwe</div>
+                            <div class="contact-role">Grade 7B Teacher - Science</div>
+                        </div>
+                        <div class="contact-status away"></div>
+                    </div>
+
+                    <div class="contact-item" onclick="CommunicationsManager.selectContact('principal')">
+                        <div class="contact-avatar" style="background: linear-gradient(135deg, #8A2BE2, #0066FF);">P</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Dr. Khumalo</div>
+                            <div class="contact-role">School Principal</div>
+                        </div>
+                        <div class="contact-status"></div>
+                    </div>
+
+                    <div class="contact-item" onclick="CommunicationsManager.selectContact('counselor')">
+                        <div class="contact-avatar" style="background: linear-gradient(135deg, #00FFAA, #00CED1);">C</div>
+                        <div class="contact-info">
+                            <div class="contact-name">Ms. Patel</div>
+                            <div class="contact-role">School Counselor</div>
+                        </div>
+                        <div class="contact-status offline"></div>
+                    </div>
+
+                    <div class="contact-item" onclick="CommunicationsManager.selectContact('office')">
+                        <div class="contact-avatar" style="background: linear-gradient(135deg, #FF69B4, #8A2BE2);">O</div>
+                        <div class="contact-info">
+                            <div class="contact-name">School Office</div>
+                            <div class="contact-role">Administration & Support</div>
+                        </div>
+                        <div class="contact-status"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MESSAGING PANEL -->
+            <div class="messaging-panel">
+                <div class="message-header">
+                    <div class="message-contact-avatar">N</div>
+                    <div class="message-contact-info">
+                        <h3>Mrs. Ndlovu</h3>
+                        <p>Grade 5A Teacher - Mathematics • Online</p>
+                    </div>
+                </div>
+
+                <div class="message-container" id="messageContainer">
+                    <div class="message received">
+                        <div class="message-content">
+                            Good morning Mrs. Dube! Lerato did exceptionally well on her mathematics test yesterday. She scored 95% - the highest in the class!
+                        </div>
+                        <div class="message-time">09:15 AM</div>
+                    </div>
+
+                    <div class="message sent">
+                        <div class="message-content">
+                            That's wonderful news! Thank you for letting me know. She's been working very hard on her math homework.
+                        </div>
+                        <div class="message-time">09:18 AM</div>
+                    </div>
+
+                    <div class="message received">
+                        <div class="message-content">
+                            Yes, her dedication is really showing. I wanted to mention that we have a parent-teacher meeting next Thursday at 3 PM. Would you be available?
+                        </div>
+                        <div class="message-time">09:20 AM</div>
+                    </div>
+
+                    <div class="message sent">
+                        <div class="message-content">
+                            Absolutely! I'll make sure to be there. Should I prepare anything specific for the meeting?
+                        </div>
+                        <div class="message-time">09:22 AM</div>
+                    </div>
+
+                    <div class="message received">
+                        <div class="message-content">
+                            Just bring any questions you might have about her progress. We'll discuss her overall performance and future learning goals.
+                        </div>
+                        <div class="message-time">09:23 AM</div>
+                    </div>
+                </div>
+
+                <div class="message-input-container">
+                    <textarea class="message-input" placeholder="Type your message here..." id="messageInput"></textarea>
+                    <button class="send-button" onclick="CommunicationsManager.sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANNOUNCEMENTS SECTION -->
+        <div class="announcements-section">
+            <div class="announcements-header">
+                <div class="announcements-icon">📢</div>
+                <h3 class="announcements-title">School Announcements & Updates</h3>
+            </div>
+
+            <div class="announcements-grid">
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <div>
+                            <div class="announcement-title">Sports Day Celebration</div>
+                            <div class="announcement-date">March 15, 2024 • 2 days ago</div>
+                        </div>
+                        <div class="announcement-badge">Event</div>
+                    </div>
+                    <div class="announcement-content">
+                        Our annual Sports Day will be held next Friday. All parents are invited to attend and cheer for our students!
+                    </div>
+                </div>
+
+                <div class="announcement-card urgent">
+                    <div class="announcement-header">
+                        <div>
+                            <div class="announcement-title">Weather Alert</div>
+                            <div class="announcement-date">March 16, 2024 • 1 day ago</div>
+                        </div>
+                        <div class="announcement-badge urgent">Urgent</div>
+                    </div>
+                    <div class="announcement-content">
+                        Due to expected severe weather, after-school activities are cancelled today. Please ensure children are collected promptly at dismissal.
+                    </div>
+                </div>
+
+                <div class="announcement-card">
+                    <div class="announcement-header">
+                        <div>
+                            <div class="announcement-title">Parent Workshop</div>
+                            <div class="announcement-date">March 10, 2024 • 1 week ago</div>
+                        </div>
+                        <div class="announcement-badge">Workshop</div>
+                    </div>
+                    <div class="announcement-content">
+                        Join us for a workshop on "Supporting Your Child's Digital Learning" next Wednesday evening in the school library.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXACT KDConcepts Ad Space -->
+        <div id="mindflow-universal-ad">
+            <div class="ad-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="ad-logo">KD</div>
+                    <div class="ad-text">
+                        <div class="ad-title">🚀 KDConcepts Premium</div>
+                        <div class="ad-subtitle">Educational Resources for African Families</div>
+                    </div>
+                </div>
+                <button class="ad-button" onclick="openKDConcepts()">
+                    Explore Resources
+                </button>
+            </div>
+        </div>
+
+        <!-- EXACT Universal Footer -->
+        <div id="mindflow-universal-footer">
+            <p>
+                <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                <span class="mindtech-glitch">MindTech</span>
+                <span style="color: #cccccc;">. COMMUNICATIONS ACTIVE - ALL SYSTEMS OPERATIONAL</span>
+            </p>
+            <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                Student Portal • Teacher Command • Parent Hub • Corporate Analytics
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        console.log('🔥 Firebase initialized for Communications Portal');
+
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#00CED1" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#00CED1",
+                    opacity: 0.4,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // Profile Manager
+        const ProfileManager = {
+            openUpload: function() {
+                alert('📸 Profile Picture Upload\n\nChoose from: Camera 📷 or File Upload 📁');
+            }
+        };
+
+        // Tab Navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                const tabName = this.textContent;
+                console.log(`Switching to tab: ${tabName}`);
+            });
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // COMMUNICATIONS MANAGEMENT SYSTEM
+        const CommunicationsManager = {
+            currentContact: 'ndlovu',
+            
+            selectContact: function(contactId) {
+                // Update active state
+                document.querySelectorAll('.contact-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                event.currentTarget.classList.add('active');
+                
+                this.currentContact = contactId;
+                this.showNotification(`💬 Opening conversation with ${this.getContactName(contactId)}`, 'info');
+                
+                // Update message header
+                this.updateMessageHeader(contactId);
+                
+                // Clear and reload messages for this contact
+                this.loadMessages(contactId);
+            },
+
+            getContactName: function(contactId) {
+                const contacts = {
+                    'ndlovu': 'Mrs. Ndlovu',
+                    'vandermerwe': 'Mr. Van der Merwe',
+                    'principal': 'Dr. Khumalo',
+                    'counselor': 'Ms. Patel',
+                    'office': 'School Office'
+                };
+                return contacts[contactId] || 'Contact';
+            },
+
+            updateMessageHeader: function(contactId) {
+                const header = document.querySelector('.message-header');
+                const contact = this.getContactName(contactId);
+                
+                header.innerHTML = `
+                    <div class="message-contact-avatar">${contact.charAt(0)}</div>
+                    <div class="message-contact-info">
+                        <h3>${contact}</h3>
+                        <p>${this.getContactRole(contactId)} • ${this.getContactStatus(contactId)}</p>
+                    </div>
+                `;
+            },
+
+            getContactRole: function(contactId) {
+                const roles = {
+                    'ndlovu': 'Grade 5A Teacher - Mathematics',
+                    'vandermerwe': 'Grade 7B Teacher - Science',
+                    'principal': 'School Principal',
+                    'counselor': 'School Counselor',
+                    'office': 'Administration & Support'
+                };
+                return roles[contactId] || 'School Staff';
+            },
+
+            getContactStatus: function(contactId) {
+                const statusElement = document.querySelector(`.contact-item[onclick*="${contactId}"] .contact-status`);
+                if (statusElement.classList.contains('away')) return 'Away';
+                if (statusElement.classList.contains('offline')) return 'Offline';
+                return 'Online';
+            },
+
+            loadMessages: function(contactId) {
+                const container = document.getElementById('messageContainer');
+                // For demo, we'll just show a loading message
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 20px; opacity: 0.7;">
+                        Loading conversation with ${this.getContactName(contactId)}...
+                    </div>
+                `;
+                
+                // Simulate loading delay
+                setTimeout(() => {
+                    this.showSampleMessages(contactId);
+                }, 1000);
+            },
+
+            showSampleMessages: function(contactId) {
+                const container = document.getElementById('messageContainer');
+                const sampleMessages = {
+                    'ndlovu': [
+                        { type: 'received', content: 'Good morning! Lerato has been doing exceptionally well in mathematics.', time: '09:15 AM' },
+                        { type: 'sent', content: 'Thank you for the update! She really enjoys your class.', time: '09:18 AM' }
+                    ],
+                    'vandermerwe': [
+                        { type: 'received', content: 'Tumi showed great curiosity in our science experiment today!', time: '10:30 AM' },
+                        { type: 'sent', content: 'That\'s wonderful to hear! He loves science.', time: '10:35 AM' }
+                    ],
+                    'principal': [
+                        { type: 'received', content: 'Welcome to our school community! We\'re delighted to have your family with us.', time: 'Yesterday' }
+                    ],
+                    'default': [
+                        { type: 'received', content: 'Hello! How can I help you today?', time: 'Just now' }
+                    ]
+                };
+
+                const messages = sampleMessages[contactId] || sampleMessages['default'];
+                
+                container.innerHTML = messages.map(msg => `
+                    <div class="message ${msg.type}">
+                        <div class="message-content">${msg.content}</div>
+                        <div class="message-time">${msg.time}</div>
+                    </div>
+                `).join('');
+                
+                container.scrollTop = container.scrollHeight;
+            },
+
+            sendMessage: function() {
+                const input = document.getElementById('messageInput');
+                const message = input.value.trim();
+                
+                if (!message) return;
+                
+                const container = document.getElementById('messageContainer');
+                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                
+                container.innerHTML += `
+                    <div class="message sent">
+                        <div class="message-content">${message}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+                
+                input.value = '';
+                container.scrollTop = container.scrollHeight;
+                
+                // Simulate reply after delay
+                setTimeout(() => {
+                    this.simulateReply();
+                }, 2000);
+            },
+
+            simulateReply: function() {
+                const replies = [
+                    "Thank you for your message. I'll get back to you soon.",
+                    "That's great to hear! Let me check on that for you.",
+                    "I appreciate you reaching out. I'll look into this matter.",
+                    "Thanks for the update. The children are doing well today."
+                ];
+                
+                const container = document.getElementById('messageContainer');
+                const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const randomReply = replies[Math.floor(Math.random() * replies.length)];
+                
+                container.innerHTML += `
+                    <div class="message received">
+                        <div class="message-content">${randomReply}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+                
+                container.scrollTop = container.scrollHeight;
+            },
+
+            newMessage: function() {
+                this.showNotification('💬 Opening new message composer...', 'info');
+            },
+
+            scheduleCall: function() {
+                this.showNotification('📞 Opening meeting scheduler...', 'info');
+            },
+
+            emergencyAlert: function() {
+                this.showNotification('🚨 Emergency alert system activated!', 'danger');
+            },
+
+            contactTeacher: function(child) {
+                const teacher = child === 'lerato' ? 'ndlovu' : 'vandermerwe';
+                this.selectContact(teacher);
+                this.showNotification(`👩‍🏫 Opening conversation with ${child}'s teacher`, 'info');
+            },
+
+            viewAnnouncements: function() {
+                document.querySelector('.announcements-section').scrollIntoView({ behavior: 'smooth' });
+                this.showNotification('📢 Scrolling to announcements...', 'info');
+            },
+
+            contactOffice: function() {
+                this.selectContact('office');
+                this.showNotification('🏫 Opening conversation with school office', 'info');
+            },
+
+            showNotification: function(message, type) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: ${type === 'success' ? 'rgba(0, 255, 170, 0.9)' : 
+                                 type === 'info' ? 'rgba(0, 206, 209, 0.9)' : 
+                                 'rgba(255, 51, 102, 0.9)'};
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    z-index: 10000;
+                    max-width: 400px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    border-left: 4px solid ${type === 'success' ? 'var(--learning-green)' : 
+                                         type === 'info' ? 'var(--communication-teal)' : 
+                                         'var(--danger)'};
+                    animation: slideUp 0.3s ease;
+                    white-space: pre-line;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' : 
+                                      type === 'info' ? 'fa-info-circle' : 
+                                      'fa-exclamation-triangle'}"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => notification.remove(), 500);
+                }, 4000);
+            }
+        };
+
+        // Firebase Data Management
+        async function loadCommunicationsData() {
+            try {
+                const user = auth.currentUser;
+                if (user) {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        console.log('👤 Parent communications data loaded:', userData);
+                        
+                        // Update UI with parent data
+                        document.querySelector('.user-name').textContent = userData.fullName || 'Thandi Dube';
+                        document.querySelector('.user-role').textContent = `Parent • ${userData.childrenCount || 2} Children`;
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error loading communications data:', error);
+            }
+        }
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load Firebase data
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log('👤 Parent authenticated:', user.email);
+                    loadCommunicationsData();
+                } else {
+                    console.log('👤 No user signed in');
+                    // Redirect to login if needed
+                    // window.location.href = 'login.html';
+                }
+            });
+
+            // Initialize message container scrolling
+            const messageContainer = document.getElementById('messageContainer');
+            if (messageContainer) {
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+            }
+
+            // Add enter key support for message input
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        CommunicationsManager.sendMessage();
+                    }
+                });
+            }
+
+            console.log('📞 Communications Portal - Fully Operational');
+            console.log('💬 Messaging System: Active');
+            console.log('👥 Contact Management: Ready');
+            console.log('📢 Announcements: Streaming');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Control | MindFlow Security</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #FF8C42;
+            --accent-glow: rgba(255, 140, 66, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(255, 140, 66, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --security-primary: #FF8C42;
+            --security-secondary: #E67E22;
+            --security-accent: #FFA366;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Security Header */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--security-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(255, 140, 66, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--security-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .security-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 140, 66, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--security-primary);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--security-primary), var(--security-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--security-primary);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--security-primary);
+        }
+
+        /* Back Navigation */
+        .back-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(255, 140, 66, 0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--security-primary), var(--security-secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(255, 140, 66, 0.4);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--security-primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Access Control Layout */
+        .access-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .access-monitor {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--security-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(255, 140, 66, 0.3);
+            position: relative;
+        }
+        
+        .access-monitor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--security-primary), var(--ai-gold));
+            z-index: 10;
+        }
+        
+        .access-points-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .access-point {
+            background: rgba(255, 140, 66, 0.05);
+            border: 2px solid var(--security-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .access-point::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--security-primary), var(--ai-gold));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .access-point:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .access-point:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(255, 140, 66, 0.3);
+        }
+        
+        .access-point.locked {
+            border-color: var(--danger);
+            background: rgba(255, 51, 102, 0.05);
+        }
+        
+        .access-point.unlocked {
+            border-color: var(--success);
+            background: rgba(0, 255, 136, 0.05);
+        }
+        
+        .access-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .access-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .access-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .status-locked {
+            color: var(--danger);
+        }
+        
+        .status-unlocked {
+            color: var(--success);
+        }
+        
+        .status-maintenance {
+            color: var(--warning);
+        }
+        
+        .access-location {
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .access-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .control-btn {
+            background: rgba(255, 140, 66, 0.1);
+            border: 1px solid var(--security-primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .control-btn:hover {
+            background: rgba(255, 140, 66, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .control-btn.success {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: var(--success);
+        }
+        
+        .control-btn.danger {
+            background: rgba(255, 51, 102, 0.1);
+            border-color: var(--danger);
+        }
+        
+        .access-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .security-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--security-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .security-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--security-primary);
+        }
+        
+        /* Access Log */
+        .access-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-item {
+            padding: 0.8rem;
+            background: rgba(255, 140, 66, 0.05);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid var(--security-primary);
+            transition: all 0.3s ease;
+        }
+        
+        .log-item.granted {
+            border-left-color: var(--success);
+            background: rgba(0, 255, 136, 0.05);
+        }
+        
+        .log-item.denied {
+            border-left-color: var(--danger);
+            background: rgba(255, 51, 102, 0.05);
+        }
+        
+        .log-item:hover {
+            transform: translateX(5px);
+            background: rgba(255, 140, 66, 0.1);
+        }
+        
+        .log-time {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-top: 0.3rem;
+        }
+        
+        /* Visitor Management */
+        .visitor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .visitor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: rgba(255, 140, 66, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .visitor-item:hover {
+            background: rgba(255, 140, 66, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .visitor-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .visitor-name {
+            font-weight: 600;
+        }
+        
+        .visitor-purpose {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+        
+        .visitor-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-approved {
+            color: var(--success);
+        }
+        
+        .status-pending {
+            color: var(--warning);
+        }
+        
+        /* Quick Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(16, 16, 24, 0.95);
+            border: 2px solid var(--security-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 140, 66, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-dim);
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, var(--security-primary), #0066FF);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid var(--learning-green);
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 140, 66, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mindflow-universal-ad::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+        }
+
+        #mindflow-universal-ad:hover::before {
+            animation: shimmer 1.5s;
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: var(--ai-gold);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px var(--ai-gold);
+            transition: all 0.3s ease;
+        }
+
+        .ad-logo:hover {
+            transform: rotate(15deg) scale(1.1);
+            box-shadow: 0 0 25px var(--ai-gold);
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: var(--learning-green);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--learning-green);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .ad-button:hover::before {
+            left: 100%;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--learning-green);
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid var(--security-primary);
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mindflow-universal-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--security-primary), var(--ai-gold), var(--learning-green), var(--security-primary));
+            animation: gradientMove 3s infinite linear;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: var(--security-primary);
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--security-primary), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--security-primary), 0 0 30px #0066FF, 0 0 40px #FF8C42; }
+            100% { text-shadow: 0 0 10px var(--security-primary), 0 0 20px #0066FF; }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .access-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .access-points-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .back-nav {
+                padding: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .access-points-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- Security Header -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="portal-title">
+                Security Command Center
+            </div>
+        </div>
+        <div class="security-status">
+            <div class="status-indicator"></div>
+            <span>All Systems Operational</span>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="AccessControlManager.openProfile()">
+                <div class="avatar">SG</div>
+            </div>
+            <div>
+                <div class="user-name">Officer James Wilson</div>
+                <div class="user-role">Security Supervisor • Shift Alpha</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Back Navigation -->
+    <nav class="back-nav">
+        <a href="security.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+        <div class="page-title">Access Control Management</div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">24/28</div>
+                <div class="stat-label">Access Points Online</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">156</div>
+                <div class="stat-label">Access Events (24h)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">3</div>
+                <div class="stat-label">Pending Approvals</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0</div>
+                <div class="stat-label">Security Breaches</div>
+            </div>
+        </div>
+        
+        <div class="access-layout">
+            <!-- Access Points Monitor -->
+            <div class="access-monitor">
+                <div class="access-points-grid">
+                    <div class="access-point unlocked">
+                        <div class="access-header">
+                            <div class="access-name">Main Gate</div>
+                            <div class="access-status status-unlocked">
+                                <i class="fas fa-lock-open"></i>
+                                UNLOCKED
+                            </div>
+                        </div>
+                        <div class="access-location">Primary Entrance • Gate 1</div>
+                        <div class="access-controls">
+                            <button class="control-btn danger" onclick="AccessControlManager.lockPoint('Main Gate')">
+                                <i class="fas fa-lock"></i> Lock
+                            </button>
+                            <button class="control-btn" onclick="AccessControlManager.remoteOpen('Main Gate')">
+                                <i class="fas fa-door-open"></i> Remote Open
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="access-point locked">
+                        <div class="access-header">
+                            <div class="access-name">Science Building</div>
+                            <div class="access-status status-locked">
+                                <i class="fas fa-lock"></i>
+                                LOCKED
+                            </div>
+                        </div>
+                        <div class="access-location">Research Wing • After Hours</div>
+                        <div class="access-controls">
+                            <button class="control-btn success" onclick="AccessControlManager.unlockPoint('Science Building')">
+                                <i class="fas fa-lock-open"></i> Unlock
+                            </button>
+                            <button class="control-btn" onclick="AccessControlManager.tempAccess('Science Building')">
+                                <i class="fas fa-clock"></i> Temp Access
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="access-point unlocked">
+                        <div class="access-header">
+                            <div class="access-name">Admin Building</div>
+                            <div class="access-status status-unlocked">
+                                <i class="fas fa-lock-open"></i>
+                                UNLOCKED
+                            </div>
+                        </div>
+                        <div class="access-location">Main Office • Business Hours</div>
+                        <div class="access-controls">
+                            <button class="control-btn danger" onclick="AccessControlManager.lockPoint('Admin Building')">
+                                <i class="fas fa-lock"></i> Lock
+                            </button>
+                            <button class="control-btn" onclick="AccessControlManager.scheduleAccess('Admin Building')">
+                                <i class="fas fa-calendar"></i> Schedule
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="access-point locked">
+                        <div class="access-header">
+                            <div class="access-name">Server Room</div>
+                            <div class="access-status status-locked">
+                                <i class="fas fa-lock"></i>
+                                LOCKED
+                            </div>
+                        </div>
+                        <div class="access-location">IT Department • Restricted</div>
+                        <div class="access-controls">
+                            <button class="control-btn success" onclick="AccessControlManager.unlockPoint('Server Room')">
+                                <i class="fas fa-lock-open"></i> Unlock
+                            </button>
+                            <button class="control-btn" onclick="AccessControlManager.emergencyOverride('Server Room')">
+                                <i class="fas fa-exclamation-triangle"></i> Override
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="access-point unlocked">
+                        <div class="access-header">
+                            <div class="access-name">Library Entrance</div>
+                            <div class="access-status status-unlocked">
+                                <i class="fas fa-lock-open"></i>
+                                UNLOCKED
+                            </div>
+                        </div>
+                        <div class="access-location">Academic Block • Public Access</div>
+                        <div class="access-controls">
+                            <button class="control-btn danger" onclick="AccessControlManager.lockPoint('Library Entrance')">
+                                <i class="fas fa-lock"></i> Lock
+                            </button>
+                            <button class="control-btn" onclick="AccessControlManager.monitorActivity('Library Entrance')">
+                                <i class="fas fa-eye"></i> Monitor
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="access-point locked">
+                        <div class="access-header">
+                            <div class="access-name">Sports Complex</div>
+                            <div class="access-status status-locked">
+                                <i class="fas fa-lock"></i>
+                                LOCKED
+                            </div>
+                        </div>
+                        <div class="access-location">Athletics Department • Evening</div>
+                        <div class="access-controls">
+                            <button class="control-btn success" onclick="AccessControlManager.unlockPoint('Sports Complex')">
+                                <i class="fas fa-lock-open"></i> Unlock
+                            </button>
+                            <button class="control-btn" onclick="AccessControlManager.remoteOpen('Sports Complex')">
+                                <i class="fas fa-door-open"></i> Remote Open
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Access Control Sidebar -->
+            <div class="access-sidebar">
+                <div class="security-card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Access Events</div>
+                        <div class="card-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                    </div>
+                    <div class="access-log">
+                        <div class="log-item granted">
+                            <strong>Access Granted - Main Gate</strong>
+                            <p>Staff ID: STF-4582 • James Wilson</p>
+                            <div class="log-time">5 minutes ago</div>
+                        </div>
+                        <div class="log-item denied">
+                            <strong>Access Denied - Server Room</strong>
+                            <p>Unauthorized attempt • Unknown ID</p>
+                            <div class="log-time">15 minutes ago</div>
+                        </div>
+                        <div class="log-item granted">
+                            <strong>Access Granted - Admin Building</strong>
+                            <p>Visitor Pass • Maria Rodriguez</p>
+                            <div class="log-time">45 minutes ago</div>
+                        </div>
+                        <div class="log-item granted">
+                            <strong>Access Granted - Science Building</strong>
+                            <p>Staff ID: STF-3291 • Dr. Chen</p>
+                            <div class="log-time">1 hour ago</div>
+                        </div>
+                        <div class="log-item denied">
+                            <strong>Access Denied - Sports Complex</strong>
+                            <p>After hours • Student ID</p>
+                            <div class="log-time">2 hours ago</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="security-card">
+                    <div class="card-header">
+                        <div class="card-title">Pending Visitor Approvals</div>
+                        <div class="card-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="visitor-list">
+                        <div class="visitor-item">
+                            <div class="visitor-info">
+                                <div class="visitor-name">Robert Johnson</div>
+                                <div class="visitor-purpose">Parent Meeting • Admin Office</div>
+                            </div>
+                            <div class="visitor-status status-pending">
+                                Pending
+                            </div>
+                        </div>
+                        <div class="visitor-item">
+                            <div class="visitor-info">
+                                <div class="visitor-name">Tech Solutions Inc.</div>
+                                <div class="visitor-purpose">IT Maintenance • Server Room</div>
+                            </div>
+                            <div class="visitor-status status-pending">
+                                Pending
+                            </div>
+                        </div>
+                        <div class="visitor-item">
+                            <div class="visitor-info">
+                                <div class="visitor-name">Sarah Williams</div>
+                                <div class="visitor-purpose">Job Interview • HR Department</div>
+                            </div>
+                            <div class="visitor-status status-pending">
+                                Pending
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <button class="control-btn" onclick="AccessControlManager.manageVisitors()" style="width: 100%;">
+                            <i class="fas fa-cog"></i> Manage Visitor Approvals
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="security-card">
+                    <div class="card-header">
+                        <div class="card-title">Quick Actions</div>
+                        <div class="card-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="control-btn" onclick="AccessControlManager.lockAllPoints()">
+                            <i class="fas fa-lock"></i> Lock All Points
+                        </button>
+                        <button class="control-btn" onclick="AccessControlManager.unlockAllPoints()">
+                            <i class="fas fa-lock-open"></i> Unlock All Points
+                        </button>
+                        <button class="control-btn" onclick="AccessControlManager.generateReport()">
+                            <i class="fas fa-file-alt"></i> Access Report
+                        </button>
+                        <button class="control-btn" onclick="AccessControlManager.systemCheck()">
+                            <i class="fas fa-cog"></i> System Diagnostics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXACT KDConcepts Ad Space -->
+        <div id="mindflow-universal-ad">
+            <div class="ad-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="ad-logo">KD</div>
+                    <div class="ad-text">
+                        <div class="ad-title">🚀 KDConcepts Premium</div>
+                        <div class="ad-subtitle">Educational Resources for African Families</div>
+                    </div>
+                </div>
+                <button class="ad-button" onclick="openKDConcepts()">
+                    Explore Resources
+                </button>
+            </div>
+        </div>
+
+        <!-- EXACT Universal Footer -->
+        <div id="mindflow-universal-footer">
+            <p>
+                <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                <span class="mindtech-glitch">MindTech</span>
+                <span style="color: #cccccc;">. Transforming African education through AI-powered quantum learning ecosystems.</span>
+            </p>
+            <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                Student Portal • Teacher Command • Parent Hub • Corporate Analytics
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#FF8C42" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#FF8C42",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // Access Control Management Functions
+        const AccessControlManager = {
+            openProfile: function() {
+                alert('👮 Security Profile\n\nOfficer: James Wilson\nBadge: SG-247\nShift: Alpha (06:00-14:00)\n\nSpecializations:\n• Access Control Systems\n• Visitor Management\n• Security Protocols');
+            },
+
+            lockPoint: function(pointName) {
+                if(confirm(`🔒 LOCK ACCESS POINT?\n\nAre you sure you want to lock ${pointName}?`)) {
+                    alert(`✅ ${pointName} has been locked\n\nAccess restricted until further notice.`);
+                    this.logAccessEvent(`${pointName} locked by security`, 'system');
+                }
+            },
+
+            unlockPoint: function(pointName) {
+                if(confirm(`🔓 UNLOCK ACCESS POINT?\n\nAre you sure you want to unlock ${pointName}?`)) {
+                    alert(`✅ ${pointName} has been unlocked\n\nAccess granted for authorized personnel.`);
+                    this.logAccessEvent(`${pointName} unlocked by security`, 'system');
+                }
+            },
+
+            remoteOpen: function(pointName) {
+                alert(`🚪 Remote opening ${pointName}\n\nAccess point will remain open for 30 seconds.`);
+                this.logAccessEvent(`Remote open activated for ${pointName}`, 'system');
+            },
+
+            tempAccess: function(pointName) {
+                alert(`⏰ Setting temporary access for ${pointName}\n\nAccess will be granted for the next 2 hours.`);
+                this.logAccessEvent(`Temporary access granted for ${pointName}`, 'system');
+            },
+
+            scheduleAccess: function(pointName) {
+                alert(`📅 Opening schedule settings for ${pointName}\n\nConfigure automatic access times.`);
+            },
+
+            emergencyOverride: function(pointName) {
+                if(confirm(`🚨 EMERGENCY OVERRIDE?\n\nThis will bypass all security protocols for ${pointName}. Confirm emergency situation.`)) {
+                    alert(`⚠️ EMERGENCY OVERRIDE ACTIVATED\n\nAll security protocols bypassed for ${pointName}.`);
+                    this.logAccessEvent(`EMERGENCY OVERRIDE: ${pointName}`, 'critical');
+                }
+            },
+
+            monitorActivity: function(pointName) {
+                alert(`👁️ Opening activity monitor for ${pointName}\n\nViewing recent access attempts and patterns.`);
+            },
+
+            lockAllPoints: function() {
+                if(confirm('🔒 LOCK ALL ACCESS POINTS?\n\nThis will secure the entire campus. Emergency services will be notified.')) {
+                    alert('🏫 ALL ACCESS POINTS LOCKED\n\nCampus is now in lockdown mode.');
+                    this.logAccessEvent('All access points locked - Campus lockdown', 'critical');
+                }
+            },
+
+            unlockAllPoints: function() {
+                if(confirm('🔓 UNLOCK ALL ACCESS POINTS?\n\nThis will restore normal access across campus.')) {
+                    alert('🏫 ALL ACCESS POINTS UNLOCKED\n\nNormal access restored.');
+                    this.logAccessEvent('All access points unlocked - Normal operations', 'system');
+                }
+            },
+
+            generateReport: function() {
+                alert('📊 Generating Access Control Report\n\nReport will include all access events from the last 24 hours.');
+            },
+
+            systemCheck: function() {
+                alert('🔧 Running System Diagnostics\n\nAll access control systems are operational.');
+            },
+
+            manageVisitors: function() {
+                alert('👥 Opening Visitor Management System\n\nManage pending visitor approvals and access permissions.');
+            },
+
+            logAccessEvent: function(message, type) {
+                const accessLog = document.querySelector('.access-log');
+                const newEvent = document.createElement('div');
+                newEvent.className = `log-item ${type === 'critical' ? 'denied' : 'granted'}`;
+                newEvent.innerHTML = `
+                    <strong>${message}</strong>
+                    <p>Action performed by Officer Wilson</p>
+                    <div class="log-time">Just now</div>
+                `;
+                accessLog.insertBefore(newEvent, accessLog.firstChild);
+            }
+        };
+
+        // Initialize access control system
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Access control system initialized');
+            
+            // Log page view to Firebase
+            logPageView('security-access-control');
+        });
+
+        // Firebase page view logging
+        function logPageView(pageName) {
+            if (firebase.apps.length) {
+                const db = firebase.firestore();
+                db.collection('navigation_logs').add({
+                    page: pageName,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    user: 'Security Officer Wilson',
+                    role: 'security',
+                    action: 'page_view'
+                }).then(() => {
+                    console.log(`📊 Logged page view: ${pageName}`);
+                }).catch(error => {
+                    console.error('Error logging page view:', error);
+                });
+            }
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC key to go back to dashboard
+            if (e.key === 'Escape') {
+                window.location.href = 'security.html';
+            }
+        });
+    </script>
+</body>
+</html>

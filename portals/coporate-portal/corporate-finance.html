@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Management | MindFlow Corporate</title>
+    
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #0066FF;
+            --accent-glow: rgba(0, 102, 255, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(0, 102, 255, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --corporate-primary: #0066FF;
+            --corporate-secondary: #0044CC;
+            --corporate-accent: #3388FF;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* EXACT Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Corporate Header */
+        .portal-header {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--corporate-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.3);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--corporate-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .corporate-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(0, 102, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--corporate-primary);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--corporate-primary), var(--corporate-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--corporate-primary);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--corporate-primary);
+        }
+
+        /* Back Navigation */
+        .back-nav {
+            background: rgba(15, 15, 26, 0.9);
+            border-bottom: 1px solid rgba(0, 102, 255, 0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--corporate-primary), var(--corporate-secondary));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.4);
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--corporate-primary);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        /* Finance Layout */
+        .finance-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .finance-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        /* Financial Overview */
+        .financial-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .finance-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .finance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .finance-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .finance-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+        
+        .finance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .finance-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .finance-icon {
+            font-size: 1.2rem;
+            color: var(--corporate-primary);
+        }
+        
+        .finance-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .finance-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--danger);
+        }
+        
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--corporate-primary);
+        }
+        
+        .chart-container {
+            height: 250px;
+            position: relative;
+        }
+        
+        /* Transactions Table */
+        .transactions-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .transactions-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+        
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .transactions-table th {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid var(--corporate-primary);
+            color: var(--ai-gold);
+            font-weight: 600;
+        }
+        
+        .transactions-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.2);
+        }
+        
+        .transaction-amount {
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .transaction-positive {
+            color: var(--success);
+        }
+        
+        .transaction-negative {
+            color: var(--danger);
+        }
+        
+        .transaction-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+        }
+        
+        /* Finance Sidebar */
+        .finance-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        .sidebar-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        
+        /* Budget Progress */
+        .budget-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .budget-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .budget-name {
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+        
+        .budget-amount {
+            font-size: 0.9rem;
+            color: var(--text-dim);
+        }
+        
+        .budget-bar {
+            height: 6px;
+            background: rgba(0, 102, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .budget-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Quick Actions */
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .action-btn {
+            background: rgba(0, 102, 255, 0.1);
+            border: 1px solid var(--corporate-primary);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 102, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        /* Financial Alerts */
+        .alerts-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        
+        .alert-item {
+            padding: 0.8rem;
+            background: rgba(255, 170, 0, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+            transition: all 0.3s ease;
+        }
+        
+        .alert-item.critical {
+            background: rgba(255, 51, 102, 0.1);
+            border-left-color: var(--danger);
+        }
+        
+        .alert-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .alert-title {
+            font-weight: 600;
+            color: var(--ai-gold);
+            margin-bottom: 0.3rem;
+        }
+        
+        .alert-message {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, var(--corporate-primary), #FF8C42);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid var(--learning-green);
+            font-family: Arial, sans-serif;
+            margin: 2rem 0;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mindflow-universal-ad::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+        }
+
+        #mindflow-universal-ad:hover::before {
+            animation: shimmer 1.5s;
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: var(--ai-gold);
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px var(--ai-gold);
+            transition: all 0.3s ease;
+        }
+
+        .ad-logo:hover {
+            transform: rotate(15deg) scale(1.1);
+            box-shadow: 0 0 25px var(--ai-gold);
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: var(--learning-green);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px var(--learning-green);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ad-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .ad-button:hover::before {
+            left: 100%;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--learning-green);
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid var(--corporate-primary);
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+            border-radius: 10px 10px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #mindflow-universal-footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold), var(--learning-green), var(--corporate-primary));
+            animation: gradientMove 3s infinite linear;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: var(--corporate-primary);
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--corporate-primary), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--corporate-primary), 0 0 30px #0066FF, 0 0 40px #FF8C42; }
+            100% { text-shadow: 0 0 10px var(--corporate-primary), 0 0 20px #0066FF; }
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .finance-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .financial-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .portal-header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .back-nav {
+                padding: 1rem;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .financial-overview {
+                grid-template-columns: 1fr;
+            }
+            
+            .transactions-table {
+                font-size: 0.8rem;
+            }
+            
+            .transactions-table th,
+            .transactions-table td {
+                padding: 0.5rem;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .ad-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- Corporate Header -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="portal-title">
+                Corporate Command Center
+            </div>
+        </div>
+        <div class="corporate-status">
+            <div class="status-indicator"></div>
+            <span>All Systems Operational</span>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="FinanceManager.openProfile()">
+                <div class="avatar">CE</div>
+            </div>
+            <div>
+                <div class="user-name">Sarah Chen</div>
+                <div class="user-role">Chief Executive Officer</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Back Navigation -->
+    <nav class="back-nav">
+        <a href="corporate.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+        <div class="page-title">Financial Management & Reporting</div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Financial Overview -->
+        <div class="financial-overview">
+            <div class="finance-card">
+                <div class="finance-header">
+                    <div class="finance-title">Total Revenue</div>
+                    <div class="finance-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="finance-value">$2.8M</div>
+                <div class="finance-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>12.4% growth</span>
+                </div>
+            </div>
+            
+            <div class="finance-card">
+                <div class="finance-header">
+                    <div class="finance-title">Operating Profit</div>
+                    <div class="finance-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                </div>
+                <div class="finance-value">$845K</div>
+                <div class="finance-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>8.7% increase</span>
+                </div>
+            </div>
+            
+            <div class="finance-card">
+                <div class="finance-header">
+                    <div class="finance-title">Cash Flow</div>
+                    <div class="finance-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                </div>
+                <div class="finance-value">$1.2M</div>
+                <div class="finance-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>15.2% positive</span>
+                </div>
+            </div>
+            
+            <div class="finance-card">
+                <div class="finance-header">
+                    <div class="finance-title">Expenses</div>
+                    <div class="finance-icon">
+                        <i class="fas fa-receipt"></i>
+                    </div>
+                </div>
+                <div class="finance-value">$1.4M</div>
+                <div class="finance-trend trend-down">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>3.2% reduction</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="finance-layout">
+            <!-- Finance Main Area -->
+            <div class="finance-main">
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <div class="card-title">Revenue vs Expenses</div>
+                            <div class="card-icon">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="revenueExpenseChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <div class="card-title">Profit Distribution</div>
+                            <div class="card-icon">
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="profitChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Transactions -->
+                <div class="transactions-card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Transactions</div>
+                        <div class="card-icon">
+                            <i class="fas fa-list"></i>
+                        </div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Oct 15, 2024</td>
+                                    <td>Corporate Training Revenue</td>
+                                    <td>Income</td>
+                                    <td class="transaction-amount transaction-positive">+$125,000</td>
+                                    <td><span class="transaction-status status-completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 14, 2024</td>
+                                    <td>Infrastructure Upgrade</td>
+                                    <td>Expense</td>
+                                    <td class="transaction-amount transaction-negative">-$45,200</td>
+                                    <td><span class="transaction-status status-completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 12, 2024</td>
+                                    <td>AI Course Subscription</td>
+                                    <td>Income</td>
+                                    <td class="transaction-amount transaction-positive">+$89,500</td>
+                                    <td><span class="transaction-status status-completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 10, 2024</td>
+                                    <td>Marketing Campaign</td>
+                                    <td>Expense</td>
+                                    <td class="transaction-amount transaction-negative">-$32,800</td>
+                                    <td><span class="transaction-status status-pending">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 8, 2024</td>
+                                    <td>Partner Revenue Share</td>
+                                    <td>Income</td>
+                                    <td class="transaction-amount transaction-positive">+$67,300</td>
+                                    <td><span class="transaction-status status-completed">Completed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="action-buttons" style="margin-top: 1rem;">
+                        <button class="action-btn" onclick="FinanceManager.viewAllTransactions()">
+                            <i class="fas fa-eye"></i> View All Transactions
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Finance Sidebar -->
+            <div class="finance-sidebar">
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Budget Allocation</div>
+                        <div class="card-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                    </div>
+                    <div class="budget-list">
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">Research & Development</div>
+                                <div class="budget-amount">$450K / $500K</div>
+                            </div>
+                            <div class="budget-bar">
+                                <div class="budget-progress" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">Marketing</div>
+                                <div class="budget-amount">$320K / $400K</div>
+                            </div>
+                            <div class="budget-bar">
+                                <div class="budget-progress" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">Operations</div>
+                                <div class="budget-amount">$280K / $350K</div>
+                            </div>
+                            <div class="budget-bar">
+                                <div class="budget-progress" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">Infrastructure</div>
+                                <div class="budget-amount">$180K / $250K</div>
+                            </div>
+                            <div class="budget-bar">
+                                <div class="budget-progress" style="width: 72%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Quick Actions</div>
+                        <div class="card-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="FinanceManager.generateReport()">
+                            <i class="fas fa-file-pdf"></i> Generate Financial Report
+                        </button>
+                        <button class="action-btn" onclick="FinanceManager.forecastRevenue()">
+                            <i class="fas fa-crystal-ball"></i> Revenue Forecast
+                        </button>
+                        <button class="action-btn" onclick="FinanceManager.analyzeExpenses()">
+                            <i class="fas fa-chart-bar"></i> Expense Analysis
+                        </button>
+                        <button class="action-btn" onclick="FinanceManager.exportData()">
+                            <i class="fas fa-download"></i> Export Financial Data
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Financial Alerts</div>
+                        <div class="card-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                    </div>
+                    <div class="alerts-list">
+                        <div class="alert-item">
+                            <div class="alert-title">Budget Overspend</div>
+                            <div class="alert-message">R&D budget at 90% utilization</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-title">Revenue Target</div>
+                            <div class="alert-message">Q3 revenue target achieved 2 weeks early</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-title">Tax Deadline</div>
+                            <div class="alert-message">Quarterly tax filing due in 15 days</div>
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="FinanceManager.aiConsult()" style="margin-top: 1rem; width: 100%;">
+                        <i class="fas fa-robot"></i> Consult Khensani AI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- EXACT KDConcepts Ad Space -->
+        <div id="mindflow-universal-ad">
+            <div class="ad-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="ad-logo">KD</div>
+                    <div class="ad-text">
+                        <div class="ad-title">🚀 KDConcepts Premium</div>
+                        <div class="ad-subtitle">Educational Resources for African Families</div>
+                    </div>
+                </div>
+                <button class="ad-button" onclick="openKDConcepts()">
+                    Explore Resources
+                </button>
+            </div>
+        </div>
+
+        <!-- EXACT Universal Footer -->
+        <div id="mindflow-universal-footer">
+            <p>
+                <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+                <span class="mindtech-glitch">MindTech</span>
+                <span style="color: #cccccc;">. Transforming African education through AI-powered quantum learning ecosystems.</span>
+            </p>
+            <div style="margin-top: 15px; font-size: 12px; color: #888;">
+                Student Portal • Teacher Command • Parent Hub • Security Command
+            </div>
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // EXACT Quantum Particles Configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#0066FF" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#0066FF",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" }
+                }
+            }
+        });
+
+        // EXACT KDConcepts Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // Finance Management Functions
+        const FinanceManager = {
+            openProfile: function() {
+                alert('👔 Corporate Profile\n\nExecutive: Sarah Chen\nRole: Chief Executive Officer\nTenure: 5 years\n\nSpecializations:\n• Financial Strategy\n• Revenue Optimization\n• Budget Management');
+            },
+
+            generateReport: function() {
+                alert('📊 Generating Financial Report\n\nComprehensive financial report will be compiled and distributed.');
+            },
+
+            forecastRevenue: function() {
+                alert('🔮 Revenue Forecasting\n\nGenerating revenue projections and financial forecasts.');
+            },
+
+            analyzeExpenses: function() {
+                alert('📈 Expense Analysis\n\nDetailed expense analysis and optimization recommendations.');
+            },
+
+            exportData: function() {
+                alert('💾 Exporting Financial Data\n\nAll financial data will be prepared for export.');
+            },
+
+            viewAllTransactions: function() {
+                alert('📋 Viewing All Transactions\n\nOpening complete transaction history and records.');
+            },
+
+            aiConsult: function() {
+                alert('🤖 Khensani AI Consultation\n\n"Based on current financials, I recommend increasing R&D investment by 15% and optimizing marketing spend for maximum ROI in African markets."');
+            }
+        };
+
+        // Initialize finance dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ Finance dashboard initialized');
+            
+            // Log page view to Firebase
+            logPageView('corporate-finance');
+            
+            // Initialize charts
+            initializeFinanceCharts();
+        });
+
+        // Firebase page view logging
+        function logPageView(pageName) {
+            if (firebase.apps.length) {
+                const db = firebase.firestore();
+                db.collection('navigation_logs').add({
+                    page: pageName,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    user: 'CEO Sarah Chen',
+                    role: 'corporate',
+                    action: 'page_view'
+                }).then(() => {
+                    console.log(`📊 Logged page view: ${pageName}`);
+                }).catch(error => {
+                    console.error('Error logging page view:', error);
+                });
+            }
+        }
+
+        // Initialize Finance Charts
+        function initializeFinanceCharts() {
+            // Revenue vs Expenses Chart
+            const revenueExpenseCtx = document.getElementById('revenueExpenseChart').getContext('2d');
+            new Chart(revenueExpenseCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [1.8, 2.1, 2.3, 2.4, 2.6, 2.5, 2.7, 2.8, 2.9],
+                        backgroundColor: 'rgba(0, 255, 136, 0.8)',
+                        borderColor: '#00FFAA',
+                        borderWidth: 2
+                    }, {
+                        label: 'Expenses',
+                        data: [1.2, 1.3, 1.4, 1.5, 1.6, 1.5, 1.4, 1.3, 1.4],
+                        backgroundColor: 'rgba(255, 51, 102, 0.8)',
+                        borderColor: '#FF3366',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0ff',
+                                callback: function(value) {
+                                    return '$' + value + 'M';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Profit Distribution Chart
+            const profitCtx = document.getElementById('profitChart').getContext('2d');
+            new Chart(profitCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Operations', 'R&D', 'Marketing', 'Infrastructure', 'Reserves'],
+                    datasets: [{
+                        data: [45, 25, 15, 10, 5],
+                        backgroundColor: [
+                            '#0066FF',
+                            '#00FFAA',
+                            '#FFD700',
+                            '#FF8C42',
+                            '#FF3366'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#0a0a2a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#e0e0ff',
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // ESC key to go back to dashboard
+            if (e.key === 'Escape') {
+                window.location.href = 'corporate.html';
+            }
+        });
+    </script>
+</body>
+</html>

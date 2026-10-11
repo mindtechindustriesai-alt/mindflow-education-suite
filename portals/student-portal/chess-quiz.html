@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess & Quiz - MindFlow Student Portal</title>
+    
+    <!-- Required Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <style>
+        :root {
+            --quantum-blue: #0066FF;
+            --student-blue: #00A8FF;
+            --learning-green: #00FFAA;
+            --ai-gold: #FFD700;
+            --gold-yellow: #FFD700;
+            --gold-light: #FFE55C;
+            --gold-dark: #FFC400;
+            --safety-orange: #FF8C42;
+            --neon-red: #FF6B6B;
+            --tech-black: #0A0A0A;
+            --dark-space: #0f0f1a;
+            --analytics-pink: #FF69B4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        body {
+            background: var(--dark-space);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* EXACT Quantum Particles Background */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* SIMPLIFIED NAVIGATION - BACK BUTTON ONLY */
+        .tech-navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 10, 16, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--ai-gold);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        .brain-icon {
+            font-size: 1.8em;
+            animation: brainPulse 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px var(--ai-gold));
+        }
+
+        .brand-main {
+            background: linear-gradient(135deg, var(--ai-gold), var(--student-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-button {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--ai-gold);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+        }
+
+        /* Main Content */
+        .games-content {
+            padding: 120px 20px 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: slideUp 1s ease-out;
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--ai-gold), var(--gold-light), var(--learning-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Games Grid */
+        .games-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-card {
+            background: rgba(16, 16, 24, 0.95);
+            backdrop-filter: blur(25px);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 2px solid var(--ai-gold);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.7);
+        }
+
+        .quiz-card {
+            border: 2px solid var(--learning-green);
+            box-shadow: 0 0 25px rgba(0, 255, 170, 0.5);
+        }
+
+        .quiz-card:hover {
+            box-shadow: 0 0 35px rgba(0, 255, 170, 0.7);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--ai-gold), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .quiz-title {
+            background: linear-gradient(135deg, var(--learning-green), var(--student-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* CHESS BOARD - PRESERVED FROM ORIGINAL */
+        .chess-board-container {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .chess-board {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            border: 3px solid var(--ai-gold);
+            border-radius: 8px;
+            box-shadow: 
+                0 0 50px rgba(255, 215, 0, 0.4),
+                inset 0 0 50px rgba(255, 215, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chess-square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 700;
+            text-shadow: 0 0 15px currentColor;
+        }
+
+        .light-square {
+            background: linear-gradient(135deg, #2a2a3a, #1a1a2a);
+        }
+
+        .dark-square {
+            background: linear-gradient(135deg, #1a1a2e, #0f0f1a);
+        }
+
+        .chess-square:hover {
+            transform: scale(1.08);
+            z-index: 20;
+            box-shadow: inset 0 0 30px rgba(255,215,0,0.3);
+        }
+
+        .selected-square {
+            background: linear-gradient(135deg, rgba(255,215,0,0.4), rgba(255,198,0,0.4)) !important;
+            box-shadow: 
+                inset 0 0 30px var(--ai-gold),
+                0 0 30px var(--ai-gold) !important;
+        }
+
+        .valid-move::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle, var(--learning-green) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 15px var(--learning-green);
+        }
+
+        .capture-move::after {
+            content: '';
+            position: absolute;
+            width: 90%;
+            height: 90%;
+            border: 3px solid var(--neon-red);
+            border-radius: 50%;
+            animation: pulseRed 1.5s infinite;
+            box-shadow: 0 0 20px var(--neon-red);
+        }
+
+        /* CHESS CONTROLS - PRESERVED */
+        .chess-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .quantum-btn {
+            background: linear-gradient(135deg, var(--ai-gold), var(--gold-dark));
+            border: none;
+            color: var(--tech-black);
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quantum-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .quantum-btn.secondary {
+            background: transparent;
+            border: 2px solid var(--ai-gold);
+            color: var(--ai-gold);
+        }
+
+        .quantum-btn.secondary:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .quantum-btn.quiz {
+            background: linear-gradient(135deg, var(--learning-green), var(--student-blue));
+            color: white;
+        }
+
+        /* GAME STATUS - PRESERVED */
+        .game-status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 10px;
+            border: 1px solid var(--ai-gold);
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+
+        /* QUIZ STYLES */
+        .quiz-question {
+            background: rgba(26, 26, 46, 0.6);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 4px solid var(--learning-green);
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .quiz-option {
+            background: rgba(26, 26, 46, 0.6);
+            padding: 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .quiz-option:hover {
+            border-color: var(--learning-green);
+            transform: translateY(-2px);
+        }
+
+        .quiz-option.correct {
+            background: rgba(0, 255, 170, 0.2);
+            border-color: var(--learning-green);
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 107, 107, 0.2);
+            border-color: var(--neon-red);
+        }
+
+        /* PROGRESS AND STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(26, 26, 46, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid var(--ai-gold);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-stat {
+            border: 2px solid var(--learning-green);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold-light);
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--ai-gold), var(--gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .quiz-stat-value {
+            background: linear-gradient(135deg, var(--learning-green), var(--student-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            opacity: 0.9;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        /* MOVE HISTORY */
+        .move-history {
+            margin-top: 20px;
+        }
+
+        .move-history h4 {
+            color: var(--ai-gold);
+            margin-bottom: 12px;
+        }
+
+        .history-container {
+            max-height: 120px;
+            overflow-y: auto;
+            background: rgba(26,26,46,0.6);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--ai-gold);
+        }
+
+        /* EXACT KDConcepts Ad Space */
+        #mindflow-universal-ad {
+            background: linear-gradient(45deg, #0066FF, #8A2BE2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-top: 2px solid #00FFAA;
+            font-family: Arial, sans-serif;
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .ad-logo {
+            background: #FFD700;
+            color: #000;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 0 15px #FFD700;
+        }
+
+        .ad-text {
+            text-align: left;
+        }
+
+        .ad-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .ad-subtitle {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .ad-button {
+            background: #00FFAA;
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px #00FFAA;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* EXACT Universal Footer */
+        #mindflow-universal-footer {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            border-top: 3px solid #0066FF;
+            font-family: Arial, sans-serif;
+            margin-top: 40px;
+        }
+
+        #mindflow-universal-footer p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mindtech-glitch {
+            color: #00A8FF;
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+
+        /* Animations */
+        @keyframes brainPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px var(--ai-gold)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 25px var(--ai-gold)); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        @keyframes pulseRed {
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px #00A8FF, 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px #00A8FF, 0 0 30px #0066FF, 0 0 40px #8A2BE2; }
+            100% { text-shadow: 0 0 10px #00A8FF, 0 0 20px #0066FF; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tech-navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .games-content {
+                padding: 140px 15px 40px;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .chess-board {
+                max-width: 100%;
+            }
+
+            .chess-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-options {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            .ad-text {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- EXACT Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- SIMPLIFIED NAVIGATION - BACK BUTTON ONLY -->
+    <nav class="tech-navbar">
+        <div class="nav-brand">
+            <span class="brain-icon">♟️</span>
+            <span class="brand-main">CHESS & QUIZ ARENA</span>
+        </div>
+        <a href="mindflow-portal.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="games-content">
+        <!-- Welcome Section -->
+        <section class="welcome-section">
+            <h1 class="welcome-title">Strategic Learning Games</h1>
+            <p class="welcome-subtitle">
+                Develop critical thinking skills with AI-powered chess and infinite quiz challenges. 
+                Compete with friends and track your progress!
+            </p>
+            <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px; flex-wrap: wrap;">
+                <button class="quantum-btn" onclick="GameHub.startDailyChallenge()">
+                    <i class="fas fa-trophy"></i> Daily Challenge
+                </button>
+                <button class="quantum-btn secondary" onclick="GameHub.viewLeaderboard()">
+                    <i class="fas fa-chart-line"></i> Leaderboard
+                </button>
+            </div>
+        </section>
+
+        <!-- Games Grid -->
+        <div class="games-grid">
+            <!-- Chess Arena -->
+            <div class="game-card">
+                <div class="section-header">
+                    <h2 class="section-title"><i class="fas fa-chess-board"></i> Khensani AI Chess</h2>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="quantum-btn secondary" onclick="ChessEngine.saveGame()">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                        <button class="quantum-btn" onclick="ChessEngine.newGame()">
+                            <i class="fas fa-plus"></i> New
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chess Board -->
+                <div class="chess-board-container">
+                    <div class="chess-board" id="chessBoard">
+                        <!-- Board generated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Game Status -->
+                <div class="game-status" id="gameStatus">
+                    Your turn! White to move.
+                </div>
+
+                <!-- Chess Controls -->
+                <div class="chess-controls">
+                    <button class="quantum-btn secondary" onclick="ChessEngine.undoMove()">
+                        <i class="fas fa-undo"></i> Undo
+                    </button>
+                    <button class="quantum-btn secondary" onclick="ChessEngine.toggleDifficulty()">
+                        <i class="fas fa-cog"></i> <span id="difficultyLabel">Medium</span>
+                    </button>
+                    <button class="quantum-btn secondary" onclick="ChessEngine.showHint()">
+                        <i class="fas fa-lightbulb"></i> Hint
+                    </button>
+                    <button class="quantum-btn secondary" onclick="ChessEngine.toggleSound()">
+                        <i class="fas fa-volume-up"></i> <span id="soundLabel">On</span>
+                    </button>
+                </div>
+
+                <!-- Chess Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="chessScore">0</div>
+                        <div class="stat-label">Chess Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamesPlayed">0</div>
+                        <div class="stat-label">Games Played</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="gamesWon">0</div>
+                        <div class="stat-label">Games Won</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bestScore">0</div>
+                        <div class="stat-label">Best Score</div>
+                    </div>
+                </div>
+
+                <!-- Move History -->
+                <div class="move-history">
+                    <h4><i class="fas fa-history"></i> Move History</h4>
+                    <div class="history-container" id="moveHistory">
+                        <!-- Move history will appear here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Arena -->
+            <div class="game-card quiz-card">
+                <div class="section-header">
+                    <h2 class="section-title quiz-title"><i class="fas fa-brain"></i> Khensani AI Quiz</h2>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="quantum-btn secondary" onclick="QuizEngine.resetQuiz()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                        <button class="quantum-btn quiz" onclick="QuizEngine.nextQuestion()">
+                            <i class="fas fa-forward"></i> Next
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quiz Controls -->
+                <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="quantum-btn secondary" onclick="QuizEngine.setDifficulty('easy')">Easy</button>
+                    <button class="quantum-btn secondary" onclick="QuizEngine.setDifficulty('medium')">Medium</button>
+                    <button class="quantum-btn secondary" onclick="QuizEngine.setDifficulty('hard')">Hard</button>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button class="quantum-btn" onclick="QuizEngine.selectSubject('mathematics')">
+                        <i class="fas fa-calculator"></i> Math
+                    </button>
+                    <button class="quantum-btn" onclick="QuizEngine.selectSubject('science')">
+                        <i class="fas fa-flask"></i> Science
+                    </button>
+                    <button class="quantum-btn" onclick="QuizEngine.selectSubject('history')">
+                        <i class="fas fa-monument"></i> History
+                    </button>
+                    <button class="quantum-btn" onclick="QuizEngine.selectSubject('programming')">
+                        <i class="fas fa-code"></i> Coding
+                    </button>
+                </div>
+
+                <!-- Quiz Display -->
+                <div class="quiz-question" id="quizQuestion">
+                    <h3 style="color: var(--learning-green); margin-bottom: 15px;" id="questionText">
+                        Welcome to Khensani AI Quiz! Select a subject to start.
+                    </h3>
+                    <div style="opacity: 0.8; font-size: 0.9em;" id="questionInfo">
+                        Questions powered by AI - Develop your knowledge
+                    </div>
+                </div>
+
+                <!-- Quiz Options -->
+                <div class="quiz-options" id="quizOptions">
+                    <!-- Options will be generated here -->
+                </div>
+
+                <!-- Quiz Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card quiz-stat">
+                        <div class="stat-value quiz-stat-value" id="quizScore">0</div>
+                        <div class="stat-label">Quiz Score</div>
+                    </div>
+                    <div class="stat-card quiz-stat">
+                        <div class="stat-value quiz-stat-value" id="questionsAnswered">0</div>
+                        <div class="stat-label">Questions</div>
+                    </div>
+                    <div class="stat-card quiz-stat">
+                        <div class="stat-value quiz-stat-value" id="correctAnswers">0</div>
+                        <div class="stat-label">Correct</div>
+                    </div>
+                    <div class="stat-card quiz-stat">
+                        <div class="stat-value quiz-stat-value" id="streak">0</div>
+                        <div class="stat-label">Streak</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- EXACT KDConcepts Ad Space -->
+    <div id="mindflow-universal-ad">
+        <div class="ad-content">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="ad-logo">KD</div>
+                <div class="ad-text">
+                    <div class="ad-title">🚀 KDConcepts Premium</div>
+                    <div class="ad-subtitle">Educational Resources for African Families</div>
+                </div>
+            </div>
+            <button class="ad-button" onclick="openKDConcepts()">
+                Explore Resources
+            </button>
+        </div>
+    </div>
+    
+    <!-- EXACT Universal Footer -->
+    <div id="mindflow-universal-footer">
+        <p>
+            <span style="color: #cccccc;">© 2025 MindFlow. Khensani AI. Powered by </span>
+            <span class="mindtech-glitch">MindTech</span>
+            <span style="color: #cccccc;">. Transforming African education through AI-powered quantum learning ecosystems.</span>
+        </p>
+        <div style="margin-top: 15px; font-size: 12px; color: #888;">
+            Student Portal • Teacher Command • Parent Hub • Corporate Analytics
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // KDConcepts Ad Function
+        function openKDConcepts() {
+            window.open('https://kdconcepts.com', '_blank');
+            console.log('🚀 Opening KDConcepts Premium Resources');
+        }
+
+        // EXACT Quantum Particles Initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: "#00A8FF" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: "#00A8FF",
+                        opacity: 0.2,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 2,
+                        direction: "none",
+                        random: true,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" }
+                    }
+                }
+            });
+
+            console.log('🎮 Chess & Quiz Arena - Enhanced Navigation Loaded');
+        });
+
+        // Enhanced Chess Engine - PRESERVED FROM ORIGINAL
+        class EnhancedChessEngine {
+            constructor() {
+                this.game = new Chess();
+                this.selectedSquare = null;
+                this.validMoves = [];
+                this.difficulty = 'medium';
+                this.soundEnabled = true;
+                
+                this.pieceUnicode = {
+                    'wK': '♔', 'wQ': '♕', 'wR': '♖', 'wB': '♗', 'wN': '♘', 'wP': '♙',
+                    'bK': '♚', 'bQ': '♛', 'bR': '♜', 'bB': '♝', 'bN': '♞', 'bP': '♟'
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.createBoard();
+                this.updateBoard();
+                console.log('♟️ Khensani AI Chess Engine Ready!');
+            }
+
+            createBoard() {
+                const board = document.getElementById('chessBoard');
+                board.innerHTML = '';
+                
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        const square = document.createElement('div');
+                        square.className = `chess-square ${(row + col) % 2 === 0 ? 'light-square' : 'dark-square'}`;
+                        square.dataset.square = this.getSquareName(row, col);
+                        square.onclick = () => this.handleSquareClick(this.getSquareName(row, col));
+                        board.appendChild(square);
+                    }
+                }
+            }
+
+            getSquareName(row, col) {
+                const files = 'abcdefgh';
+                const ranks = '87654321';
+                return files[col] + ranks[row];
+            }
+
+            updateBoard() {
+                // Clear board
+                document.querySelectorAll('.chess-square').forEach(square => {
+                    square.innerHTML = '';
+                    square.classList.remove('selected-square', 'valid-move', 'capture-move');
+                });
+
+                // Place pieces
+                for (let row = 0; row < 8; row++) {
+                    for (let col = 0; col < 8; col++) {
+                        const squareName = this.getSquareName(row, col);
+                        const piece = this.game.get(squareName);
+                        
+                        if (piece) {
+                            const square = document.querySelector(`[data-square="${squareName}"]`);
+                            const pieceCode = piece.color + piece.type.toUpperCase();
+                            square.innerHTML = this.pieceUnicode[pieceCode];
+                            square.style.color = piece.color === 'w' ? '#FFFFFF' : '#FF6B6B';
+                            square.style.textShadow = `0 0 15px ${piece.color === 'w' ? 'var(--ai-gold)' : 'var(--neon-red)'}`;
+                        }
+                    }
+                }
+
+                this.updateGameStatus();
+            }
+
+            handleSquareClick(square) {
+                if (this.selectedSquare) {
+                    const move = this.game.move({
+                        from: this.selectedSquare,
+                        to: square,
+                        promotion: 'q'
+                    });
+
+                    if (move) {
+                        this.selectedSquare = null;
+                        this.validMoves = [];
+                        this.updateBoard();
+                        
+                        // Update game stats
+                        this.updateChessStats(10);
+                        this.addToMoveHistory(move.san);
+                        
+                        if (!this.game.game_over()) {
+                            setTimeout(() => this.makeAIMove(), 600);
+                        } else {
+                            this.handleGameEnd();
+                        }
+                    } else {
+                        const piece = this.game.get(square);
+                        if (piece && piece.color === 'w') {
+                            this.selectSquare(square);
+                        } else {
+                            this.selectedSquare = null;
+                            this.validMoves = [];
+                            this.updateBoard();
+                        }
+                    }
+                } else {
+                    this.selectSquare(square);
+                }
+            }
+
+            selectSquare(square) {
+                const piece = this.game.get(square);
+                if (piece && piece.color === 'w') {
+                    this.selectedSquare = square;
+                    this.validMoves = this.game.moves({ 
+                        square: square, 
+                        verbose: true 
+                    });
+                    
+                    document.querySelector(`[data-square="${square}"]`).classList.add('selected-square');
+                    
+                    this.validMoves.forEach(move => {
+                        const targetSquare = document.querySelector(`[data-square="${move.to}"]`);
+                        if (targetSquare) {
+                            const isCapture = this.game.get(move.to);
+                            targetSquare.classList.add(isCapture ? 'capture-move' : 'valid-move');
+                        }
+                    });
+                }
+            }
+
+            makeAIMove() {
+                if (this.game.game_over()) return;
+
+                const moves = this.game.moves();
+                if (moves.length === 0) return;
+
+                let move;
+                const captures = moves.filter(m => m.includes('x'));
+                const checks = moves.filter(m => m.includes('+'));
+                
+                if (captures.length > 0) {
+                    move = captures[Math.floor(Math.random() * captures.length)];
+                } else if (checks.length > 0) {
+                    move = checks[Math.floor(Math.random() * checks.length)];
+                } else {
+                    move = moves[Math.floor(Math.random() * moves.length)];
+                }
+
+                this.game.move(move);
+                this.updateBoard();
+                this.addToMoveHistory(move);
+                
+                if (this.game.game_over()) {
+                    this.handleGameEnd();
+                }
+            }
+
+            updateGameStatus() {
+                let status = '';
+                let statusColor = 'var(--ai-gold)';
+                
+                if (this.game.in_checkmate()) {
+                    status = `🎉 Checkmate! ${this.game.turn() === 'w' ? 'Black' : 'White'} wins!`;
+                    statusColor = this.game.turn() === 'w' ? 'var(--neon-red)' : 'var(--learning-green)';
+                    if (this.game.turn() === 'b') {
+                        this.updateChessStats(100);
+                        this.incrementGamesWon();
+                    }
+                } else if (this.game.in_draw()) {
+                    status = "🤝 Game drawn!";
+                    statusColor = 'var(--student-blue)';
+                } else if (this.game.in_check()) {
+                    status = `⚡ ${this.game.turn() === 'w' ? 'White' : 'Black'} is in check!`;
+                    statusColor = 'var(--neon-red)';
+                } else {
+                    status = `${this.game.turn() === 'w' ? '⚪ White' : '⚫ Black'} to move`;
+                }
+
+                const statusElement = document.getElementById('gameStatus');
+                statusElement.textContent = status;
+                statusElement.style.color = statusColor;
+                statusElement.style.borderColor = statusColor;
+            }
+
+            handleGameEnd() {
+                this.incrementGamesPlayed();
+                this.updateBestScore();
+            }
+
+            addToMoveHistory(move) {
+                const history = document.getElementById('moveHistory');
+                const moveNumber = Math.ceil(this.game.history().length / 2);
+                const moveElement = document.createElement('div');
+                moveElement.style.cssText = 'padding: 5px 8px; margin: 2px 0; background: rgba(255,215,0,0.1); border-radius: 6px; font-size: 0.9em;';
+                moveElement.textContent = `${moveNumber}. ${move}`;
+                history.appendChild(moveElement);
+                history.scrollTop = history.scrollHeight;
+            }
+
+            updateChessStats(points) {
+                const currentScore = parseInt(document.getElementById('chessScore').textContent) + points;
+                document.getElementById('chessScore').textContent = currentScore;
+            }
+
+            incrementGamesPlayed() {
+                const gamesPlayed = parseInt(document.getElementById('gamesPlayed').textContent) + 1;
+                document.getElementById('gamesPlayed').textContent = gamesPlayed;
+            }
+
+            incrementGamesWon() {
+                const gamesWon = parseInt(document.getElementById('gamesWon').textContent) + 1;
+                document.getElementById('gamesWon').textContent = gamesWon;
+            }
+
+            updateBestScore() {
+                const currentScore = parseInt(document.getElementById('chessScore').textContent);
+                const bestScore = parseInt(document.getElementById('bestScore').textContent);
+                if (currentScore > bestScore) {
+                    document.getElementById('bestScore').textContent = currentScore;
+                }
+            }
+
+            // Public methods
+            newGame() {
+                this.game = new Chess();
+                this.selectedSquare = null;
+                this.validMoves = [];
+                this.updateBoard();
+                document.getElementById('moveHistory').innerHTML = '';
+                this.showNotification('New Game', 'New chess game started!', 'info');
+            }
+
+            undoMove() {
+                if (this.game.history().length > 0) {
+                    this.game.undo();
+                    this.game.undo();
+                    this.selectedSquare = null;
+                    this.validMoves = [];
+                    this.updateBoard();
+                    
+                    const history = document.getElementById('moveHistory');
+                    if (history.children.length > 0) {
+                        history.removeChild(history.lastChild);
+                    }
+                }
+            }
+
+            toggleDifficulty() {
+                const difficulties = ['easy', 'medium', 'hard'];
+                const currentIndex = difficulties.indexOf(this.difficulty);
+                this.difficulty = difficulties[(currentIndex + 1) % difficulties.length];
+                document.getElementById('difficultyLabel').textContent = 
+                    this.difficulty.charAt(0).toUpperCase() + this.difficulty.slice(1);
+            }
+
+            toggleSound() {
+                this.soundEnabled = !this.soundEnabled;
+                document.getElementById('soundLabel').textContent = this.soundEnabled ? 'On' : 'Off';
+            }
+
+            showHint() {
+                const moves = this.game.moves({ verbose: true });
+                if (moves.length > 0) {
+                    const hint = moves[Math.floor(Math.random() * moves.length)];
+                    this.showNotification('Chess Hint', `Consider moving ${hint.piece} from ${hint.from} to ${hint.to}`, 'info');
+                }
+            }
+
+            saveGame() {
+                this.showNotification('Game Saved', 'Your chess game has been saved!', 'success');
+            }
+
+            showNotification(title, message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: rgba(16, 16, 24, 0.95);
+                    border: 2px solid var(--ai-gold);
+                    border-radius: 10px;
+                    padding: 15px 20px;
+                    color: white;
+                    z-index: 10000;
+                    backdrop-filter: blur(10px);
+                    animation: slideUp 0.3s ease-out;
+                    max-width: 300px;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.2em;">${type === 'success' ? '✅' : '💡'}</span>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 3000);
+            }
+        }
+
+        // Quiz Engine
+        class QuizEngine {
+            constructor() {
+                this.currentSubject = 'mathematics';
+                this.currentDifficulty = 'easy';
+                this.currentStreak = 0;
+                
+                this.questions = {
+                    mathematics: [
+                        {
+                            question: "What is 15 + 27?",
+                            options: ["32", "42", "52", "37"],
+                            correct: 1,
+                            explanation: "15 + 27 = 42"
+                        },
+                        {
+                            question: "What is 8 × 7?",
+                            options: ["48", "56", "64", "72"],
+                            correct: 1,
+                            explanation: "8 × 7 = 56"
+                        },
+                        {
+                            question: "Solve: 3x + 7 = 22",
+                            options: ["x = 3", "x = 5", "x = 7", "x = 9"],
+                            correct: 1,
+                            explanation: "3x = 15, so x = 5"
+                        }
+                    ],
+                    science: [
+                        {
+                            question: "What planet is known as the Red Planet?",
+                            options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                            correct: 1,
+                            explanation: "Mars is the Red Planet"
+                        },
+                        {
+                            question: "What is H2O commonly known as?",
+                            options: ["Oxygen", "Hydrogen", "Water", "Carbon Dioxide"],
+                            correct: 2,
+                            explanation: "H2O is the chemical formula for water"
+                        }
+                    ],
+                    history: [
+                        {
+                            question: "Who was the famous emperor of Mali?",
+                            options: ["Shaka Zulu", "Mansa Musa", "Cetshwayo", "Sundiata"],
+                            correct: 1,
+                            explanation: "Mansa Musa was the emperor of Mali"
+                        }
+                    ],
+                    programming: [
+                        {
+                            question: "What does HTML stand for?",
+                            options: ["Hyper Text Markup Language", "High Tech Modern Language", "Hyper Transfer Markup Language", "Home Tool Markup Language"],
+                            correct: 0,
+                            explanation: "HTML stands for Hyper Text Markup Language"
+                        }
+                    ]
+                };
+            }
+
+            generateQuestion() {
+                const subjectQuestions = this.questions[this.currentSubject];
+                if (!subjectQuestions) return;
+
+                this.currentQuestion = subjectQuestions[Math.floor(Math.random() * subjectQuestions.length)];
+                this.displayQuestion();
+            }
+
+            displayQuestion() {
+                document.getElementById('questionText').textContent = this.currentQuestion.question;
+                document.getElementById('questionInfo').textContent = `Subject: ${this.currentSubject.charAt(0).toUpperCase() + this.currentSubject.slice(1)} | Difficulty: ${this.currentDifficulty}`;
+                
+                const optionsContainer = document.getElementById('quizOptions');
+                optionsContainer.innerHTML = '';
+
+                this.currentQuestion.options.forEach((option, index) => {
+                    const optionElement = document.createElement('div');
+                    optionElement.className = 'quiz-option';
+                    optionElement.textContent = option;
+                    optionElement.onclick = () => this.checkAnswer(index);
+                    optionsContainer.appendChild(optionElement);
+                });
+            }
+
+            checkAnswer(selectedIndex) {
+                const questionsAnswered = parseInt(document.getElementById('questionsAnswered').textContent) + 1;
+                document.getElementById('questionsAnswered').textContent = questionsAnswered;
+                
+                const options = document.querySelectorAll('.quiz-option');
+                let isCorrect = false;
+
+                options.forEach((option, index) => {
+                    if (index === this.currentQuestion.correct) {
+                        option.classList.add('correct');
+                    } else if (index === selectedIndex) {
+                        option.classList.add('incorrect');
+                    }
+                });
+
+                if (selectedIndex === this.currentQuestion.correct) {
+                    const quizScore = parseInt(document.getElementById('quizScore').textContent) + 10;
+                    const correctAnswers = parseInt(document.getElementById('correctAnswers').textContent) + 1;
+                    this.currentStreak++;
+                    const streak = parseInt(document.getElementById('streak').textContent);
+                    
+                    document.getElementById('quizScore').textContent = quizScore;
+                    document.getElementById('correctAnswers').textContent = correctAnswers;
+                    document.getElementById('streak').textContent = Math.max(streak, this.currentStreak);
+                    isCorrect = true;
+                    
+                    document.getElementById('questionInfo').textContent = "✅ Correct! " + this.currentQuestion.explanation;
+                    document.getElementById('questionInfo').style.color = 'var(--learning-green)';
+                } else {
+                    this.currentStreak = 0;
+                    document.getElementById('questionInfo').textContent = "❌ Incorrect. " + this.currentQuestion.explanation;
+                    document.getElementById('questionInfo').style.color = 'var(--neon-red)';
+                }
+            }
+
+            nextQuestion() {
+                const options = document.querySelectorAll('.quiz-option');
+                options.forEach(option => {
+                    option.classList.remove('correct', 'incorrect');
+                });
+                
+                this.generateQuestion();
+            }
+
+            resetQuiz() {
+                document.getElementById('quizScore').textContent = '0';
+                document.getElementById('questionsAnswered').textContent = '0';
+                document.getElementById('correctAnswers').textContent = '0';
+                document.getElementById('streak').textContent = '0';
+                this.currentStreak = 0;
+                this.generateQuestion();
+                this.showNotification('Quiz Reset', 'Quiz statistics have been reset!', 'info');
+            }
+
+            setDifficulty(difficulty) {
+                this.currentDifficulty = difficulty;
+                this.showNotification('Difficulty Changed', `Quiz difficulty set to ${difficulty}`, 'info');
+            }
+
+            selectSubject(subject) {
+                this.currentSubject = subject;
+                this.generateQuestion();
+                this.showNotification('Subject Changed', `Now playing ${subject} quiz!`, 'info');
+            }
+
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: rgba(16, 16, 24, 0.95);
+                    border: 2px solid var(--learning-green);
+                    border-radius: 10px;
+                    padding: 15px 20px;
+                    color: white;
+                    z-index: 10000;
+                    backdrop-filter: blur(10px);
+                    animation: slideUp 0.3s ease-out;
+                    max-width: 300px;
+                `;
+                
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.2em;">${type === 'success' ? '✅' : '💡'}</span>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 3000);
+            }
+        }
+
+        // Game Hub
+        const GameHub = {
+            startDailyChallenge() {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: rgba(16, 16, 24, 0.95);
+                    border: 2px solid var(--ai-gold);
+                    border-radius: 10px;
+                    padding: 15px 20px;
+                    color: white;
+                    z-index: 10000;
+                    backdrop-filter: blur(10px);
+                    animation: slideUp 0.3s ease-out;
+                    max-width: 300px;
+                `;
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.2em;">🏆</span>
+                        <span>Starting today's strategic thinking challenge!</span>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            },
+
+            viewLeaderboard() {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 100px;
+                    right: 20px;
+                    background: rgba(16, 16, 24, 0.95);
+                    border: 2px solid var(--ai-gold);
+                    border-radius: 10px;
+                    padding: 15px 20px;
+                    color: white;
+                    z-index: 10000;
+                    backdrop-filter: blur(10px);
+                    animation: slideUp 0.3s ease-out;
+                    max-width: 300px;
+                `;
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.2em;">📊</span>
+                        <span>Opening global leaderboard...</span>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            }
+        };
+
+        // Initialize game engines when page loads
+        let chessEngine, quizEngine;
+
+        window.addEventListener('load', function() {
+            chessEngine = new EnhancedChessEngine();
+            quizEngine = new QuizEngine();
+            
+            console.log('🎮 Chess & Quiz Games Hub Fully Operational!');
+            console.log('♟️ Khensani AI Chess: READY');
+            console.log('🎯 Khensani AI Quiz: READY');
+        });
+    </script>
+</body>
+</html>

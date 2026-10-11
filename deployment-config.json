@@ -1,0 +1,21 @@
+{
+  "project": "MindFlow Education Suite",
+  "version": "1.0.0",
+  "deployment": {
+    "platform": "netlify",
+    "buildCommand": "",
+    "publishDirectory": ".",
+    "environmentVariables": [
+      "FIREBASE_API_KEY",
+      "FIREBASE_AUTH_DOMAIN",
+      "FIREBASE_PROJECT_ID"
+    ]
+  },
+  "features": {
+    "authentication": true,
+    "realTimeDatabase": true,
+    "fileStorage": true,
+    "analytics": true,
+    "hosting": true
+  }
+}

@@ -1,0 +1,301 @@
+/* 📱 RESPONSIVE DESIGN SYSTEM - MindFlow Education Suite */
+
+/* Mobile First Approach */
+@media (max-width: 768px) {
+    /* Base Layout */
+    .portal-header {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .main-content {
+        padding: 1rem;
+    }
+    
+    /* Navigation */
+    .portal-nav {
+        padding: 1rem;
+    }
+    
+    .nav-back {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* Grid Systems */
+    .grid-4,
+    .grid-3,
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Typography */
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+    h3 { font-size: 1.5rem; }
+    
+    /* Cards */
+    .dashboard-card,
+    .sidebar-card {
+        padding: 1rem;
+    }
+    
+    .metric-value {
+        font-size: 2rem;
+    }
+    
+    /* Charts */
+    .chart-container {
+        height: 250px;
+        padding: 1rem;
+    }
+    
+    /* User Interface */
+    .user-info {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}
+
+/* Tablet Devices */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .main-content {
+        padding: 1.5rem;
+    }
+    
+    .portal-header {
+        padding: 1rem 1.5rem;
+    }
+}
+
+/* Large Desktop */
+@media (min-width: 1440px) {
+    .main-content {
+        max-width: 1800px;
+    }
+    
+    .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Print Styles */
+@media print {
+    .portal-header,
+    .portal-nav,
+    .action-btn,
+    .btn {
+        display: none;
+    }
+    
+    .main-content {
+        padding: 0;
+    }
+    
+    .dashboard-card {
+        break-inside: avoid;
+        border: 1px solid #ccc;
+        box-shadow: none;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --text: #000000;
+        --text-dim: #333333;
+        --card-bg: #ffffff;
+        --glass-bg: #f8f9fa;
+    }
+    
+    .glass-card {
+        border: 2px solid #000000;
+        background: #ffffff;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .quantum-glow::before,
+    .quantum-stream::before,
+    .mindtech-interface::after {
+        animation: none;
+    }
+}
+
+/* Dark Mode (System Preference) */
+@media (prefers-color-scheme: dark) {
+    /* Already dark by default, but ensure compatibility */
+    body {
+        background: linear-gradient(135deg, #0a0a2a 0%, #000022 100%);
+    }
+}
+
+/* Portrait Orientation */
+@media (max-width: 768px) and (orientation: portrait) {
+    .main-content {
+        padding: 0.5rem;
+    }
+    
+    .dashboard-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Landscape Orientation for Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .portal-header {
+        position: relative;
+    }
+    
+    .main-content {
+        padding: 0.5rem;
+    }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .dashboard-card:hover {
+        transform: none;
+    }
+    
+    .action-btn:hover {
+        transform: none;
+        background: rgba(0, 102, 255, 0.1);
+    }
+    
+    /* Larger touch targets */
+    .btn,
+    .action-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* Foldable Devices */
+@media (max-width: 300px) {
+    .portal-title {
+        font-size: 1.2rem;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.8rem;
+    }
+}
+
+/* 4K and High DPI Screens */
+@media (min-width: 2560px) {
+    .main-content {
+        max-width: 2400px;
+    }
+    
+    h1 { font-size: 3.5rem; }
+    h2 { font-size: 3rem; }
+    h3 { font-size: 2.5rem; }
+    
+    .metric-value {
+        font-size: 4rem;
+    }
+    
+    .btn {
+        padding: 20px 32px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Responsive Utility Classes */
+.hidden-mobile { display: block; }
+.visible-mobile { display: none; }
+
+@media (max-width: 768px) {
+    .hidden-mobile { display: none; }
+    .visible-mobile { display: block; }
+}
+
+/* Flexbox Grid for Complex Layouts */
+.responsive-grid {
+    display: grid;
+    gap: var(--space-md);
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Fluid Typography */
+.fluid-text {
+    font-size: clamp(1rem, 2.5vw, 2rem);
+}
+
+.fluid-heading {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+}
+
+/* Container Queries Support */
+@container (min-width: 400px) {
+    .card-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Scroll Snap for Mobile */
+.scroll-snap {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+}
+
+.scroll-snap-item {
+    scroll-snap-align: start;
+    flex: 0 0 auto;
+}
+
+/* Performance Optimizations */
+.will-change-transform {
+    will-change: transform;
+}
+
+.will-change-opacity {
+    will-change: opacity;
+}
+
+/* Loading States */
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

@@ -1,0 +1,17 @@
+.khensani-divicon { background: transparent; border: none; }
+
+.khensani-marker {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--marker-color, #2A7A5E);
+  border: 3px solid rgba(255,255,255,0.9);
+  box-shadow: 0 0 12px var(--marker-color);
+  animation: marker-pulse 2s ease-in-out infinite;
+}
+
+@keyframes marker-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%      { transform: scale(1.15); opacity: 0.85; }
+}
+
+.khensani-marker-officer { border-radius: 4px; }
