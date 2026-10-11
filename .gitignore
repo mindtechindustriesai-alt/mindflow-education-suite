@@ -1,0 +1,38 @@
+﻿# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Build
+dist/
+build/
+
+# Cloud Functions
+functions/node_modules/
+functions/.env
+
+# Secrets
+*.key
+*.pem
+serviceAccountKey.json
