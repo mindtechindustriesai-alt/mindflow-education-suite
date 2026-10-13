@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Management | MindFlow Corporate · Khensani AI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDK 10.8.0 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.__khensaniFirebase = { app, auth, db };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) console.log('⚛️ Corporate Finance authenticated:', user.email);
+            else console.log('⚛️ Corporate Finance session: demo mode active');
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #0066FF;
+            --accent-glow: rgba(0, 102, 255, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(15, 20, 35, 0.48);
+            --card-border: rgba(0, 102, 255, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --corporate-primary: #0066FF;
+            --corporate-secondary: #0044CC;
+            --corporate-accent: #3388FF;
+            --creator-pink: #FF69B4;
+            --khensani-gold: #C8A450;
+            --khensani-cream: #E8D5A3;
+            --dark-space: #0f0f1a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Exo 2', sans-serif; }
+
+        html { background: var(--dark-space); }
+        body {
+            background: transparent;
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-top: 90px;
+            position: relative;
+            isolation: isolate;
+        }
+
+        #particles-js {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+            opacity: 1 !important;
+        }
+        #particles-js canvas {
+            display: block;
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* ============ TECH NAVBAR ============ */
+        .tech-navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 72px;
+            background: rgba(10, 10, 18, 0.48);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--corporate-primary);
+            display: flex; align-items: center;
+            padding: 0 1.5rem; gap: 1rem;
+            z-index: 2000;
+            box-shadow: 0 2px 20px rgba(0, 102, 255, 0.25);
+        }
+
+        .tech-navbar .khensani-logo {
+            height: 90px; width: auto;
+            margin-top: 4px;
+            filter: drop-shadow(0 0 10px rgba(0, 102, 255, 0.6));
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .tech-navbar .khensani-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.8));
+        }
+
+        .brand-block { display: flex; align-items: center; gap: 0.6rem; }
+
+        .brand-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--corporate-primary), var(--ai-gold));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 0 18px rgba(0, 102, 255, 0.6);
+        }
+
+        .brand-name {
+            font-size: 1.15rem; font-weight: 800; letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .brand-sub {
+            font-size: 0.65rem; color: var(--text-dim);
+            letter-spacing: 2px; font-family: 'Space Mono', monospace;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        .nav-back-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.55rem 1.25rem;
+            border: 2px solid var(--corporate-primary);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--ai-gold);
+            font-weight: 600; font-size: 0.85rem;
+            text-decoration: none; letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .nav-back-btn:hover {
+            background: var(--corporate-primary);
+            color: #fff;
+            box-shadow: 0 0 22px rgba(0, 102, 255, 0.75);
+            transform: translateX(-3px);
+        }
+
+        .notif-wrap { position: relative; }
+
+        .notif-bell {
+            position: relative;
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 2px solid var(--corporate-primary);
+            background: rgba(0, 102, 255, 0.15);
+            color: var(--ai-gold);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; font-size: 1.1rem;
+        }
+        .notif-bell:hover { background: rgba(0, 102, 255, 0.35); box-shadow: 0 0 20px rgba(0, 102, 255, 0.7); }
+
+        .notif-badge {
+            position: absolute; top: -4px; right: -4px;
+            min-width: 20px; height: 20px; padding: 0 5px;
+            border-radius: 999px; background: var(--creator-pink); color: #fff;
+            font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #0a0a16;
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        .notif-panel {
+            position: absolute; top: 60px; right: 0;
+            width: 360px; max-height: 0; overflow: hidden;
+            background: rgba(15, 20, 35, 0.92);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            z-index: 2500;
+        }
+        .notif-panel.open { max-height: 460px; padding: 1rem; }
+
+        .notif-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.8rem; padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.4);
+        }
+        .notif-title { font-size: 0.95rem; font-weight: 700; color: var(--ai-gold); }
+        .notif-clear { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; }
+        .notif-clear:hover { color: var(--creator-pink); }
+
+        .notif-item {
+            padding: 0.7rem 0.8rem; border-radius: 8px;
+            background: rgba(0, 102, 255, 0.12);
+            border-left: 3px solid var(--corporate-primary);
+            margin-bottom: 0.6rem;
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .notif-item:hover { background: rgba(0, 102, 255, 0.25); transform: translateX(3px); }
+        .notif-item.creator { border-left-color: var(--creator-pink); background: rgba(255, 105, 180, 0.1); }
+        .notif-item.creator .notif-item-title { color: var(--creator-pink); }
+        .notif-item-title { font-size: 0.85rem; font-weight: 600; color: var(--ai-gold); margin-bottom: 0.25rem; }
+        .notif-item-text { font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; }
+        .notif-item-time { font-size: 0.7rem; color: #666; margin-top: 0.3rem; font-family: 'Space Mono', monospace; }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-content {
+            padding: 2rem; max-width: 1600px; margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+
+        .welcome-header { margin-bottom: 2rem; animation: fadeIn 0.6s ease; }
+
+        .welcome-title {
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+
+        .quantum-line {
+            font-size: 0.75rem; color: var(--khensani-gold);
+            letter-spacing: 3px; font-family: 'Space Mono', monospace; text-transform: uppercase;
+        }
+
+        /* Financial Overview */
+        .financial-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .finance-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px; padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+        }
+        .finance-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+        }
+        .finance-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+        .finance-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .finance-title { font-size: 0.9rem; font-weight: 600; color: var(--ai-gold); text-transform: uppercase; letter-spacing: 1px; }
+        .finance-icon { font-size: 1.2rem; color: var(--corporate-primary); }
+        .finance-value {
+            font-size: 2.2rem; font-weight: 700;
+            background: linear-gradient(45deg, var(--ai-gold), var(--corporate-primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .finance-trend { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 600; }
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+
+        /* Layout */
+        .finance-layout { display: grid; grid-template-columns: 1fr 400px; gap: 2rem; margin-bottom: 2rem; }
+        .finance-main { display: flex; flex-direction: column; gap: 2rem; }
+        .finance-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        /* Charts */
+        .charts-section { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        .chart-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px; padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .chart-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+        .chart-card:hover { transform: translateY(-5px); border-color: var(--ai-gold); box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .card-title { font-size: 1.2rem; font-weight: 600; color: var(--ai-gold); }
+        .card-icon { font-size: 1.5rem; color: var(--corporate-primary); }
+        .chart-container { height: 250px; position: relative; }
+
+        /* Transactions Table */
+        .transactions-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px; padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+        }
+        .transactions-card:hover { transform: translateY(-5px); border-color: var(--ai-gold); box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3); }
+        .transactions-table { width: 100%; border-collapse: collapse; }
+        .transactions-table th {
+            text-align: left; padding: 1rem;
+            border-bottom: 2px solid var(--corporate-primary);
+            color: var(--ai-gold); font-weight: 600;
+        }
+        .transactions-table td { padding: 1rem; border-bottom: 1px solid rgba(0, 102, 255, 0.2); }
+        .transaction-amount { font-weight: 600; color: var(--ai-gold); }
+        .transaction-positive { color: var(--success); }
+        .transaction-negative { color: var(--danger); }
+        .transaction-status {
+            padding: 4px 8px; border-radius: 12px;
+            font-size: 0.8rem; font-weight: 600;
+        }
+        .status-completed { background: rgba(0, 255, 136, 0.2); color: var(--success); }
+        .status-pending { background: rgba(255, 170, 0, 0.2); color: var(--warning); }
+
+        /* Sidebar */
+        .sidebar-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px; padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .sidebar-card:hover { transform: translateY(-5px); border-color: var(--ai-gold); box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); }
+
+        /* Budget Progress */
+        .budget-list { display: flex; flex-direction: column; gap: 1rem; }
+        .budget-item { display: flex; flex-direction: column; gap: 0.5rem; }
+        .budget-header { display: flex; justify-content: space-between; align-items: center; }
+        .budget-name { font-weight: 600; color: var(--ai-gold); }
+        .budget-amount { font-size: 0.9rem; color: var(--text-dim); }
+        .budget-bar { height: 6px; background: rgba(0, 102, 255, 0.2); border-radius: 3px; overflow: hidden; }
+        .budget-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            border-radius: 3px; transition: width 0.3s ease;
+        }
+
+        /* Quick Actions */
+        .action-buttons { display: flex; flex-direction: column; gap: 0.8rem; }
+        .action-btn {
+            background: rgba(0, 102, 255, 0.1);
+            border: 1px solid var(--corporate-primary);
+            color: white; padding: 12px 16px;
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex; align-items: center;
+            gap: 10px; font-size: 0.9rem;
+            font-family: 'Exo 2', sans-serif;
+        }
+        .action-btn:hover { background: rgba(0, 102, 255, 0.3); transform: translateY(-2px); }
+
+        /* Alerts */
+        .alerts-list { display: flex; flex-direction: column; gap: 0.8rem; }
+        .alert-item {
+            padding: 0.8rem;
+            background: rgba(255, 170, 0, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+            transition: all 0.3s ease;
+        }
+        .alert-item.critical { background: rgba(255, 51, 102, 0.1); border-left-color: var(--danger); }
+        .alert-item:hover { transform: translateX(5px); }
+        .alert-title { font-weight: 600; color: var(--ai-gold); margin-bottom: 0.3rem; }
+        .alert-message { font-size: 0.8rem; color: var(--text-dim); }
+
+        /* Creator Finance Impact */
+        .creator-finance {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--creator-pink);
+            border-radius: 12px; padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
+            position: relative;
+        }
+        .creator-finance::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+        .creator-finance-title {
+            font-size: 1.4rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.4rem;
+        }
+        .creator-finance-sub { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+        .creator-finance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        .creator-finance-card {
+            background: rgba(255, 105, 180, 0.08);
+            border: 1px solid rgba(255, 105, 180, 0.4);
+            border-radius: 10px; padding: 1rem; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .creator-finance-card:hover {
+            background: rgba(255, 105, 180, 0.18);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+        }
+        .creator-finance-icon { font-size: 1.6rem; color: var(--creator-pink); margin-bottom: 0.5rem; }
+        .creator-finance-value {
+            font-size: 1.5rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+        .creator-finance-label { font-size: 0.78rem; color: var(--text-dim); }
+
+        /* ============ CORPORATE AD — CANONICAL KD ROTATING LOGO ============ */
+        .corporate-ad-center {
+            background: linear-gradient(135deg, rgba(70, 25, 115, 0.22), rgba(110, 80, 20, 0.18));
+            border: 2px solid rgba(200, 164, 80, 0.4);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 1.5rem; flex-wrap: wrap;
+            text-decoration: none; color: inherit;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+            min-height: 100px;
+        }
+        .corporate-ad-center::before {
+            content: '';
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(200, 164, 80, 0.08), transparent);
+            animation: kd-shine 4s infinite;
+        }
+        @keyframes kd-shine { 0% { left: -100%; } 100% { left: 100%; } }
+        .corporate-ad-center:hover {
+            border-color: var(--khensani-gold);
+            box-shadow: 0 0 40px rgba(200, 164, 80, 0.3);
+            transform: translateY(-3px);
+        }
+        .corporate-ad-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--khensani-cream);
+            letter-spacing: 1px;
+        }
+        .corporate-ad-text strong {
+            color: var(--khensani-gold);
+            font-size: 1.15rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .kd-rotating-logo {
+            height: 65px; width: 65px;
+            object-fit: contain; background: transparent; flex-shrink: 0;
+            opacity: 1 !important;
+            filter: brightness(0.78) contrast(1.28)
+                    drop-shadow(0 0 7px rgba(80, 20, 135, 0.98))
+                    drop-shadow(0 0 16px rgba(138, 43, 226, 0.95))
+                    drop-shadow(0 0 25px rgba(200, 164, 80, 0.72)) !important;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            animation: kd-superposition-visible 6s ease-in-out infinite !important;
+        }
+        @keyframes kd-superposition-visible {
+            0%, 100% { transform: perspective(600px) rotateY(0deg) rotateZ(0deg) scale(1); }
+            25% { transform: perspective(600px) rotateY(90deg) rotateZ(4deg) scale(1.08); }
+            50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); }
+            75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); }
+        }
+
+        /* ============ FLOATING FOOTER ============ */
+        .floating-footer {
+            padding: 30px 20px 20px;
+            margin-top: 60px;
+            text-align: center;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            position: relative; z-index: 1;
+        }
+        .footer-logo-row {
+            display: flex; justify-content: center; align-items: center;
+            gap: 40px; margin-bottom: 15px; flex-wrap: wrap;
+        }
+        .footer-logo {
+            height: 55px; width: auto; opacity: 0.85;
+            transition: all 0.3s ease; background: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 102, 255, 0.3));
+        }
+        .footer-logo:hover {
+            opacity: 1; transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(0, 102, 255, 0.5));
+        }
+        .mindtech-glitch {
+            color: #0066FF; font-weight: bold; font-size: 15px;
+            position: relative; display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px #0066FF, 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px #0066FF, 0 0 30px #0066FF, 0 0 40px #FF8C42; }
+            100% { text-shadow: 0 0 10px #0066FF, 0 0 20px #0066FF; }
+        }
+        .floating-footer .copyright { font-size: 0.78rem; color: #A0AAB8; margin-bottom: 6px; }
+        .floating-footer .footer-bottom {
+            margin-top: 12px; font-size: 10px;
+            color: #666; font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .finance-layout { grid-template-columns: 1fr; }
+            .financial-overview { grid-template-columns: repeat(2, 1fr); }
+            .charts-section { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 900px) {
+            .tech-navbar .khensani-logo { height: 70px; }
+            .brand-name { font-size: 1rem; }
+        }
+        @media (max-width: 768px) {
+            body { padding-top: 80px; }
+            .tech-navbar { height: 64px; padding: 0 0.8rem; }
+            .tech-navbar .khensani-logo { height: 60px; }
+            .brand-sub { display: none; }
+            .main-content { padding: 1rem; }
+            .financial-overview { grid-template-columns: 1fr; }
+            .transactions-table { font-size: 0.8rem; }
+            .transactions-table th, .transactions-table td { padding: 0.5rem; }
+            .notif-panel { width: 300px; right: -60px; }
+            .footer-logo-row { gap: 20px; }
+            .footer-logo { height: 42px; }
+        }
+        @media (max-width: 480px) {
+            .creator-finance-grid { grid-template-columns: 1fr; }
+            .welcome-title { font-size: 1.5rem; }
+            .nav-back-btn span { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .kd-rotating-logo, .corporate-ad-center::before { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <!-- ============ TECH NAVBAR ============ -->
+    <nav class="tech-navbar">
+        <a href="mindflow-portal.html" title="Khensani AI · MindFlow Portal">
+            <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png" alt="Khensani AI" class="khensani-logo">
+        </a>
+
+        <div class="brand-block">
+            <div class="brand-icon">⚛️</div>
+            <div>
+                <div class="brand-name">KHENSANI AI</div>
+                <div class="brand-sub">CORPORATE · FINANCE</div>
+            </div>
+        </div>
+
+        <div class="nav-spacer"></div>
+
+        <a href="mindflow-portal.html" class="nav-back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </a>
+
+        <div class="notif-wrap">
+            <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">4</span>
+            </div>
+            <div class="notif-panel" id="notifPanel">
+                <div class="notif-header">
+                    <div class="notif-title">🔔 Notifications</div>
+                    <div class="notif-clear" onclick="clearNotifications()">Clear all</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">🎬 Creator Sponsor Revenue</div>
+                    <div class="notif-item-text">Creator platform sponsorship revenue up 42% this quarter.</div>
+                    <div class="notif-item-time">5 min ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">⚠️ Budget Overspend Alert</div>
+                    <div class="notif-item-text">R&D budget at 90% utilization — review required.</div>
+                    <div class="notif-item-time">2 hours ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">✅ Revenue Target Achieved</div>
+                    <div class="notif-item-text">Q3 revenue target achieved 2 weeks early.</div>
+                    <div class="notif-item-time">5 hours ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">📅 Tax Deadline</div>
+                    <div class="notif-item-text">Quarterly tax filing due in 15 days.</div>
+                    <div class="notif-item-time">Yesterday</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content">
+
+        <div class="welcome-header">
+            <h1 class="welcome-title">Financial Management Command</h1>
+            <p class="welcome-subtitle">Sarah Chen · Chief Executive Officer · Institutional Financial Oversight</p>
+            <p class="quantum-line">⚛️ QUANTUM-VERIFIED · CHSH S=2.8284 · SA PATENT 2026/05142</p>
+        </div>
+
+        <!-- Financial Overview -->
+        <div class="financial-overview">
+            <div class="finance-card">
+                <div class="finance-header">
+                    <div class="finance-title">Total Revenue</div>
+                    <div class="finance-icon"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <div class="finance-value">R2.8M</div>
+                <div class="finance-trend trend-up"><i class="fas fa-arrow-up"></i><span>12.4% growth</span></div>
+            </div>
+
+            <div class="finance-card">
+                <div class="finance-header">
+                    <div class="finance-title">Operating Profit</div>
+                    <div class="finance-icon"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="finance-value">R845K</div>
+                <div class="finance-trend trend-up"><i class="fas fa-arrow-up"></i><span>8.7% increase</span></div>
+            </div>
+
+            <div class="finance-card">
+                <div class="finance-header">
+                    <div class="finance-title">Cash Flow</div>
+                    <div class="finance-icon"><i class="fas fa-money-bill-wave"></i></div>
+                </div>
+                <div class="finance-value">R1.2M</div>
+                <div class="finance-trend trend-up"><i class="fas fa-arrow-up"></i><span>15.2% positive</span></div>
+            </div>
+
+            <div class="finance-card">
+                <div class="finance-header">
+                    <div class="finance-title">Expenses</div>
+                    <div class="finance-icon"><i class="fas fa-receipt"></i></div>
+                </div>
+                <div class="finance-value">R1.4M</div>
+                <div class="finance-trend trend-down"><i class="fas fa-arrow-down"></i><span>3.2% reduction</span></div>
+            </div>
+        </div>
+
+        <!-- Finance Layout -->
+        <div class="finance-layout">
+            <div class="finance-main">
+                <div class="charts-section">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <div class="card-title">Revenue vs Expenses</div>
+                            <div class="card-icon"><i class="fas fa-balance-scale"></i></div>
+                        </div>
+                        <div class="chart-container"><canvas id="revenueExpenseChart"></canvas></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <div class="card-title">Profit Distribution</div>
+                            <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+                        </div>
+                        <div class="chart-container"><canvas id="profitChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Transactions -->
+                <div class="transactions-card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Transactions</div>
+                        <div class="card-icon"><i class="fas fa-list"></i></div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Oct 15, 2024</td>
+                                    <td>Corporate Training Revenue</td>
+                                    <td>Income</td>
+                                    <td class="transaction-amount transaction-positive">+R125,000</td>
+                                    <td><span class="transaction-status status-completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 14, 2024</td>
+                                    <td>Infrastructure Upgrade</td>
+                                    <td>Expense</td>
+                                    <td class="transaction-amount transaction-negative">-R45,200</td>
+                                    <td><span class="transaction-status status-completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 12, 2024</td>
+                                    <td>AI Course Subscription</td>
+                                    <td>Income</td>
+                                    <td class="transaction-amount transaction-positive">+R89,500</td>
+                                    <td><span class="transaction-status status-completed">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 10, 2024</td>
+                                    <td>Marketing Campaign</td>
+                                    <td>Expense</td>
+                                    <td class="transaction-amount transaction-negative">-R32,800</td>
+                                    <td><span class="transaction-status status-pending">Pending</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Oct 8, 2024</td>
+                                    <td>🎬 Creator Sponsor Revenue Share</td>
+                                    <td>Income</td>
+                                    <td class="transaction-amount transaction-positive">+R67,300</td>
+                                    <td><span class="transaction-status status-completed">Completed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="action-buttons" style="margin-top: 1rem;">
+                        <button class="action-btn" onclick="FinanceManager.viewAllTransactions()">
+                            <i class="fas fa-eye"></i> View All Transactions
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="finance-sidebar">
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Budget Allocation</div>
+                        <div class="card-icon"><i class="fas fa-wallet"></i></div>
+                    </div>
+                    <div class="budget-list">
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">Research & Development</div>
+                                <div class="budget-amount">R450K / R500K</div>
+                            </div>
+                            <div class="budget-bar"><div class="budget-progress" style="width: 90%"></div></div>
+                        </div>
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">Marketing</div>
+                                <div class="budget-amount">R320K / R400K</div>
+                            </div>
+                            <div class="budget-bar"><div class="budget-progress" style="width: 80%"></div></div>
+                        </div>
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">Operations</div>
+                                <div class="budget-amount">R280K / R350K</div>
+                            </div>
+                            <div class="budget-bar"><div class="budget-progress" style="width: 80%"></div></div>
+                        </div>
+                        <div class="budget-item">
+                            <div class="budget-header">
+                                <div class="budget-name">Creator Platform</div>
+                                <div class="budget-amount">R180K / R250K</div>
+                            </div>
+                            <div class="budget-bar"><div class="budget-progress" style="width: 72%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Quick Actions</div>
+                        <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="FinanceManager.generateReport()">
+                            <i class="fas fa-file-pdf"></i> Generate Financial Report
+                        </button>
+                        <button class="action-btn" onclick="FinanceManager.forecastRevenue()">
+                            <i class="fas fa-crystal-ball"></i> Revenue Forecast
+                        </button>
+                        <button class="action-btn" onclick="FinanceManager.analyzeExpenses()">
+                            <i class="fas fa-chart-bar"></i> Expense Analysis
+                        </button>
+                        <button class="action-btn" onclick="FinanceManager.exportData()">
+                            <i class="fas fa-download"></i> Export Financial Data
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Financial Alerts</div>
+                        <div class="card-icon"><i class="fas fa-bell"></i></div>
+                    </div>
+                    <div class="alerts-list">
+                        <div class="alert-item critical">
+                            <div class="alert-title">Budget Overspend</div>
+                            <div class="alert-message">R&D budget at 90% utilization</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-title">Revenue Target</div>
+                            <div class="alert-message">Q3 revenue target achieved 2 weeks early</div>
+                        </div>
+                        <div class="alert-item">
+                            <div class="alert-title">Tax Deadline</div>
+                            <div class="alert-message">Quarterly tax filing due in 15 days</div>
+                        </div>
+                    </div>
+                    <button class="action-btn" onclick="FinanceManager.aiConsult()" style="margin-top: 1rem; width: 100%;">
+                        <i class="fas fa-robot"></i> Consult Khensani AI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Creator Finance Impact -->
+        <div class="creator-finance">
+            <div class="creator-finance-title">🎬 Creator Platform — Financial Impact</div>
+            <div class="creator-finance-sub">Sponsor revenue · creator budget allocation · sponsor-pick ROI · chess competition economics</div>
+
+            <div class="creator-finance-grid">
+                <div class="creator-finance-card">
+                    <div class="creator-finance-icon"><i class="fas fa-coins"></i></div>
+                    <div class="creator-finance-value" id="creatorRevenue">R428K</div>
+                    <div class="creator-finance-label">Sponsor Revenue Q3</div>
+                </div>
+                <div class="creator-finance-card">
+                    <div class="creator-finance-icon"><i class="fas fa-star"></i></div>
+                    <div class="creator-finance-value" id="creatorSponsorPicks">63</div>
+                    <div class="creator-finance-label">⭐ Sponsor Picks YTD</div>
+                </div>
+                <div class="creator-finance-card">
+                    <div class="creator-finance-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="creator-finance-value" id="creatorROI">3.2x</div>
+                    <div class="creator-finance-label">Creator ROI</div>
+                </div>
+                <div class="creator-finance-card">
+                    <div class="creator-finance-icon"><i class="fas fa-chess"></i></div>
+                    <div class="creator-finance-value" id="creatorChessPrize">R182K</div>
+                    <div class="creator-finance-label">Chess Prize Pool</div>
+                </div>
+                <div class="creator-finance-card">
+                    <div class="creator-finance-icon"><i class="fas fa-video"></i></div>
+                    <div class="creator-finance-value" id="creatorBudget">R62K</div>
+                    <div class="creator-finance-label">Creator Budget Spent</div>
+                </div>
+                <div class="creator-finance-card">
+                    <div class="creator-finance-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                    <div class="creator-finance-value" id="creatorGrowth">+42%</div>
+                    <div class="creator-finance-label">Sponsor Growth</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ CORPORATE AD — CANONICAL KD ROTATING LOGO ============ -->
+        <a href="https://kdconcepts.com" target="_blank" rel="noopener" id="corporate-ad-center" class="corporate-ad-center">
+            <img id="corporate-ad-logo"
+                 src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png"
+                 alt="KD Concepts"
+                 class="kd-rotating-logo"
+                 onerror="this.style.display='none'">
+            <div class="corporate-ad-text">
+                <strong id="corporate-ad-title">Corporate Finance Sponsored by KD Concepts</strong>
+                <span id="corporate-ad-tagline">Advertising · Platform Exposure · Circular Economy Partner</span>
+            </div>
+            <i class="fas fa-external-link-alt" style="color: var(--khensani-gold); font-size: 1.2rem;"></i>
+        </a>
+    </main>
+
+    <!-- ============ FLOATING FOOTER ============ -->
+    <footer class="floating-footer">
+        <div class="footer-logo-row">
+            <a href="https://mindtech.africa" target="_blank" rel="noopener" aria-label="MindTech Industries">
+                <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                     alt="EntangleGuard · MindTech Industries"
+                     class="footer-logo"
+                     onerror="this.style.display='none'">
+            </a>
+        </div>
+        <p class="copyright">
+            © 2026 MindFlow · Khensani AI · Powered by
+            <a href="https://mindtech.africa" target="_blank" style="text-decoration:none;">
+                <span class="mindtech-glitch">MindTech</span>
+            </a>
+            · Transforming African education
+        </p>
+        <div class="footer-bottom">
+            ⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Jobs db6h46o4qg6s73c4q1n0 · db6h3eslf4us73c5c80g
+        </div>
+    </footer>
+
+    <script>
+        // ============ PARTICLES — SALARYPLAN CALM ============
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55 },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 2.5, random: true },
+                line_linked: { enable: true, distance: 150, color: "#00B4D8", opacity: 0.08 },
+                move: { enable: true, speed: 0.8 }
+            },
+            interactivity: { events: { onhover: { enable: true, mode: "repulse" } } }
+        });
+
+        // ============ NOTIFICATIONS ============
+        function toggleNotifPanel() { document.getElementById('notifPanel').classList.toggle('open'); }
+        function clearNotifications() {
+            const badge = document.getElementById('notifBadge');
+            badge.textContent = '0';
+            badge.style.display = 'none';
+            document.querySelectorAll('.notif-item').forEach(item => { item.style.opacity = '0.4'; });
+        }
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.getElementById('notifBell');
+            if (panel && bell && !panel.contains(e.target) && !bell.contains(e.target)) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // ============ FINANCE MANAGER ============
+        const FinanceManager = {
+            openProfile: function() {
+                alert('👔 Corporate Profile\n\nExecutive: Sarah Chen\nRole: Chief Executive Officer\nTenure: 5 years');
+            },
+            generateReport: function() {
+                alert('📊 Generating Financial Report\n\nComprehensive financial report will be compiled.\n\n⚛️ CHSH S=2.8284 verified');
+            },
+            forecastRevenue: function() {
+                alert('🔮 Revenue Forecasting\n\nGenerating revenue projections and financial forecasts.');
+            },
+            analyzeExpenses: function() {
+                alert('📈 Expense Analysis\n\nDetailed expense analysis and optimization recommendations.');
+            },
+            exportData: function() {
+                alert('💾 Exporting Financial Data\n\nAll financial data prepared for export.');
+            },
+            viewAllTransactions: function() {
+                alert('📋 Viewing All Transactions\n\nOpening complete transaction history.');
+            },
+            aiConsult: function() {
+                alert('🤖 Khensani AI Consultation\n\n"Based on current financials, I recommend increasing R&D investment by 15% and optimizing creator sponsor outreach for Q4 expansion. Creator platform ROI at 3.2x."');
+            }
+        };
+
+        // ============ CHARTS ============
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFinanceCharts();
+            animateCreatorFinance();
+            console.log('✅ Finance dashboard initialized');
+        });
+
+        function initializeFinanceCharts() {
+            const revExpCtx = document.getElementById('revenueExpenseChart').getContext('2d');
+            new Chart(revExpCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    datasets: [
+                        {
+                            label: 'Revenue',
+                            data: [1.8, 2.1, 2.3, 2.4, 2.6, 2.5, 2.7, 2.8, 2.9],
+                            backgroundColor: 'rgba(0, 255, 136, 0.8)',
+                            borderColor: '#00FFAA',
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [1.2, 1.3, 1.4, 1.5, 1.6, 1.5, 1.4, 1.3, 1.4],
+                            backgroundColor: 'rgba(255, 51, 102, 0.8)',
+                            borderColor: '#FF3366',
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { color: '#e0e0ff' } } },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#e0e0ff', callback: v => 'R' + v + 'M' }
+                        },
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#e0e0ff' } }
+                    }
+                }
+            });
+
+            const profitCtx = document.getElementById('profitChart').getContext('2d');
+            new Chart(profitCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Operations', 'R&D', 'Marketing', 'Infrastructure', 'Creator Platform'],
+                    datasets: [{
+                        data: [40, 24, 14, 9, 13],
+                        backgroundColor: ['#0066FF', '#00FFAA', '#FFD700', '#FF8C42', '#FF69B4'],
+                        borderWidth: 2, borderColor: '#0a0a2a'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#e0e0ff', padding: 20 } } }
+                }
+            });
+        }
+
+        // ============ CREATOR FINANCE ANIMATION ============
+        function animateCreatorFinance() {
+            const metrics = [
+                { id: 'creatorSponsorPicks', target: 63, suffix: '' }
+            ];
+            metrics.forEach(m => {
+                const el = document.getElementById(m.id);
+                if (!el) return;
+                let current = 0;
+                const step = m.target / 40;
+                const interval = setInterval(() => {
+                    current += step;
+                    if (current >= m.target) { current = m.target; clearInterval(interval); }
+                    el.textContent = Math.floor(current) + m.suffix;
+                }, 30);
+            });
+        }
+
+        // ============ CORPORATE AD DYNAMIC LOADER (CANONICAL) ============
+        async function loadCorporateAds() {
+            const db = window.__khensaniFirebase?.db;
+            if (!db) return;
+            try {
+                const { collection, query, where, orderBy, limit, getDocs, updateDoc, doc, increment } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                const now = new Date();
+                const q = query(collection(db, 'corporate_ads'), where('approved', '==', true), orderBy('tier', 'desc'), limit(5));
+                const snap = await getDocs(q);
+                if (snap.empty) return;
+                const validAds = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .filter(a => {
+                        const end = a.endDate?.toDate?.() || (a.endDate ? new Date(a.endDate) : null);
+                        return !end || end > now;
+                    });
+                if (validAds.length === 0) return;
+                const ad = validAds[0];
+                const banner = document.getElementById('corporate-ad-center');
+                const logo = document.getElementById('corporate-ad-logo');
+                const title = document.getElementById('corporate-ad-title');
+                const tagline = document.getElementById('corporate-ad-tagline');
+                if (logo && ad.logoUrl) { logo.src = ad.logoUrl; logo.style.display = ''; }
+                if (title) title.textContent = 'Corporate Finance Sponsored by ' + (ad.companyName || 'Our Sponsor');
+                if (tagline) tagline.textContent = ad.tagline || 'Supporting African education';
+                if (banner && ad.linkUrl) banner.href = ad.linkUrl;
+                try { await updateDoc(doc(db, 'corporate_ads', ad.id), { impressions: increment(1) }); } catch(e) {}
+                console.log('[Ads] Loaded:', ad.companyName);
+            } catch(e) {
+                console.log('[Ads] KD fallback active:', e.message);
+            }
+        }
+
+        function openKDConcepts() { window.open('https://kdconcepts.com', '_blank'); }
+
+        // ============ INIT ============
+        window.addEventListener('load', function() {
+            loadCorporateAds();
+            console.log('⚛️ Corporate Finance — Quantum Verified');
+            console.log('   CHSH S=2.8284 · SA Patent 2026/05142');
+            console.log('   🌊 Calm particles: 55 · 2 · 0.2 · 0.8');
+            console.log('   🎬 Creator finance impact integrated');
+        });
+
+        window.toggleNotifPanel = toggleNotifPanel;
+        window.clearNotifications = clearNotifications;
+        window.FinanceManager = FinanceManager;
+        window.openKDConcepts = openKDConcepts;
+    </script>
+</body>
+</html>

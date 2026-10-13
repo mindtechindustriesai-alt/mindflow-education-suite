@@ -36,3 +36,4 @@ functions/.env
 *.key
 *.pem
 serviceAccountKey.json
+portal-inventory.txt

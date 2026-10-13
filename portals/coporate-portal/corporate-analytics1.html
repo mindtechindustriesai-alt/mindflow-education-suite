@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & Insights | MindFlow Corporate · Khensani AI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDK 10.8.0 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.__khensaniFirebase = { app, auth, db };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) console.log('⚛️ Corporate Analytics authenticated:', user.email);
+            else console.log('⚛️ Corporate Analytics session: demo mode active');
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #0066FF;
+            --accent-glow: rgba(0, 102, 255, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(15, 20, 35, 0.48);
+            --card-border: rgba(0, 102, 255, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --corporate-primary: #0066FF;
+            --corporate-secondary: #0044CC;
+            --corporate-accent: #3388FF;
+            --creator-pink: #FF69B4;
+            --communication-blue: #00A8FF;
+            --analytics-purple: #8A2BE2;
+            --khensani-gold: #C8A450;
+            --khensani-cream: #E8D5A3;
+            --dark-space: #0f0f1a;
+            --analytics-teal: #00D4AA;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Exo 2', sans-serif; }
+
+        html { background: var(--dark-space); }
+        body {
+            background: transparent;
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-top: 90px;
+            position: relative;
+            isolation: isolate;
+        }
+
+        #particles-js {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+            opacity: 1 !important;
+        }
+        #particles-js canvas {
+            display: block;
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* ============ TECH NAVBAR ============ */
+        .tech-navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 72px;
+            background: rgba(10, 10, 18, 0.48);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--analytics-teal);
+            display: flex; align-items: center;
+            padding: 0 1.5rem; gap: 1rem;
+            z-index: 2000;
+            box-shadow: 0 2px 20px rgba(0, 212, 170, 0.25);
+        }
+
+        .tech-navbar .khensani-logo {
+            height: 90px; width: auto;
+            margin-top: 4px;
+            filter: drop-shadow(0 0 10px rgba(0, 212, 170, 0.6));
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .tech-navbar .khensani-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.8));
+        }
+
+        .brand-block { display: flex; align-items: center; gap: 0.6rem; }
+
+        .brand-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--analytics-teal), var(--ai-gold));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 0 18px rgba(0, 212, 170, 0.6);
+        }
+
+        .brand-name {
+            font-size: 1.15rem; font-weight: 800; letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--analytics-teal), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .brand-sub {
+            font-size: 0.65rem; color: var(--text-dim);
+            letter-spacing: 2px; font-family: 'Space Mono', monospace;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        .nav-back-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.55rem 1.25rem;
+            border: 2px solid var(--analytics-teal);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--ai-gold);
+            font-weight: 600; font-size: 0.85rem;
+            text-decoration: none; letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .nav-back-btn:hover {
+            background: var(--analytics-teal);
+            color: #fff;
+            box-shadow: 0 0 22px rgba(0, 212, 170, 0.75);
+            transform: translateX(-3px);
+        }
+
+        .notif-wrap { position: relative; }
+
+        .notif-bell {
+            position: relative;
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 2px solid var(--analytics-teal);
+            background: rgba(0, 212, 170, 0.15);
+            color: var(--ai-gold);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; font-size: 1.1rem;
+        }
+        .notif-bell:hover { background: rgba(0, 212, 170, 0.35); box-shadow: 0 0 20px rgba(0, 212, 170, 0.7); }
+
+        .notif-badge {
+            position: absolute; top: -4px; right: -4px;
+            min-width: 20px; height: 20px; padding: 0 5px;
+            border-radius: 999px; background: var(--creator-pink); color: #fff;
+            font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #0a0a16;
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        .notif-panel {
+            position: absolute; top: 60px; right: 0;
+            width: 360px; max-height: 0; overflow: hidden;
+            background: rgba(15, 20, 35, 0.92);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 2px solid var(--analytics-teal);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            z-index: 2500;
+        }
+        .notif-panel.open { max-height: 460px; padding: 1rem; }
+
+        .notif-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.8rem; padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(0, 212, 170, 0.4);
+        }
+        .notif-title { font-size: 0.95rem; font-weight: 700; color: var(--ai-gold); }
+        .notif-clear { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; }
+        .notif-clear:hover { color: var(--creator-pink); }
+
+        .notif-item {
+            padding: 0.7rem 0.8rem; border-radius: 8px;
+            background: rgba(0, 212, 170, 0.12);
+            border-left: 3px solid var(--analytics-teal);
+            margin-bottom: 0.6rem;
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .notif-item:hover { background: rgba(0, 212, 170, 0.25); transform: translateX(3px); }
+        .notif-item.creator { border-left-color: var(--creator-pink); background: rgba(255, 105, 180, 0.1); }
+        .notif-item.creator .notif-item-title { color: var(--creator-pink); }
+        .notif-item-title { font-size: 0.85rem; font-weight: 600; color: var(--ai-gold); margin-bottom: 0.25rem; }
+        .notif-item-text { font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; }
+        .notif-item-time { font-size: 0.7rem; color: #666; margin-top: 0.3rem; font-family: 'Space Mono', monospace; }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-content {
+            padding: 2rem; max-width: 1800px; margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+
+        .welcome-header { margin-bottom: 2rem; animation: fadeIn 0.6s ease; }
+
+        .welcome-title {
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--analytics-teal), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+
+        .quantum-line {
+            font-size: 0.75rem; color: var(--khensani-gold);
+            letter-spacing: 3px; font-family: 'Space Mono', monospace; text-transform: uppercase;
+        }
+
+        /* Data Filters */
+        .filters-container { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .filter-btn {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid var(--analytics-teal);
+            color: var(--text); padding: 8px 16px;
+            border-radius: 20px; cursor: pointer;
+            transition: all 0.3s ease; font-size: 0.8rem;
+            font-family: 'Exo 2', sans-serif;
+        }
+        .filter-btn.active { background: var(--analytics-teal); color: var(--primary); font-weight: 600; }
+        .filter-btn:hover { background: rgba(0, 212, 170, 0.3); }
+
+        /* Analytics Overview */
+        .analytics-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .analytics-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--analytics-teal);
+            border-radius: 12px; padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+        }
+        .analytics-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--analytics-teal), var(--ai-gold));
+        }
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 212, 170, 0.3);
+        }
+        .analytics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .analytics-title { font-size: 0.9rem; font-weight: 600; color: var(--ai-gold); text-transform: uppercase; letter-spacing: 1px; }
+        .analytics-icon { font-size: 1.2rem; color: var(--analytics-teal); }
+        .analytics-value {
+            font-size: 2.2rem; font-weight: 700;
+            background: linear-gradient(45deg, var(--ai-gold), var(--analytics-teal));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .analytics-trend { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 600; }
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+
+        /* Analytics Section */
+        .analytics-section { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        .chart-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--analytics-teal);
+            border-radius: 12px; padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .chart-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--analytics-teal), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+        .chart-card:hover { transform: translateY(-5px); border-color: var(--ai-gold); box-shadow: 0 10px 25px rgba(0, 212, 170, 0.3); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .card-title { font-size: 1.2rem; font-weight: 600; color: var(--ai-gold); }
+        .card-icon { font-size: 1.5rem; color: var(--analytics-teal); }
+        .chart-container { height: 250px; position: relative; }
+
+        /* User Analytics Grid */
+        .user-analytics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .user-analytics-card {
+            background: rgba(0, 212, 170, 0.05);
+            border: 1px solid var(--analytics-teal);
+            border-radius: 8px; padding: 1rem;
+            text-align: center; transition: all 0.3s ease;
+        }
+        .user-analytics-card:hover {
+            background: rgba(0, 212, 170, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 212, 170, 0.2);
+        }
+        .user-analytics-value {
+            font-size: 1.8rem; font-weight: 700;
+            background: linear-gradient(45deg, var(--ai-gold), var(--analytics-teal));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.25rem;
+        }
+        .user-analytics-label { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Analytics Layout */
+        .analytics-layout { display: grid; grid-template-columns: 1fr 400px; gap: 2rem; margin-bottom: 2rem; }
+        .analytics-main { display: flex; flex-direction: column; gap: 2rem; }
+        .analytics-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .sidebar-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--analytics-teal);
+            border-radius: 12px; padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 212, 170, 0.3);
+            transition: all 0.3s ease;
+        }
+        .sidebar-card:hover { transform: translateY(-5px); border-color: var(--ai-gold); box-shadow: 0 0 30px rgba(255, 215, 0, 0.4); }
+
+        /* Content List */
+        .content-list { display: flex; flex-direction: column; gap: 1rem; }
+        .content-item {
+            padding: 1rem;
+            background: rgba(255, 170, 0, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--warning);
+            transition: all 0.3s ease;
+        }
+        .content-item.critical { background: rgba(255, 51, 102, 0.1); border-left-color: var(--danger); }
+        .content-item.info { background: rgba(0, 212, 170, 0.1); border-left-color: var(--analytics-teal); }
+        .content-item.creator { background: rgba(255, 105, 180, 0.08); border-left-color: var(--creator-pink); }
+        .content-item:hover { transform: translateX(5px); }
+        .content-title { font-weight: 600; color: var(--ai-gold); margin-bottom: 0.3rem; }
+        .content-item.creator .content-title { color: var(--creator-pink); }
+        .content-message { font-size: 0.8rem; color: var(--text-dim); }
+
+        /* Action Buttons */
+        .action-buttons { display: flex; flex-direction: column; gap: 0.8rem; }
+        .action-btn {
+            background: rgba(0, 212, 170, 0.1);
+            border: 1px solid var(--analytics-teal);
+            color: white; padding: 12px 16px;
+            border-radius: 8px; cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex; align-items: center;
+            gap: 10px; font-size: 0.9rem;
+            font-family: 'Exo 2', sans-serif;
+        }
+        .action-btn:hover { background: rgba(0, 212, 170, 0.3); transform: translateY(-2px); }
+
+        /* Metrics List */
+        .metrics-list { display: flex; flex-direction: column; gap: 1rem; }
+        .metric-item { display: flex; flex-direction: column; gap: 0.5rem; }
+        .metric-header { display: flex; justify-content: space-between; align-items: center; }
+        .metric-name { font-weight: 600; color: var(--ai-gold); }
+        .metric-value-text { font-size: 0.9rem; color: var(--text-dim); }
+        .metric-bar { height: 6px; background: rgba(0, 212, 170, 0.2); border-radius: 3px; overflow: hidden; }
+        .metric-progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--analytics-teal), var(--ai-gold));
+            border-radius: 3px; transition: width 0.3s ease;
+        }
+
+        /* Creator Analytics Section */
+        .creator-analytics {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--creator-pink);
+            border-radius: 12px; padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
+            position: relative;
+        }
+        .creator-analytics::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+        .creator-analytics-title {
+            font-size: 1.4rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.4rem;
+        }
+        .creator-analytics-sub { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+        .creator-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        .creator-metric-card {
+            background: rgba(255, 105, 180, 0.08);
+            border: 1px solid rgba(255, 105, 180, 0.4);
+            border-radius: 10px; padding: 1rem; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .creator-metric-card:hover {
+            background: rgba(255, 105, 180, 0.18);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+        }
+        .creator-metric-icon { font-size: 1.6rem; color: var(--creator-pink); margin-bottom: 0.5rem; }
+        .creator-metric-value {
+            font-size: 1.5rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+        .creator-metric-label { font-size: 0.78rem; color: var(--text-dim); }
+
+        /* ============ CORPORATE AD — CANONICAL KD ROTATING LOGO ============ */
+        .corporate-ad-center {
+            background: linear-gradient(135deg, rgba(70, 25, 115, 0.22), rgba(110, 80, 20, 0.18));
+            border: 2px solid rgba(200, 164, 80, 0.4);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 1.5rem; flex-wrap: wrap;
+            text-decoration: none; color: inherit;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+            min-height: 100px;
+        }
+        .corporate-ad-center::before {
+            content: '';
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(200, 164, 80, 0.08), transparent);
+            animation: kd-shine 4s infinite;
+        }
+        @keyframes kd-shine { 0% { left: -100%; } 100% { left: 100%; } }
+        .corporate-ad-center:hover {
+            border-color: var(--khensani-gold);
+            box-shadow: 0 0 40px rgba(200, 164, 80, 0.3);
+            transform: translateY(-3px);
+        }
+        .corporate-ad-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--khensani-cream);
+            letter-spacing: 1px;
+        }
+        .corporate-ad-text strong {
+            color: var(--khensani-gold);
+            font-size: 1.15rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .kd-rotating-logo {
+            height: 65px; width: 65px;
+            object-fit: contain; background: transparent; flex-shrink: 0;
+            opacity: 1 !important;
+            filter: brightness(0.78) contrast(1.28)
+                    drop-shadow(0 0 7px rgba(80, 20, 135, 0.98))
+                    drop-shadow(0 0 16px rgba(138, 43, 226, 0.95))
+                    drop-shadow(0 0 25px rgba(200, 164, 80, 0.72)) !important;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            animation: kd-superposition-visible 6s ease-in-out infinite !important;
+        }
+        @keyframes kd-superposition-visible {
+            0%, 100% { transform: perspective(600px) rotateY(0deg) rotateZ(0deg) scale(1); }
+            25% { transform: perspective(600px) rotateY(90deg) rotateZ(4deg) scale(1.08); }
+            50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); }
+            75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); }
+        }
+
+        /* ============ FLOATING FOOTER ============ */
+        .floating-footer {
+            padding: 30px 20px 20px;
+            margin-top: 60px;
+            text-align: center;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            position: relative; z-index: 1;
+        }
+        .footer-logo-row {
+            display: flex; justify-content: center; align-items: center;
+            gap: 40px; margin-bottom: 15px; flex-wrap: wrap;
+        }
+        .footer-logo {
+            height: 55px; width: auto; opacity: 0.85;
+            transition: all 0.3s ease; background: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 170, 0.3));
+        }
+        .footer-logo:hover {
+            opacity: 1; transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(0, 212, 170, 0.5));
+        }
+        .mindtech-glitch {
+            color: #00D4AA; font-weight: bold; font-size: 15px;
+            position: relative; display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px #00D4AA, 0 0 20px #00D4AA; }
+            50% { text-shadow: 0 0 15px #00D4AA, 0 0 30px #00D4AA, 0 0 40px #FF8C42; }
+            100% { text-shadow: 0 0 10px #00D4AA, 0 0 20px #00D4AA; }
+        }
+        .floating-footer .copyright { font-size: 0.78rem; color: #A0AAB8; margin-bottom: 6px; }
+        .floating-footer .footer-bottom {
+            margin-top: 12px; font-size: 10px;
+            color: #666; font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .analytics-layout { grid-template-columns: 1fr; }
+            .analytics-overview { grid-template-columns: repeat(2, 1fr); }
+            .analytics-section { grid-template-columns: 1fr; }
+            .user-analytics-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .tech-navbar .khensani-logo { height: 70px; }
+            .brand-name { font-size: 1rem; }
+        }
+        @media (max-width: 768px) {
+            body { padding-top: 80px; }
+            .tech-navbar { height: 64px; padding: 0 0.8rem; }
+            .tech-navbar .khensani-logo { height: 60px; }
+            .brand-sub { display: none; }
+            .main-content { padding: 1rem; }
+            .analytics-overview { grid-template-columns: 1fr; }
+            .user-analytics-grid { grid-template-columns: 1fr; }
+            .notif-panel { width: 300px; right: -60px; }
+            .footer-logo-row { gap: 20px; }
+            .footer-logo { height: 42px; }
+        }
+        @media (max-width: 480px) {
+            .creator-metrics-grid { grid-template-columns: 1fr; }
+            .welcome-title { font-size: 1.5rem; }
+            .nav-back-btn span { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .kd-rotating-logo, .corporate-ad-center::before { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <!-- ============ TECH NAVBAR ============ -->
+    <nav class="tech-navbar">
+        <a href="mindflow-portal.html" title="Khensani AI · MindFlow Portal">
+            <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png" alt="Khensani AI" class="khensani-logo">
+        </a>
+
+        <div class="brand-block">
+            <div class="brand-icon">⚛️</div>
+            <div>
+                <div class="brand-name">KHENSANI AI</div>
+                <div class="brand-sub">CORPORATE · ANALYTICS</div>
+            </div>
+        </div>
+
+        <div class="nav-spacer"></div>
+
+        <a href="mindflow-portal.html" class="nav-back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </a>
+
+        <div class="notif-wrap">
+            <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">5</span>
+            </div>
+            <div class="notif-panel" id="notifPanel">
+                <div class="notif-header">
+                    <div class="notif-title">🔔 Notifications</div>
+                    <div class="notif-clear" onclick="clearNotifications()">Clear all</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">🎬 Creator Content Analytics Spike</div>
+                    <div class="notif-item-text">Creator engagement up 34% WoW — quantum screen pass rate 96%.</div>
+                    <div class="notif-item-time">6 min ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">📊 Analytics Report Ready</div>
+                    <div class="notif-item-text">Q3 learning performance analytics report is available.</div>
+                    <div class="notif-item-time">1 hour ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">🌍 Geographic Expansion</div>
+                    <div class="notif-item-text">Nigeria user base grew 22% — top 3 market now.</div>
+                    <div class="notif-item-time">3 hours ago</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">⭐ Sponsor Pick Analytics</div>
+                    <div class="notif-item-text">Creator sponsor picks ROI at 3.2x — recommend scaling.</div>
+                    <div class="notif-item-time">Yesterday</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">🚀 Platform Milestone</div>
+                    <div class="notif-item-text">24,892 active users — record high.</div>
+                    <div class="notif-item-time">2 days ago</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content">
+
+        <div class="welcome-header">
+            <h1 class="welcome-title">Analytics Command Center</h1>
+            <p class="welcome-subtitle">David Analytics · Chief Data Officer · Real-Time Business Intelligence & Insights</p>
+            <p class="quantum-line">⚛️ QUANTUM-VERIFIED · CHSH S=2.8284 · SA PATENT 2026/05142</p>
+        </div>
+
+        <!-- Data Filters -->
+        <div class="filters-container">
+            <button class="filter-btn active" onclick="AnalyticsManager.setTimeFilter('today', event)">Today</button>
+            <button class="filter-btn" onclick="AnalyticsManager.setTimeFilter('week', event)">This Week</button>
+            <button class="filter-btn" onclick="AnalyticsManager.setTimeFilter('month', event)">This Month</button>
+            <button class="filter-btn" onclick="AnalyticsManager.setTimeFilter('quarter', event)">This Quarter</button>
+            <button class="filter-btn" onclick="AnalyticsManager.setTimeFilter('year', event)">This Year</button>
+        </div>
+
+        <!-- Analytics Overview -->
+        <div class="analytics-overview">
+            <div class="analytics-card">
+                <div class="analytics-header">
+                    <div class="analytics-title">Active Users</div>
+                    <div class="analytics-icon"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="analytics-value">24,892</div>
+                <div class="analytics-trend trend-up"><i class="fas fa-arrow-up"></i><span>12.5% growth</span></div>
+            </div>
+
+            <div class="analytics-card">
+                <div class="analytics-header">
+                    <div class="analytics-title">Engagement Rate</div>
+                    <div class="analytics-icon"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="analytics-value">68.4%</div>
+                <div class="analytics-trend trend-up"><i class="fas fa-arrow-up"></i><span>5.2% improvement</span></div>
+            </div>
+
+            <div class="analytics-card">
+                <div class="analytics-header">
+                    <div class="analytics-title">Avg. Session</div>
+                    <div class="analytics-icon"><i class="fas fa-clock"></i></div>
+                </div>
+                <div class="analytics-value">14.2m</div>
+                <div class="analytics-trend trend-up"><i class="fas fa-arrow-up"></i><span>2.1m longer</span></div>
+            </div>
+
+            <div class="analytics-card">
+                <div class="analytics-header">
+                    <div class="analytics-title">Completion Rate</div>
+                    <div class="analytics-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="analytics-value">84.7%</div>
+                <div class="analytics-trend trend-up"><i class="fas fa-arrow-up"></i><span>7.3% increase</span></div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div class="analytics-section">
+            <div class="chart-card">
+                <div class="card-header">
+                    <div class="card-title">User Engagement Trends</div>
+                    <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                </div>
+                <div class="chart-container"><canvas id="engagementChart"></canvas></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="card-header">
+                    <div class="card-title">Content Performance</div>
+                    <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+                </div>
+                <div class="chart-container"><canvas id="contentChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- User Analytics Grid -->
+        <div class="user-analytics-grid">
+            <div class="user-analytics-card">
+                <div class="user-analytics-value">42.8%</div>
+                <div class="user-analytics-label">Mobile Users</div>
+            </div>
+            <div class="user-analytics-card">
+                <div class="user-analytics-value">34.1</div>
+                <div class="user-analytics-label">Avg. Course Score</div>
+            </div>
+            <div class="user-analytics-card">
+                <div class="user-analytics-value">2.4M</div>
+                <div class="user-analytics-label">Monthly Pageviews</div>
+            </div>
+            <div class="user-analytics-card">
+                <div class="user-analytics-value">18.2%</div>
+                <div class="user-analytics-label">Bounce Rate</div>
+            </div>
+        </div>
+
+        <!-- Analytics Layout -->
+        <div class="analytics-layout">
+            <div class="analytics-main">
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="card-title">Learning Performance Analytics</div>
+                        <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    </div>
+                    <div class="chart-container"><canvas id="performanceChart"></canvas></div>
+                    <div class="action-buttons" style="margin-top: 1rem;">
+                        <button class="action-btn" onclick="AnalyticsManager.generateReport()">
+                            <i class="fas fa-file-pdf"></i> Generate Analytics Report
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="card-header">
+                        <div class="card-title">User Geographic Distribution</div>
+                        <div class="card-icon"><i class="fas fa-globe-africa"></i></div>
+                    </div>
+                    <div class="chart-container"><canvas id="geoChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="analytics-sidebar">
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Top Performing Content</div>
+                        <div class="card-icon"><i class="fas fa-trophy"></i></div>
+                    </div>
+                    <div class="content-list">
+                        <div class="content-item info">
+                            <div class="content-title">AI Fundamentals Course</div>
+                            <div class="content-message">94% completion rate • 4.8★ rating</div>
+                        </div>
+                        <div class="content-item">
+                            <div class="content-title">Quantum Computing Workshop</div>
+                            <div class="content-message">89% completion rate • 4.7★ rating</div>
+                        </div>
+                        <div class="content-item">
+                            <div class="content-title">Data Science Bootcamp</div>
+                            <div class="content-message">87% completion rate • 4.6★ rating</div>
+                        </div>
+                        <div class="content-item creator">
+                            <div class="content-title">🎬 Student Creator Content</div>
+                            <div class="content-message">96% quantum pass • 63 sponsor picks</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Engagement Metrics</div>
+                        <div class="card-icon"><i class="fas fa-bullseye"></i></div>
+                    </div>
+                    <div class="metrics-list">
+                        <div class="metric-item">
+                            <div class="metric-header">
+                                <div class="metric-name">Course Engagement</div>
+                                <div class="metric-value-text">78%</div>
+                            </div>
+                            <div class="metric-bar"><div class="metric-progress" style="width: 78%"></div></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-header">
+                                <div class="metric-name">Assessment Completion</div>
+                                <div class="metric-value-text">92%</div>
+                            </div>
+                            <div class="metric-bar"><div class="metric-progress" style="width: 92%"></div></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-header">
+                                <div class="metric-name">Peer Interaction</div>
+                                <div class="metric-value-text">65%</div>
+                            </div>
+                            <div class="metric-bar"><div class="metric-progress" style="width: 65%"></div></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-header">
+                                <div class="metric-name">Content Sharing</div>
+                                <div class="metric-value-text">42%</div>
+                            </div>
+                            <div class="metric-bar"><div class="metric-progress" style="width: 42%"></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="card-header">
+                        <div class="card-title">Analytics Actions</div>
+                        <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="AnalyticsManager.deepDiveAnalysis()">
+                            <i class="fas fa-chart-bar"></i> Deep Dive Analysis
+                        </button>
+                        <button class="action-btn" onclick="AnalyticsManager.predictiveModeling()">
+                            <i class="fas fa-crystal-ball"></i> Predictive Modeling
+                        </button>
+                        <button class="action-btn" onclick="AnalyticsManager.exportData()">
+                            <i class="fas fa-download"></i> Export Data
+                        </button>
+                        <button class="action-btn" onclick="AnalyticsManager.aiInsights()">
+                            <i class="fas fa-robot"></i> Khensani AI Insights
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Creator Analytics Section -->
+        <div class="creator-analytics">
+            <div class="creator-analytics-title">🎬 Creator Platform — Analytics</div>
+            <div class="creator-analytics-sub">Student creator content performance · sponsor engagement · quantum screening analytics</div>
+
+            <div class="creator-metrics-grid">
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-heart"></i></div>
+                    <div class="creator-metric-value" id="creatorEngagement">48.7K</div>
+                    <div class="creator-metric-label">Creator Engagement</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-star"></i></div>
+                    <div class="creator-metric-value" id="creatorSponsorPicks">63</div>
+                    <div class="creator-metric-label">⭐ Sponsor Picks YTD</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="creator-metric-value" id="creatorROI">3.2x</div>
+                    <div class="creator-metric-label">Creator ROI</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="creator-metric-value" id="creatorQuantumPass">96%</div>
+                    <div class="creator-metric-label">Quantum Screen Pass</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-video"></i></div>
+                    <div class="creator-metric-value" id="creatorVideos">512</div>
+                    <div class="creator-metric-label">Videos Published</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-chess"></i></div>
+                    <div class="creator-metric-value" id="creatorChess">24</div>
+                    <div class="creator-metric-label">Chess Competitions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ CORPORATE AD — CANONICAL KD ROTATING LOGO ============ -->
+        <a href="https://kdconcepts.com" target="_blank" rel="noopener" id="corporate-ad-center" class="corporate-ad-center">
+            <img id="corporate-ad-logo"
+                 src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png"
+                 alt="KD Concepts"
+                 class="kd-rotating-logo"
+                 onerror="this.style.display='none'">
+            <div class="corporate-ad-text">
+                <strong id="corporate-ad-title">Corporate Analytics Sponsored by KD Concepts</strong>
+                <span id="corporate-ad-tagline">Advertising · Platform Exposure · Circular Economy Partner</span>
+            </div>
+            <i class="fas fa-external-link-alt" style="color: var(--khensani-gold); font-size: 1.2rem;"></i>
+        </a>
+    </main>
+
+    <!-- ============ FLOATING FOOTER ============ -->
+    <footer class="floating-footer">
+        <div class="footer-logo-row">
+            <a href="https://mindtech.africa" target="_blank" rel="noopener" aria-label="MindTech Industries">
+                <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                     alt="EntangleGuard · MindTech Industries"
+                     class="footer-logo"
+                     onerror="this.style.display='none'">
+            </a>
+        </div>
+        <p class="copyright">
+            © 2026 MindFlow · Khensani AI · Powered by
+            <a href="https://mindtech.africa" target="_blank" style="text-decoration:none;">
+                <span class="mindtech-glitch">MindTech</span>
+            </a>
+            · Transforming African education
+        </p>
+        <div class="footer-bottom">
+            ⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Jobs db6h46o4qg6s73c4q1n0 · db6h3eslf4us73c5c80g
+        </div>
+    </footer>
+
+    <script>
+        // ============ PARTICLES — SALARYPLAN CALM ============
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55 },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 2.5, random: true },
+                line_linked: { enable: true, distance: 150, color: "#00B4D8", opacity: 0.08 },
+                move: { enable: true, speed: 0.8 }
+            },
+            interactivity: { events: { onhover: { enable: true, mode: "repulse" } } }
+        });
+
+        // ============ NOTIFICATIONS ============
+        function toggleNotifPanel() { document.getElementById('notifPanel').classList.toggle('open'); }
+        function clearNotifications() {
+            const badge = document.getElementById('notifBadge');
+            badge.textContent = '0';
+            badge.style.display = 'none';
+            document.querySelectorAll('.notif-item').forEach(item => { item.style.opacity = '0.4'; });
+        }
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.getElementById('notifBell');
+            if (panel && bell && !panel.contains(e.target) && !bell.contains(e.target)) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // ============ ANALYTICS MANAGER ============
+        const AnalyticsManager = {
+            openProfile: function() {
+                alert('👔 Analytics Leadership Profile\n\nExecutive: David Analytics\nRole: Chief Data Officer\nTenure: 3 years');
+            },
+            generateReport: function() {
+                alert('📊 Generating Analytics Report\n\nComprehensive analytics report with insights.\n\n⚛️ CHSH S=2.8284 verified');
+            },
+            deepDiveAnalysis: function() {
+                alert('🔍 Initiating Deep Dive Analysis\n\nAdvanced analytics and correlation analysis in progress.');
+            },
+            predictiveModeling: function() {
+                alert('🔮 Running Predictive Modeling\n\nMachine learning models analyzing future trends.');
+            },
+            exportData: function() {
+                alert('📥 Exporting Analytics Data\n\nSelected analytics data export initiated.');
+            },
+            aiInsights: function() {
+                alert('🤖 Consulting Khensani AI\n\n"Creator platform engagement up 34% WoW. Sponsor ROI at 3.2x. Recommend aggressive sponsor outreach for Q4 expansion across all 12 provinces."');
+            },
+            setTimeFilter: function(filter, evt) {
+                document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                if (evt && evt.target) evt.target.classList.add('active');
+                console.log('Filter set to:', filter);
+            }
+        };
+
+        // ============ CHARTS ============
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            animateCreatorMetrics();
+            console.log('✅ Corporate Analytics dashboard initialized');
+        });
+
+        function initializeCharts() {
+            const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+            new Chart(engagementCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [
+                        {
+                            label: 'User Engagement (%)',
+                            data: [65, 70, 75, 80, 85, 90, 95],
+                            borderColor: '#00D4AA',
+                            backgroundColor: 'rgba(0, 212, 170, 0.1)',
+                            tension: 0.4, fill: true
+                        },
+                        {
+                            label: 'Course Completions',
+                            data: [45, 50, 55, 60, 65, 70, 75],
+                            borderColor: '#FFD700',
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                            tension: 0.4, fill: true, yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#a0a0cc' } },
+                        y1: { position: 'right', beginAtZero: true, max: 100, grid: { drawOnChartArea: false }, ticks: { color: '#a0a0cc' } },
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#a0a0cc' } }
+                    },
+                    plugins: { legend: { labels: { color: '#e0e0ff' } } }
+                }
+            });
+
+            const contentCtx = document.getElementById('contentChart').getContext('2d');
+            new Chart(contentCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['AI Courses', 'Data Science', 'Programming', 'Business', 'Creator Content', 'Other'],
+                    datasets: [{
+                        data: [30, 22, 14, 11, 18, 5],
+                        backgroundColor: ['#00D4AA', '#FFD700', '#0066FF', '#FF8C42', '#FF69B4', '#8A2BE2'],
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#e0e0ff', padding: 20 } } }
+                }
+            });
+
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Beginner', 'Intermediate', 'Advanced', 'Expert', 'Master'],
+                    datasets: [{
+                        label: 'Average Score (%)',
+                        data: [65, 72, 78, 85, 92],
+                        backgroundColor: [
+                            'rgba(0, 212, 170, 0.8)', 'rgba(255, 215, 0, 0.8)', 'rgba(0, 102, 255, 0.8)',
+                            'rgba(255, 140, 66, 0.8)', 'rgba(138, 43, 226, 0.8)'
+                        ],
+                        borderColor: 'rgba(255, 255, 255, 0.3)', borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#a0a0cc' } },
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#a0a0cc' } }
+                    },
+                    plugins: { legend: { labels: { color: '#e0e0ff' } } }
+                }
+            });
+
+            const geoCtx = document.getElementById('geoChart').getContext('2d');
+            new Chart(geoCtx, {
+                type: 'polarArea',
+                data: {
+                    labels: ['Nigeria', 'South Africa', 'Kenya', 'Ghana', 'Egypt', 'Other'],
+                    datasets: [{
+                        data: [35, 25, 15, 12, 8, 5],
+                        backgroundColor: [
+                            'rgba(0, 212, 170, 0.8)', 'rgba(255, 215, 0, 0.8)', 'rgba(0, 102, 255, 0.8)',
+                            'rgba(255, 140, 66, 0.8)', 'rgba(138, 43, 226, 0.8)', 'rgba(255, 51, 102, 0.8)'
+                        ],
+                        borderColor: 'rgba(255, 255, 255, 0.3)', borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { color: '#e0e0ff', padding: 20 } } }
+                }
+            });
+        }
+
+        // ============ CREATOR METRIC ANIMATION ============
+        function animateCreatorMetrics() {
+            const metrics = [
+                { id: 'creatorSponsorPicks', target: 63, suffix: '' },
+                { id: 'creatorQuantumPass', target: 96, suffix: '%' },
+                { id: 'creatorVideos', target: 512, suffix: '' },
+                { id: 'creatorChess', target: 24, suffix: '' }
+            ];
+            metrics.forEach(m => {
+                const el = document.getElementById(m.id);
+                if (!el) return;
+                let current = 0;
+                const step = m.target / 40;
+                const interval = setInterval(() => {
+                    current += step;
+                    if (current >= m.target) { current = m.target; clearInterval(interval); }
+                    el.textContent = Math.floor(current) + m.suffix;
+                }, 30);
+            });
+        }
+
+        // ============ CORPORATE AD DYNAMIC LOADER (CANONICAL) ============
+        async function loadCorporateAds() {
+            const db = window.__khensaniFirebase?.db;
+            if (!db) return;
+            try {
+                const { collection, query, where, orderBy, limit, getDocs, updateDoc, doc, increment } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                const now = new Date();
+                const q = query(collection(db, 'corporate_ads'), where('approved', '==', true), orderBy('tier', 'desc'), limit(5));
+                const snap = await getDocs(q);
+                if (snap.empty) return;
+                const validAds = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .filter(a => {
+                        const end = a.endDate?.toDate?.() || (a.endDate ? new Date(a.endDate) : null);
+                        return !end || end > now;
+                    });
+                if (validAds.length === 0) return;
+                const ad = validAds[0];
+                const banner = document.getElementById('corporate-ad-center');
+                const logo = document.getElementById('corporate-ad-logo');
+                const title = document.getElementById('corporate-ad-title');
+                const tagline = document.getElementById('corporate-ad-tagline');
+                if (logo && ad.logoUrl) { logo.src = ad.logoUrl; logo.style.display = ''; }
+                if (title) title.textContent = 'Corporate Analytics Sponsored by ' + (ad.companyName || 'Our Sponsor');
+                if (tagline) tagline.textContent = ad.tagline || 'Supporting African education';
+                if (banner && ad.linkUrl) banner.href = ad.linkUrl;
+                try { await updateDoc(doc(db, 'corporate_ads', ad.id), { impressions: increment(1) }); } catch(e) {}
+                console.log('[Ads] Loaded:', ad.companyName);
+            } catch(e) {
+                console.log('[Ads] KD fallback active:', e.message);
+            }
+        }
+
+        function openKDConcepts() { window.open('https://kdconcepts.com', '_blank'); }
+
+        // ============ INIT ============
+        window.addEventListener('load', function() {
+            loadCorporateAds();
+            console.log('⚛️ Corporate Analytics — Quantum Verified');
+            console.log('   CHSH S=2.8284 · SA Patent 2026/05142');
+            console.log('   🌊 Calm particles: 55 · 2 · 0.2 · 0.8');
+            console.log('   🎬 Creator analytics integrated');
+        });
+
+        window.toggleNotifPanel = toggleNotifPanel;
+        window.clearNotifications = clearNotifications;
+        window.AnalyticsManager = AnalyticsManager;
+        window.openKDConcepts = openKDConcepts;
+    </script>
+</body>
+</html>

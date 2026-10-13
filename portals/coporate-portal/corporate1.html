@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate Command - MindFlow Education Suite · Khensani AI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDK 10.8.0 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.__khensaniFirebase = { app, auth, db };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) console.log('⚛️ Corporate authenticated:', user.email);
+            else console.log('⚛️ Corporate session: demo mode active');
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #0066FF;
+            --accent-glow: rgba(0, 102, 255, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(15, 20, 35, 0.48);
+            --card-border: rgba(0, 102, 255, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --corporate-primary: #0066FF;
+            --corporate-secondary: #0044CC;
+            --corporate-accent: #3388FF;
+            --creator-pink: #FF69B4;
+            --communication-blue: #00A8FF;
+            --analytics-purple: #8A2BE2;
+            --khensani-gold: #C8A450;
+            --khensani-cream: #E8D5A3;
+            --dark-space: #0f0f1a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Exo 2', sans-serif; }
+
+        html { background: var(--dark-space); }
+        body {
+            background: transparent;
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-top: 90px;
+            position: relative;
+            isolation: isolate;
+        }
+
+        #particles-js {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+            opacity: 1 !important;
+        }
+        #particles-js canvas {
+            display: block;
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* ============ TECH NAVBAR ============ */
+        .tech-navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 72px;
+            background: rgba(10, 10, 18, 0.48);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--corporate-primary);
+            display: flex; align-items: center;
+            padding: 0 1.5rem; gap: 1rem;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.35);
+        }
+
+        .tech-navbar .khensani-logo {
+            height: 90px; width: auto;
+            margin-top: 4px;
+            filter: drop-shadow(0 0 10px rgba(0, 102, 255, 0.6));
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .tech-navbar .khensani-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.8));
+        }
+
+        .brand-block { display: flex; align-items: center; gap: 0.6rem; }
+
+        .brand-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--corporate-primary), var(--ai-gold));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 0 18px rgba(0, 102, 255, 0.6);
+        }
+
+        .brand-name {
+            font-size: 1.15rem; font-weight: 800; letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .brand-sub {
+            font-size: 0.65rem; color: var(--text-dim);
+            letter-spacing: 2px; font-family: 'Space Mono', monospace;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        .nav-back-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.55rem 1.25rem;
+            border: 2px solid var(--corporate-primary);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--ai-gold);
+            font-weight: 600; font-size: 0.85rem;
+            text-decoration: none; letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .nav-back-btn:hover {
+            background: var(--corporate-primary);
+            color: #fff;
+            box-shadow: 0 0 22px rgba(0, 102, 255, 0.75);
+            transform: translateX(-3px);
+        }
+
+        .notif-wrap { position: relative; }
+
+        .notif-bell {
+            position: relative;
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 2px solid var(--corporate-primary);
+            background: rgba(0, 102, 255, 0.15);
+            color: var(--ai-gold);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; font-size: 1.1rem;
+        }
+        .notif-bell:hover { background: rgba(0, 102, 255, 0.35); box-shadow: 0 0 20px rgba(0, 102, 255, 0.7); }
+
+        .notif-badge {
+            position: absolute; top: -4px; right: -4px;
+            min-width: 20px; height: 20px; padding: 0 5px;
+            border-radius: 999px; background: var(--creator-pink); color: #fff;
+            font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #0a0a16;
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        .notif-panel {
+            position: absolute; top: 60px; right: 0;
+            width: 360px; max-height: 0; overflow: hidden;
+            background: rgba(15, 20, 35, 0.92);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            z-index: 2500;
+        }
+        .notif-panel.open { max-height: 460px; padding: 1rem; }
+
+        .notif-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.8rem; padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(0, 102, 255, 0.4);
+        }
+        .notif-title { font-size: 0.95rem; font-weight: 700; color: var(--ai-gold); }
+        .notif-clear { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; }
+        .notif-clear:hover { color: var(--creator-pink); }
+
+        .notif-item {
+            padding: 0.7rem 0.8rem; border-radius: 8px;
+            background: rgba(0, 102, 255, 0.12);
+            border-left: 3px solid var(--corporate-primary);
+            margin-bottom: 0.6rem;
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .notif-item:hover { background: rgba(0, 102, 255, 0.25); transform: translateX(3px); }
+        .notif-item.creator { border-left-color: var(--creator-pink); background: rgba(255, 105, 180, 0.1); }
+        .notif-item.creator .notif-item-title { color: var(--creator-pink); }
+        .notif-item-title { font-size: 0.85rem; font-weight: 600; color: var(--ai-gold); margin-bottom: 0.25rem; }
+        .notif-item-text { font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; }
+        .notif-item-time { font-size: 0.7rem; color: #666; margin-top: 0.3rem; font-family: 'Space Mono', monospace; }
+
+        /* ============ CORPORATE NAV TABS ============ */
+        .portal-nav {
+            background: rgba(10, 10, 18, 0.48);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 102, 255, 0.3);
+            padding: 0 2rem;
+            position: sticky;
+            top: 72px;
+            z-index: 1500;
+        }
+
+        .nav-tabs {
+            display: flex;
+            list-style: none; gap: 0;
+            max-width: 1600px; margin: 0 auto;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: var(--text-dim);
+            text-decoration: none;
+            display: block;
+        }
+        .nav-tab.active {
+            border-bottom-color: var(--corporate-primary);
+            color: var(--corporate-primary);
+            background: rgba(0, 102, 255, 0.1);
+        }
+        .nav-tab:hover {
+            background: rgba(0, 102, 255, 0.05);
+            color: var(--text);
+        }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-content {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-header { margin-bottom: 2rem; animation: fadeIn 0.6s ease; }
+
+        .welcome-title {
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+
+        .quantum-line {
+            font-size: 0.75rem; color: var(--khensani-gold);
+            letter-spacing: 3px; font-family: 'Space Mono', monospace; text-transform: uppercase;
+        }
+
+        /* Corporate Layout */
+        .corporate-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem; margin-bottom: 2rem;
+        }
+        .dashboard-main { display: flex; flex-direction: column; gap: 2rem; }
+
+        /* KPI Dashboard */
+        .kpi-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .kpi-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px; padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+        }
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+        .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .kpi-title { font-size: 0.9rem; font-weight: 600; color: var(--ai-gold); text-transform: uppercase; letter-spacing: 1px; }
+        .kpi-icon { font-size: 1.2rem; color: var(--corporate-primary); }
+        .kpi-value {
+            font-size: 2.2rem; font-weight: 700;
+            background: linear-gradient(45deg, var(--ai-gold), var(--corporate-primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .kpi-trend { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 600; }
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+
+        /* Charts */
+        .charts-section {
+            display: grid; grid-template-columns: 2fr 1fr;
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .chart-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px; padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .chart-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--corporate-primary), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+        .chart-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+        }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .chart-title { font-size: 1.2rem; font-weight: 600; color: var(--ai-gold); }
+        .chart-container { height: 250px; position: relative; }
+
+        /* Sidebar */
+        .corporate-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .corporate-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--corporate-primary);
+            border-radius: 12px; padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .corporate-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .card-title { font-size: 1.2rem; font-weight: 600; color: var(--ai-gold); }
+        .card-icon { font-size: 1.5rem; color: var(--corporate-primary); }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem; margin-bottom: 2rem;
+        }
+        .action-btn {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--corporate-primary);
+            color: white; padding: 1.2rem;
+            border-radius: 12px; cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex; flex-direction: column;
+            align-items: center; gap: 0.8rem;
+            text-align: center; text-decoration: none;
+            font-family: 'Exo 2', sans-serif;
+            position: relative; overflow: hidden;
+        }
+        .action-btn:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 102, 255, 0.3);
+            border-color: var(--ai-gold);
+        }
+        .action-icon { font-size: 2rem; color: var(--corporate-primary); }
+
+        /* Performance Metrics */
+        .performance-metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+        .metric {
+            text-align: center; padding: 1rem;
+            background: rgba(0, 102, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 102, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .metric:hover {
+            background: rgba(0, 102, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 102, 255, 0.2);
+        }
+        .metric-value { font-size: 1.5rem; font-weight: 700; color: var(--ai-gold); margin-bottom: 0.25rem; }
+        .metric-label { font-size: 0.8rem; color: var(--text-dim); }
+
+        /* Activity List */
+        .activity-list { max-height: 300px; overflow-y: auto; }
+        .activity-item {
+            padding: 0.8rem;
+            background: rgba(0, 102, 255, 0.05);
+            border-radius: 8px; margin-bottom: 0.5rem;
+            border-left: 4px solid var(--corporate-primary);
+            transition: all 0.3s ease;
+        }
+        .activity-item:hover { transform: translateX(5px); background: rgba(0, 102, 255, 0.1); }
+        .activity-time { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.3rem; }
+
+        /* Creator Platform Oversight */
+        .creator-oversight {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--creator-pink);
+            border-radius: 12px; padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
+            position: relative;
+        }
+        .creator-oversight::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+        .creator-oversight-title {
+            font-size: 1.4rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.4rem;
+        }
+        .creator-oversight-sub { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+        .creator-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        .creator-metric-card {
+            background: rgba(255, 105, 180, 0.08);
+            border: 1px solid rgba(255, 105, 180, 0.4);
+            border-radius: 10px; padding: 1rem; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .creator-metric-card:hover {
+            background: rgba(255, 105, 180, 0.18);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+        }
+        .creator-metric-icon { font-size: 1.6rem; color: var(--creator-pink); margin-bottom: 0.5rem; }
+        .creator-metric-value {
+            font-size: 1.5rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+        .creator-metric-label { font-size: 0.78rem; color: var(--text-dim); }
+
+        /* ============ CORPORATE AD — CANONICAL KD ROTATING LOGO ============ */
+        .corporate-ad-center {
+            background: linear-gradient(135deg, rgba(70, 25, 115, 0.22), rgba(110, 80, 20, 0.18));
+            border: 2px solid rgba(200, 164, 80, 0.4);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 1.5rem; flex-wrap: wrap;
+            text-decoration: none; color: inherit;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+            min-height: 100px;
+        }
+        .corporate-ad-center::before {
+            content: '';
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(200, 164, 80, 0.08), transparent);
+            animation: kd-shine 4s infinite;
+        }
+        @keyframes kd-shine { 0% { left: -100%; } 100% { left: 100%; } }
+        .corporate-ad-center:hover {
+            border-color: var(--khensani-gold);
+            box-shadow: 0 0 40px rgba(200, 164, 80, 0.3);
+            transform: translateY(-3px);
+        }
+        .corporate-ad-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--khensani-cream);
+            letter-spacing: 1px;
+        }
+        .corporate-ad-text strong {
+            color: var(--khensani-gold);
+            font-size: 1.15rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .kd-rotating-logo {
+            height: 65px; width: 65px;
+            object-fit: contain; background: transparent; flex-shrink: 0;
+            opacity: 1 !important;
+            filter: brightness(0.78) contrast(1.28)
+                    drop-shadow(0 0 7px rgba(80, 20, 135, 0.98))
+                    drop-shadow(0 0 16px rgba(138, 43, 226, 0.95))
+                    drop-shadow(0 0 25px rgba(200, 164, 80, 0.72)) !important;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            animation: kd-superposition-visible 6s ease-in-out infinite !important;
+        }
+        @keyframes kd-superposition-visible {
+            0%, 100% { transform: perspective(600px) rotateY(0deg) rotateZ(0deg) scale(1); }
+            25% { transform: perspective(600px) rotateY(90deg) rotateZ(4deg) scale(1.08); }
+            50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); }
+            75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); }
+        }
+
+        /* ============ FLOATING FOOTER ============ */
+        .floating-footer {
+            padding: 30px 20px 20px;
+            margin-top: 60px;
+            text-align: center;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            position: relative; z-index: 1;
+        }
+        .footer-logo-row {
+            display: flex; justify-content: center; align-items: center;
+            gap: 40px; margin-bottom: 15px; flex-wrap: wrap;
+        }
+        .footer-logo {
+            height: 55px; width: auto; opacity: 0.85;
+            transition: all 0.3s ease; background: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 102, 255, 0.3));
+        }
+        .footer-logo:hover {
+            opacity: 1; transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(0, 102, 255, 0.5));
+        }
+        .mindtech-glitch {
+            color: #0066FF; font-weight: bold; font-size: 15px;
+            position: relative; display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px #0066FF, 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px #0066FF, 0 0 30px #0066FF, 0 0 40px #FF8C42; }
+            100% { text-shadow: 0 0 10px #0066FF, 0 0 20px #0066FF; }
+        }
+        .floating-footer .copyright { font-size: 0.78rem; color: #A0AAB8; margin-bottom: 6px; }
+        .floating-footer .footer-bottom {
+            margin-top: 12px; font-size: 10px;
+            color: #666; font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInRight { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .corporate-layout { grid-template-columns: 1fr; }
+            .kpi-dashboard { grid-template-columns: repeat(2, 1fr); }
+            .charts-section { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .tech-navbar .khensani-logo { height: 70px; }
+            .brand-name { font-size: 1rem; }
+        }
+        @media (max-width: 768px) {
+            body { padding-top: 80px; }
+            .tech-navbar { height: 64px; padding: 0 0.8rem; }
+            .tech-navbar .khensani-logo { height: 60px; }
+            .brand-sub { display: none; }
+            .portal-nav { padding: 0 0.5rem; top: 64px; }
+            .nav-tabs { overflow-x: auto; scrollbar-width: none; }
+            .nav-tabs::-webkit-scrollbar { display: none; }
+            .nav-tab { padding: 0.8rem 1rem; min-width: 120px; text-align: center; font-size: 0.85rem; white-space: nowrap; }
+            .main-content { padding: 1rem; }
+            .kpi-dashboard { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: 1fr; }
+            .performance-metrics { grid-template-columns: 1fr; }
+            .notif-panel { width: 300px; right: -60px; }
+            .footer-logo-row { gap: 20px; }
+            .footer-logo { height: 42px; }
+        }
+        @media (max-width: 480px) {
+            .creator-metrics-grid { grid-template-columns: 1fr; }
+            .welcome-title { font-size: 1.5rem; }
+            .nav-back-btn span { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .kd-rotating-logo, .corporate-ad-center::before { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <!-- ============ TECH NAVBAR ============ -->
+    <nav class="tech-navbar">
+        <a href="mindflow-portal.html" title="Khensani AI · MindFlow Portal">
+            <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png" alt="Khensani AI" class="khensani-logo">
+        </a>
+
+        <div class="brand-block">
+            <div class="brand-icon">⚛️</div>
+            <div>
+                <div class="brand-name">KHENSANI AI</div>
+                <div class="brand-sub">CORPORATE · COMMAND CENTER</div>
+            </div>
+        </div>
+
+        <div class="nav-spacer"></div>
+
+        <a href="mindflow-portal.html" class="nav-back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </a>
+
+        <div class="notif-wrap">
+            <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">5</span>
+            </div>
+            <div class="notif-panel" id="notifPanel">
+                <div class="notif-header">
+                    <div class="notif-title">🔔 Notifications</div>
+                    <div class="notif-clear" onclick="clearNotifications()">Clear all</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">🎬 Creator Sponsorship Q3 Revenue</div>
+                    <div class="notif-item-text">Creator platform sponsorship revenue hit R428K — 42% above target.</div>
+                    <div class="notif-item-time">8 min ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">📊 Quarterly Report Generated</div>
+                    <div class="notif-item-text">Q3 financial performance analysis completed and ready for review.</div>
+                    <div class="notif-item-time">2 hours ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">🤝 New Partnership Signed</div>
+                    <div class="notif-item-text">Agreement with TechEd Alliance finalized — expansion into 4 new regions.</div>
+                    <div class="notif-item-time">5 hours ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">🚀 Platform Milestone</div>
+                    <div class="notif-item-text">10,000th student enrolled in AI courses — system performance optimal.</div>
+                    <div class="notif-item-time">Yesterday</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">⭐ Sponsor Pick Analytics</div>
+                    <div class="notif-item-text">63 sponsor picks YTD — ROI at 3.2x. Recommend program expansion.</div>
+                    <div class="notif-item-time">2 days ago</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============ CORPORATE NAV TABS ============ -->
+    <nav class="portal-nav">
+        <ul class="nav-tabs">
+            <li><a href="corporate.html" class="nav-tab active">Corporate Dashboard</a></li>
+            <li><a href="corporate-analytics.html" class="nav-tab">Business Analytics</a></li>
+            <li><a href="corporate-finance.html" class="nav-tab">Financial Management</a></li>
+            <li><a href="corporate-operations.html" class="nav-tab">Operations</a></li>
+            <li><a href="corporate-strategy.html" class="nav-tab">Strategic Planning</a></li>
+        </ul>
+    </nav>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content">
+
+        <div class="welcome-header">
+            <h1 class="welcome-title">Corporate Command Center</h1>
+            <p class="welcome-subtitle">Sarah Chen · CEO · Business Intelligence & Institutional Overview</p>
+            <p class="quantum-line">⚛️ QUANTUM-VERIFIED · CHSH S=2.8284 · SA PATENT 2026/05142</p>
+        </div>
+
+        <!-- KPI Dashboard -->
+        <div class="kpi-dashboard">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Revenue</div>
+                    <div class="kpi-icon"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <div class="kpi-value">R2.8M</div>
+                <div class="kpi-trend trend-up"><i class="fas fa-arrow-up"></i><span>12.4% vs last month</span></div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Active Students</div>
+                    <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                </div>
+                <div class="kpi-value">12,458</div>
+                <div class="kpi-trend trend-up"><i class="fas fa-arrow-up"></i><span>8.2% growth</span></div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Completion Rate</div>
+                    <div class="kpi-icon"><i class="fas fa-graduation-cap"></i></div>
+                </div>
+                <div class="kpi-value">94.2%</div>
+                <div class="kpi-trend trend-up"><i class="fas fa-arrow-up"></i><span>3.1% improvement</span></div>
+            </div>
+
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="kpi-title">Satisfaction</div>
+                    <div class="kpi-icon"><i class="fas fa-star"></i></div>
+                </div>
+                <div class="kpi-value">4.8/5</div>
+                <div class="kpi-trend trend-up"><i class="fas fa-arrow-up"></i><span>0.2 points increase</span></div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="corporate-analytics.html" class="action-btn">
+                <i class="fas fa-chart-bar action-icon"></i>
+                <div>
+                    <div class="card-title">Business Analytics</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.3rem;">Performance insights & trends</div>
+                </div>
+            </a>
+            <a href="corporate-finance.html" class="action-btn">
+                <i class="fas fa-file-invoice-dollar action-icon"></i>
+                <div>
+                    <div class="card-title">Financial Reports</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.3rem;">Revenue & expense analysis</div>
+                </div>
+            </a>
+            <a href="corporate-operations.html" class="action-btn">
+                <i class="fas fa-cogs action-icon"></i>
+                <div>
+                    <div class="card-title">Operations</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.3rem;">Performance monitoring</div>
+                </div>
+            </a>
+            <a href="corporate-strategy.html" class="action-btn">
+                <i class="fas fa-chess-queen action-icon"></i>
+                <div>
+                    <div class="card-title">Strategic Planning</div>
+                    <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.3rem;">Growth initiatives</div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Corporate Layout -->
+        <div class="corporate-layout">
+            <div class="dashboard-main">
+                <div class="charts-section">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Revenue Trend</div>
+                            <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                        </div>
+                        <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title">Student Distribution</div>
+                            <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
+                        </div>
+                        <div class="chart-container"><canvas id="studentChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="corporate-card">
+                    <div class="card-header">
+                        <div class="card-title">Performance Metrics</div>
+                        <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
+                    </div>
+                    <div class="performance-metrics">
+                        <div class="metric"><div class="metric-value">98.7%</div><div class="metric-label">System Uptime</div></div>
+                        <div class="metric"><div class="metric-value">2.1min</div><div class="metric-label">Avg Response Time</div></div>
+                        <div class="metric"><div class="metric-value">156</div><div class="metric-label">Active Courses</div></div>
+                        <div class="metric"><div class="metric-value">87%</div><div class="metric-label">Resource Utilization</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="corporate-sidebar">
+                <div class="corporate-card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Activity</div>
+                        <div class="card-icon"><i class="fas fa-history"></i></div>
+                    </div>
+                    <div class="activity-list">
+                        <div class="activity-item">
+                            <strong>Quarterly Report Generated</strong>
+                            <p>Q3 financial performance analysis completed</p>
+                            <div class="activity-time">2 hours ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <strong>New Partnership Signed</strong>
+                            <p>Agreement with TechEd Alliance finalized</p>
+                            <div class="activity-time">5 hours ago</div>
+                        </div>
+                        <div class="activity-item">
+                            <strong>System Update Completed</strong>
+                            <p>Platform performance optimization deployed</p>
+                            <div class="activity-time">Yesterday</div>
+                        </div>
+                        <div class="activity-item">
+                            <strong>Student Milestone Reached</strong>
+                            <p>10,000th student enrolled in AI courses</p>
+                            <div class="activity-time">2 days ago</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="corporate-card">
+                    <div class="card-header">
+                        <div class="card-title">Quick Actions</div>
+                        <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button class="action-btn" onclick="CorporateManager.generateReport()" style="flex-direction: row; justify-content: start; padding: 12px;">
+                            <i class="fas fa-file-alt"></i><span>Generate Report</span>
+                        </button>
+                        <button class="action-btn" onclick="CorporateManager.scheduleMeeting()" style="flex-direction: row; justify-content: start; padding: 12px;">
+                            <i class="fas fa-calendar-plus"></i><span>Schedule Meeting</span>
+                        </button>
+                        <button class="action-btn" onclick="CorporateManager.analyzeData()" style="flex-direction: row; justify-content: start; padding: 12px;">
+                            <i class="fas fa-chart-line"></i><span>Analyze Trends</span>
+                        </button>
+                        <button class="action-btn" onclick="CorporateManager.systemCheck()" style="flex-direction: row; justify-content: start; padding: 12px;">
+                            <i class="fas fa-cog"></i><span>System Status</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="corporate-card">
+                    <div class="card-header">
+                        <div class="card-title">AI Insights</div>
+                        <div class="card-icon"><i class="fas fa-robot"></i></div>
+                    </div>
+                    <div style="text-align: center; padding: 1rem;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🤖</div>
+                        <div style="font-weight: 600; color: var(--ai-gold); margin-bottom: 0.5rem;">Khensani AI Active</div>
+                        <div style="color: var(--text-dim); font-size: 0.9rem;">
+                            Analyzing performance patterns and providing strategic recommendations
+                        </div>
+                        <button class="action-btn" onclick="CorporateManager.aiConsult()" style="margin-top: 1rem; width: 100%;">
+                            <i class="fas fa-comments"></i><span>Consult AI</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Creator Platform Oversight -->
+        <div class="creator-oversight">
+            <div class="creator-oversight-title">🎬 Creator Platform — Corporate Oversight</div>
+            <div class="creator-oversight-sub">Curriculum-gated student creator platform · sponsor revenue · enterprise partnership pipeline</div>
+
+            <div class="creator-metrics-grid">
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-coins"></i></div>
+                    <div class="creator-metric-value" id="creatorRevenue">R428K</div>
+                    <div class="creator-metric-label">Sponsor Revenue Q3</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-handshake"></i></div>
+                    <div class="creator-metric-value" id="creatorPipeline">4</div>
+                    <div class="creator-metric-label">Sponsor Pipeline</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-star"></i></div>
+                    <div class="creator-metric-value" id="creatorSponsorPicks">63</div>
+                    <div class="creator-metric-label">⭐ Sponsor Picks YTD</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="creator-metric-value" id="creatorROI">3.2x</div>
+                    <div class="creator-metric-label">Creator Platform ROI</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="creator-metric-value" id="creatorQuantumPass">96%</div>
+                    <div class="creator-metric-label">Quantum Screen Pass</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-globe-africa"></i></div>
+                    <div class="creator-metric-value" id="creatorReach">12</div>
+                    <div class="creator-metric-label">Provinces Reached</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ CORPORATE AD — CANONICAL KD ROTATING LOGO ============ -->
+        <a href="https://kdconcepts.com" target="_blank" rel="noopener" id="corporate-ad-center" class="corporate-ad-center">
+            <img id="corporate-ad-logo"
+                 src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png"
+                 alt="KD Concepts"
+                 class="kd-rotating-logo"
+                 onerror="this.style.display='none'">
+            <div class="corporate-ad-text">
+                <strong id="corporate-ad-title">Corporate Command Sponsored by KD Concepts</strong>
+                <span id="corporate-ad-tagline">Advertising · Platform Exposure · Circular Economy Partner</span>
+            </div>
+            <i class="fas fa-external-link-alt" style="color: var(--khensani-gold); font-size: 1.2rem;"></i>
+        </a>
+    </main>
+
+    <!-- ============ FLOATING FOOTER ============ -->
+    <footer class="floating-footer">
+        <div class="footer-logo-row">
+            <a href="https://mindtech.africa" target="_blank" rel="noopener" aria-label="MindTech Industries">
+                <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                     alt="EntangleGuard · MindTech Industries"
+                     class="footer-logo"
+                     onerror="this.style.display='none'">
+            </a>
+        </div>
+        <p class="copyright">
+            © 2026 MindFlow · Khensani AI · Powered by
+            <a href="https://mindtech.africa" target="_blank" style="text-decoration:none;">
+                <span class="mindtech-glitch">MindTech</span>
+            </a>
+            · Transforming African education
+        </p>
+        <div class="footer-bottom">
+            ⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Jobs db6h46o4qg6s73c4q1n0 · db6h3eslf4us73c5c80g
+        </div>
+    </footer>
+
+    <script>
+        // ============ PARTICLES — SALARYPLAN CALM ============
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55 },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 2.5, random: true },
+                line_linked: { enable: true, distance: 150, color: "#00B4D8", opacity: 0.08 },
+                move: { enable: true, speed: 0.8 }
+            },
+            interactivity: { events: { onhover: { enable: true, mode: "repulse" } } }
+        });
+
+        // ============ NOTIFICATIONS ============
+        function toggleNotifPanel() { document.getElementById('notifPanel').classList.toggle('open'); }
+        function clearNotifications() {
+            const badge = document.getElementById('notifBadge');
+            badge.textContent = '0';
+            badge.style.display = 'none';
+            document.querySelectorAll('.notif-item').forEach(item => { item.style.opacity = '0.4'; });
+        }
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.getElementById('notifBell');
+            if (panel && bell && !panel.contains(e.target) && !bell.contains(e.target)) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // ============ CORPORATE MANAGER ============
+        const CorporateManager = {
+            openProfile: function() {
+                alert('👔 Corporate Profile\n\nExecutive: Sarah Chen\nRole: Chief Executive Officer\nTenure: 5 years\n\nSpecializations:\n• Strategic Leadership\n• Business Development\n• Educational Innovation');
+            },
+            generateReport: function() {
+                alert('📊 Generating Corporate Report\n\nQuarterly performance report will be compiled and distributed.\n\n⚛️ CHSH S=2.8284 verified');
+            },
+            scheduleMeeting: function() {
+                alert('📅 Opening Meeting Scheduler\n\nSchedule executive meeting with management team.');
+            },
+            analyzeData: function() {
+                alert('📈 Launching Data Analysis\n\nAdvanced analytics dashboard loading...');
+            },
+            systemCheck: function() {
+                alert('🔧 Running System Diagnostics\n\nAll corporate systems are operational and performing optimally.');
+            },
+            aiConsult: function() {
+                alert('🤖 Khensani AI Consultation\n\n"Based on current trends, I recommend focusing on AI course expansion and African market penetration for Q4 growth. Creator platform ROI at 3.2x — expand sponsor partnerships aggressively."');
+            }
+        };
+
+        // ============ CHARTS ============
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            animateCreatorMetrics();
+            console.log('✅ Corporate dashboard initialized');
+        });
+
+        function initializeCharts() {
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    datasets: [{
+                        label: 'Revenue (Millions)',
+                        data: [1.8, 2.1, 2.3, 2.4, 2.6, 2.5, 2.7, 2.8, 2.9],
+                        borderColor: '#0066FF',
+                        backgroundColor: 'rgba(0, 102, 255, 0.1)',
+                        borderWidth: 3, fill: true, tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#e0e0ff' } },
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#e0e0ff' } }
+                    }
+                }
+            });
+
+            const studentCtx = document.getElementById('studentChart').getContext('2d');
+            new Chart(studentCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['K-12', 'University', 'Professional', 'Corporate Training'],
+                    datasets: [{
+                        data: [35, 40, 15, 10],
+                        backgroundColor: ['#0066FF', '#00FFAA', '#FFD700', '#FF8C42'],
+                        borderWidth: 2, borderColor: '#0a0a2a'
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: '#e0e0ff', padding: 20 } }
+                    }
+                }
+            });
+        }
+
+        // ============ CREATOR METRIC ANIMATION ============
+        function animateCreatorMetrics() {
+            const metrics = [
+                { id: 'creatorPipeline', target: 4, suffix: '' },
+                { id: 'creatorSponsorPicks', target: 63, suffix: '' },
+                { id: 'creatorQuantumPass', target: 96, suffix: '%' },
+                { id: 'creatorReach', target: 12, suffix: '' }
+            ];
+            metrics.forEach(m => {
+                const el = document.getElementById(m.id);
+                if (!el) return;
+                let current = 0;
+                const step = m.target / 40;
+                const interval = setInterval(() => {
+                    current += step;
+                    if (current >= m.target) { current = m.target; clearInterval(interval); }
+                    el.textContent = Math.floor(current) + m.suffix;
+                }, 30);
+            });
+        }
+
+        // ============ CORPORATE AD DYNAMIC LOADER (CANONICAL) ============
+        async function loadCorporateAds() {
+            const db = window.__khensaniFirebase?.db;
+            if (!db) return;
+            try {
+                const { collection, query, where, orderBy, limit, getDocs, updateDoc, doc, increment } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                const now = new Date();
+                const q = query(collection(db, 'corporate_ads'), where('approved', '==', true), orderBy('tier', 'desc'), limit(5));
+                const snap = await getDocs(q);
+                if (snap.empty) return;
+                const validAds = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .filter(a => {
+                        const end = a.endDate?.toDate?.() || (a.endDate ? new Date(a.endDate) : null);
+                        return !end || end > now;
+                    });
+                if (validAds.length === 0) return;
+                const ad = validAds[0];
+                const banner = document.getElementById('corporate-ad-center');
+                const logo = document.getElementById('corporate-ad-logo');
+                const title = document.getElementById('corporate-ad-title');
+                const tagline = document.getElementById('corporate-ad-tagline');
+                if (logo && ad.logoUrl) { logo.src = ad.logoUrl; logo.style.display = ''; }
+                if (title) title.textContent = 'Corporate Command Sponsored by ' + (ad.companyName || 'Our Sponsor');
+                if (tagline) tagline.textContent = ad.tagline || 'Supporting African education';
+                if (banner && ad.linkUrl) banner.href = ad.linkUrl;
+                try { await updateDoc(doc(db, 'corporate_ads', ad.id), { impressions: increment(1) }); } catch(e) {}
+                console.log('[Ads] Loaded:', ad.companyName);
+            } catch(e) {
+                console.log('[Ads] KD fallback active:', e.message);
+            }
+        }
+
+        function openKDConcepts() { window.open('https://kdconcepts.com', '_blank'); }
+
+        // ============ INIT ============
+        window.addEventListener('load', function() {
+            loadCorporateAds();
+            console.log('⚛️ Corporate Command Center — Quantum Verified');
+            console.log('   CHSH S=2.8284 · SA Patent 2026/05142');
+            console.log('   🌊 Calm particles: 55 · 2 · 0.2 · 0.8');
+            console.log('   🎬 Creator platform corporate oversight integrated');
+        });
+
+        window.toggleNotifPanel = toggleNotifPanel;
+        window.clearNotifications = clearNotifications;
+        window.CorporateManager = CorporateManager;
+        window.openKDConcepts = openKDConcepts;
+    </script>
+</body>
+</html>

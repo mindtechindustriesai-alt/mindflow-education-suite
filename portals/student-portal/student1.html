@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile · Khensani Quantum AI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Exo 2', sans-serif; }
+
+        :root {
+            --quantum-blue: #0066FF;
+            --student-blue: #00A8FF;
+            --learning-green: #00FFAA;
+            --ai-gold: #FFD700;
+            --profile-purple: #8A2BE2;
+            --tech-black: #0A0A0A;
+            --dark-space: #0f0f1a;
+            --profile-light: #9D4EDD;
+            --profile-dark: #7B2CBF;
+            --khensani-gold: #C8A450;
+            --khensani-cream: #E8D5A3;
+            --neon-red: #FF6B6B;
+            --glass-border: rgba(138, 43, 226, 0.25);
+            --text-secondary: #8A99B0;
+            --purple-glow: 0 0 30px rgba(138, 43, 226, 0.7);
+        }
+
+        body { background: var(--dark-space); color: white; min-height: 100vh; overflow-x: hidden; position: relative; }
+
+        #particles-js { position: fixed; width: 100%; height: 100%; z-index: -1; }
+
+        /* ============================================================
+           NAVBAR — EXACT student1.html PATTERN
+           ============================================================ */
+        .tech-navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 10, 16, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--profile-purple);
+            padding: 12px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--purple-glow);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+
+        .khensani-nav-logo {
+            height: 90px;
+            width: auto;
+            filter: drop-shadow(0 0 15px rgba(200, 164, 80, 0.55));
+            transition: filter 0.3s ease, transform 0.3s ease;
+        }
+        .khensani-nav-logo:hover {
+            filter: drop-shadow(0 0 30px rgba(200, 164, 80, 0.9));
+            transform: scale(1.03);
+        }
+        .nav-logo-link { display: flex; align-items: center; text-decoration: none; }
+
+        .brain-icon {
+            font-size: 1.4em;
+            animation: brainPulse 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 15px var(--profile-purple));
+        }
+
+        .brand-main {
+            background: linear-gradient(135deg, var(--profile-purple), var(--profile-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 1.1em;
+        }
+
+        .header-controls-right { display: flex; align-items: center; gap: 1rem; }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--profile-purple);
+            transition: all 0.3s ease;
+        }
+        .notification-bell:hover { transform: scale(1.1); }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--neon-red);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .back-button {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            background: rgba(138, 43, 226, 0.1);
+            border: 1px solid var(--profile-purple);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-button:hover {
+            background: rgba(138, 43, 226, 0.2);
+            transform: translateY(-2px);
+            box-shadow: var(--purple-glow);
+        }
+
+        .notification-panel {
+            position: fixed;
+            top: 120px;
+            right: 2rem;
+            background: rgba(10, 10, 10, 0.95);
+            border: 2px solid var(--profile-purple);
+            border-radius: 15px;
+            padding: 1.5rem;
+            width: 320px;
+            max-height: 500px;
+            overflow-y: auto;
+            z-index: 1500;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        .notification-panel.active { display: block; animation: slideInRight 0.3s ease; }
+        .notification-item {
+            background: rgba(138, 43, 226, 0.1);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .notification-item:hover { background: rgba(138, 43, 226, 0.2); transform: translateX(5px); }
+        .notification-title { font-weight: 600; color: var(--profile-purple); margin-bottom: 0.5rem; font-size: 0.9rem; }
+        .notification-desc { font-size: 0.82rem; color: rgba(255,255,255,0.7); }
+        .notification-time { font-size: 0.75rem; opacity: 0.7; margin-top: 0.3rem; }
+        .notification-empty { text-align: center; padding: 20px; color: #5A6A80; font-size: 13px; }
+
+        @keyframes slideInRight { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes brainPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px var(--profile-purple)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 25px var(--profile-light)); }
+        }
+
+        /* ============================================================
+           MAIN CONTENT
+           ============================================================ */
+        .profile-content {
+            padding: 130px 20px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.1), rgba(157, 78, 221, 0.1));
+            border: 2px solid var(--profile-purple);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .profile-avatar-container { position: relative; cursor: pointer; }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--profile-purple), var(--profile-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            border: 4px solid var(--profile-light);
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+            object-fit: cover;
+            transition: all 0.3s ease;
+        }
+        .profile-avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(138, 43, 226, 0.7);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--profile-purple);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+        .upload-overlay:hover { background: var(--profile-light); transform: scale(1.1); }
+
+        .profile-info { flex: 1; }
+        .profile-name { font-size: 2rem; font-weight: 700; color: var(--profile-light); margin-bottom: 0.5rem; }
+        .profile-role { font-size: 1.2rem; opacity: 0.9; margin-bottom: 1rem; }
+
+        .profile-stats { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--profile-light); }
+        .stat-label { font-size: 0.9rem; opacity: 0.8; }
+
+        /* Profile Grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-card {
+            background: rgba(15, 15, 26, 0.8);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        .profile-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--profile-purple);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+        }
+        .card-icon { font-size: 1.5rem; color: var(--profile-purple); }
+        .card-title { font-size: 1.3rem; font-weight: 600; color: var(--profile-light); }
+
+        /* Info Items */
+        .info-grid { display: grid; gap: 1rem; }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem;
+            background: rgba(138, 43, 226, 0.1);
+            border-radius: 8px;
+        }
+        .info-label { font-weight: 500; color: var(--profile-light); }
+        .info-value { font-weight: 400; opacity: 0.9; }
+
+        /* Progress */
+        .progress-item { margin-bottom: 1.5rem; }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .progress-bar {
+            height: 8px;
+            background: rgba(138, 43, 226, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--profile-purple), var(--profile-light));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        .achievement-card {
+            background: rgba(138, 43, 226, 0.1);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .achievement-card:hover { transform: scale(1.05); border-color: var(--profile-purple); }
+        .achievement-icon { font-size: 2rem; color: var(--profile-light); margin-bottom: 0.5rem; }
+
+        /* Khensani Profile Assistant */
+        .khensani-profile {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(138, 43, 226, 0.1));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .khensani-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .khensani-icon { font-size: 2rem; color: var(--ai-gold); }
+        .khensani-title { font-size: 1.5rem; font-weight: 600; color: var(--ai-gold); }
+
+        .profile-tips {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .tip-card {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        .tip-card strong { color: var(--ai-gold); }
+        .tip-card p { margin-top: 6px; font-size: 0.9rem; opacity: 0.9; }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .action-btn {
+            background: linear-gradient(135deg, var(--profile-purple), var(--profile-light));
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+        .action-btn.secondary {
+            background: rgba(138, 43, 226, 0.2);
+            border: 1px solid var(--profile-purple);
+        }
+
+        /* Upload Modal */
+        .upload-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .upload-modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        .upload-content {
+            background: var(--dark-space);
+            border: 2px solid var(--profile-purple);
+            border-radius: 15px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(138, 43, 226, 0.5);
+        }
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.3);
+        }
+        .upload-title { font-size: 1.5rem; font-weight: 600; color: var(--profile-light); }
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .close-modal:hover { color: var(--profile-light); transform: scale(1.1); }
+
+        .upload-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+        .upload-option {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px dashed rgba(138, 43, 226, 0.3);
+            border-radius: 10px;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-option:hover { border-color: var(--profile-purple); background: rgba(138, 43, 226, 0.2); }
+        .option-icon { font-size: 2rem; color: var(--profile-light); margin-bottom: 1rem; }
+
+        .upload-preview { text-align: center; margin: 1.5rem 0; display: none; }
+        .preview-image {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 10px;
+            border: 2px solid var(--profile-purple);
+            margin-bottom: 1rem;
+        }
+        .upload-actions { display: flex; gap: 1rem; justify-content: flex-end; }
+        .upload-btn {
+            background: linear-gradient(135deg, var(--profile-purple), var(--profile-light));
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4); }
+        .upload-btn.cancel { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ============================================================
+           CORPORATE AD — CENTER SLOT
+           ============================================================ */
+        .corporate-ad-center {
+            background: linear-gradient(135deg, rgba(70, 25, 115, 0.22), rgba(110, 80, 20, 0.18));
+            border: 2px solid rgba(200, 164, 80, 0.4);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+        .corporate-ad-center::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(200, 164, 80, 0.08), transparent);
+            animation: kd-shine 4s infinite;
+        }
+        @keyframes kd-shine { 0% { left: -100%; } 100% { left: 100%; } }
+        .corporate-ad-center:hover {
+            border-color: var(--khensani-gold);
+            box-shadow: 0 0 40px rgba(200, 164, 80, 0.3);
+            transform: translateY(-3px);
+        }
+        .corporate-ad-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--khensani-cream);
+            letter-spacing: 1px;
+        }
+        .corporate-ad-text strong { color: var(--khensani-gold); font-size: 1.15rem; display: block; margin-bottom: 4px; }
+
+        .kd-rotating-logo {
+            height: 65px;
+            width: 65px;
+            object-fit: contain;
+            background: transparent;
+            flex-shrink: 0;
+            opacity: 1 !important;
+            filter: brightness(0.78) contrast(1.28)
+                    drop-shadow(0 0 7px rgba(80, 20, 135, 0.98))
+                    drop-shadow(0 0 16px rgba(138, 43, 226, 0.95))
+                    drop-shadow(0 0 25px rgba(200, 164, 80, 0.72)) !important;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            animation: kd-superposition-visible 6s ease-in-out infinite !important;
+        }
+        @keyframes kd-superposition-visible {
+            0%, 100% { transform: perspective(600px) rotateY(0deg) rotateZ(0deg) scale(1); }
+            25% { transform: perspective(600px) rotateY(90deg) rotateZ(4deg) scale(1.08); }
+            50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); }
+            75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); }
+        }
+
+        /* ============================================================
+           FLOATING FOOTER — EXACT student1.html PATTERN
+           ============================================================ */
+        .floating-footer {
+            padding: 30px 20px 20px;
+            margin-top: 60px;
+            text-align: center;
+            background: transparent;
+            position: relative;
+            z-index: 1;
+        }
+        .footer-logo-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .footer-logo {
+            height: 55px;
+            width: auto;
+            opacity: 0.85;
+            transition: all 0.3s ease;
+            background: transparent;
+            filter: drop-shadow(0 0 15px rgba(0, 168, 255, 0.3));
+        }
+        .footer-logo:hover {
+            opacity: 1;
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(0, 168, 255, 0.5));
+        }
+        .mindtech-glitch {
+            color: #00A8FF;
+            font-weight: bold;
+            font-size: 15px;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px #00A8FF, 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px #00A8FF, 0 0 30px #0066FF, 0 0 40px #8A2BE2; }
+            100% { text-shadow: 0 0 10px #00A8FF, 0 0 20px #0066FF; }
+        }
+        .floating-footer .copyright { font-size: 0.78rem; color: #A0AAB8; margin-bottom: 6px; }
+        .floating-footer .footer-bottom {
+            margin-top: 12px;
+            font-size: 10px;
+            color: #666;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* ============================================================
+           QUANTUM GLASS LAYER — MATCHES student1.html
+           ============================================================ */
+        html { background: var(--dark-space); }
+        body { background: transparent; isolation: isolate; }
+
+        #particles-js {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+            opacity: 1 !important;
+        }
+        #particles-js canvas {
+            display: block;
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+        }
+
+        body > .tech-navbar,
+        body > .profile-content,
+        body > .floating-footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tech-navbar,
+        .profile-header,
+        .profile-card,
+        .khensani-profile,
+        .tip-card,
+        .achievement-card,
+        .corporate-ad-center,
+        .notification-panel,
+        .notification-item {
+            background-color: rgba(15, 20, 35, 0.48) !important;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+
+        .profile-header {
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.15), rgba(157, 78, 221, 0.12)) !important;
+            border: 2px solid var(--profile-purple);
+        }
+
+        .tech-navbar {
+            background: rgba(10, 10, 18, 0.48) !important;
+            border-bottom: 2px solid var(--profile-purple);
+        }
+
+        .floating-footer {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 768px) {
+            .tech-navbar { padding: 10px 20px; flex-direction: column; gap: 12px; }
+            .khensani-nav-logo { height: 70px; }
+            .profile-content { padding: 160px 15px 40px; }
+            .profile-header { flex-direction: column; text-align: center; gap: 1rem; }
+            .profile-grid { grid-template-columns: 1fr; }
+            .profile-stats { justify-content: center; }
+            .action-buttons { grid-template-columns: 1fr; }
+            .upload-options { grid-template-columns: 1fr; }
+            .notification-panel { right: 1rem; width: calc(100% - 2rem); }
+            .footer-logo-row { gap: 20px; }
+            .footer-logo { height: 42px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .kd-rotating-logo, .corporate-ad-center::before, .brain-icon { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <!-- NAVIGATION -->
+    <nav class="tech-navbar">
+        <div class="nav-brand">
+            <a href="mindflow-portal.html" class="nav-logo-link" title="Home">
+                <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png"
+                     alt="Khensani AI"
+                     class="khensani-nav-logo"
+                     onerror="this.style.display='none'">
+            </a>
+            <span class="brain-icon">👤</span>
+            <span class="brand-main">STUDENT PROFILE</span>
+        </div>
+        <div class="header-controls-right">
+            <div class="notification-bell" onclick="NotificationPanel.toggle()" title="Notifications">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge" id="notificationBadge" style="display:none;">0</div>
+            </div>
+            <a href="mindflow-portal.html" class="back-button">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </nav>
+
+    <!-- NOTIFICATION PANEL -->
+    <div class="notification-panel" id="notificationPanel">
+        <div id="notificationList">
+            <div class="notification-empty">🔔 No notifications yet</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <main class="profile-content">
+        <!-- Profile Header -->
+        <section class="profile-header">
+            <div class="profile-avatar-container" onclick="openUploadModal()">
+                <img src="" alt="Profile Picture" class="profile-avatar" id="profileAvatar" onerror="this.style.display='none'">
+                <div class="profile-avatar" id="defaultAvatar" style="display: flex;">LD</div>
+                <div class="upload-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+            <div class="profile-info">
+                <h1 class="profile-name">Lerato Dube</h1>
+                <p class="profile-role">Grade 10A Student • MindFlow Academy</p>
+                <div style="font-size: 0.72rem; color: var(--khensani-gold); letter-spacing: 3px; font-family: 'Space Mono', monospace; margin-bottom: 12px;">
+                    ⚛️ QUANTUM-VERIFIED · CHSH S=2.8284
+                </div>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">87%</div>
+                        <div class="stat-label">Overall Average</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">156</div>
+                        <div class="stat-label">Learning Hours</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">24</div>
+                        <div class="stat-label">Achievements</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">Streak Days</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CORPORATE AD SLOT -->
+        <a href="https://kdconcepts.com" target="_blank" rel="noopener" id="corporate-ad-center" class="corporate-ad-center">
+            <img id="corporate-ad-logo"
+                 src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png"
+                 alt="KD Concepts"
+                 class="kd-rotating-logo"
+                 onerror="this.style.display='none'">
+            <div class="corporate-ad-text">
+                <strong id="corporate-ad-title">Profile Sponsors by KD Concepts</strong>
+                <span id="corporate-ad-tagline">Advertising · Platform Exposure · Circular Economy Partner</span>
+            </div>
+            <i class="fas fa-external-link-alt" style="color: var(--khensani-gold); font-size: 1.2rem;"></i>
+        </a>
+
+        <!-- Profile Grid -->
+        <div class="profile-grid">
+            <!-- Personal Information -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="fas fa-user card-icon"></i>
+                    <h2 class="card-title">Personal Information</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Full Name:</span>
+                        <span class="info-value">Lerato Dube</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Student ID:</span>
+                        <span class="info-value">MF2024001</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Grade &amp; Class:</span>
+                        <span class="info-value">Grade 10A</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Date of Birth:</span>
+                        <span class="info-value">March 15, 2008</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Contact Email:</span>
+                        <span class="info-value">lerato.dube@mindflow.edu</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Parent/Guardian:</span>
+                        <span class="info-value">Thandi Dube</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Progress -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line card-icon"></i>
+                    <h2 class="card-title">Academic Progress</h2>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header"><span>Mathematics</span><span>92%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 92%"></div></div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header"><span>Physical Sciences</span><span>85%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header"><span>English Language</span><span>88%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 88%"></div></div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header"><span>History</span><span>78%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 78%"></div></div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-header"><span>Life Sciences</span><span>90%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 90%"></div></div>
+                </div>
+            </div>
+
+            <!-- Learning Preferences -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="fas fa-cogs card-icon"></i>
+                    <h2 class="card-title">Learning Preferences</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Learning Style:</span>
+                        <span class="info-value">Visual &amp; Kinesthetic</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Preferred Language:</span>
+                        <span class="info-value">English &amp; Zulu</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Study Time:</span>
+                        <span class="info-value">Afternoon (2-5 PM)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Challenge Level:</span>
+                        <span class="info-value">Advanced</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Focus Areas:</span>
+                        <span class="info-value">STEM &amp; Leadership</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Achievements -->
+            <div class="profile-card">
+                <div class="card-header">
+                    <i class="fas fa-trophy card-icon"></i>
+                    <h2 class="card-title">Recent Achievements</h2>
+                </div>
+                <div class="achievements-grid">
+                    <div class="achievement-card">
+                        <i class="fas fa-brain achievement-icon"></i>
+                        <div>Math Whiz</div>
+                        <small>Top 5% in Algebra</small>
+                    </div>
+                    <div class="achievement-card">
+                        <i class="fas fa-flask achievement-icon"></i>
+                        <div>Science Star</div>
+                        <small>Lab Excellence</small>
+                    </div>
+                    <div class="achievement-card">
+                        <i class="fas fa-book achievement-icon"></i>
+                        <div>Reading Champion</div>
+                        <small>50+ Books</small>
+                    </div>
+                    <div class="achievement-card">
+                        <i class="fas fa-users achievement-icon"></i>
+                        <div>Team Leader</div>
+                        <small>Group Projects</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khensani AI Profile Assistant -->
+        <section class="khensani-profile">
+            <div class="khensani-header">
+                <i class="fas fa-robot khensani-icon"></i>
+                <h2 class="khensani-title">Khensani Profile Assistant</h2>
+            </div>
+            <div class="profile-tips">
+                <div class="tip-card">
+                    <strong>🎯 Learning Recommendation</strong>
+                    <p>Based on your progress, focus on History concepts. You're excelling in STEM subjects!</p>
+                </div>
+                <div class="tip-card">
+                    <strong>📈 Growth Opportunity</strong>
+                    <p>Your visual learning preference is strong. Try more diagram-based study methods.</p>
+                </div>
+                <div class="tip-card">
+                    <strong>🏆 Achievement Path</strong>
+                    <p>You're 2 achievements away from reaching "Academic Excellence" tier.</p>
+                </div>
+                <div class="tip-card">
+                    <strong>🕒 Study Optimization</strong>
+                    <p>Your afternoon study sessions show 25% better retention. Keep this schedule!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="action-btn" onclick="editProfile()">
+                <i class="fas fa-edit"></i>
+                Edit Profile
+            </button>
+            <button class="action-btn secondary" onclick="viewProgressReport()">
+                <i class="fas fa-chart-bar"></i>
+                Detailed Progress Report
+            </button>
+            <button class="action-btn secondary" onclick="downloadTranscript()">
+                <i class="fas fa-download"></i>
+                Download Transcript
+            </button>
+            <button class="action-btn" onclick="setLearningGoals()">
+                <i class="fas fa-bullseye"></i>
+                Set Learning Goals
+            </button>
+        </div>
+    </main>
+
+    <!-- Upload Modal -->
+    <div class="upload-modal" id="uploadModal">
+        <div class="upload-content">
+            <div class="upload-header">
+                <h3 class="upload-title">Update Profile Picture</h3>
+                <button class="close-modal" onclick="closeUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="upload-options">
+                <div class="upload-option" onclick="openFilePicker()">
+                    <i class="fas fa-folder-open option-icon"></i>
+                    <div>Choose from Files</div>
+                </div>
+                <div class="upload-option" onclick="openCamera()">
+                    <i class="fas fa-camera option-icon"></i>
+                    <div>Take Photo</div>
+                </div>
+            </div>
+
+            <div class="upload-preview" id="uploadPreview">
+                <img src="" alt="Preview" class="preview-image" id="previewImage">
+                <p>Preview your selected image</p>
+            </div>
+
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+
+            <div class="upload-actions">
+                <button class="upload-btn cancel" onclick="closeUploadModal()">
+                    Cancel
+                </button>
+                <button class="upload-btn" onclick="uploadProfilePicture()" id="uploadBtn" disabled>
+                    <i class="fas fa-upload"></i>
+                    Upload Picture
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING FOOTER — EXACT student1.html PATTERN -->
+    <footer class="floating-footer">
+        <div class="footer-logo-row">
+            <a href="https://mindtech.africa" target="_blank" rel="noopener" aria-label="MindTech Industries">
+                <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                     alt="EntangleGuard · MindTech Industries"
+                     class="footer-logo"
+                     onerror="this.style.display='none'">
+            </a>
+        </div>
+        <p class="copyright">
+            © 2026 MindFlow · Khensani AI · Powered by
+            <a href="https://mindtech.africa" target="_blank" style="text-decoration:none;">
+                <span class="mindtech-glitch">MindTech</span>
+            </a>
+            · Transforming African education
+        </p>
+        <div class="footer-bottom">
+            ⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Job d8uhvl4bp3hs738628cg
+        </div>
+    </footer>
+
+    <script>
+        // ============================================================
+        // FIREBASE INIT
+        // ============================================================
+        let db, auth, storage, functions;
+        try {
+            if (window.firebase && window.firebase.apps.length === 0) {
+                firebase.initializeApp({
+                    apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+                    authDomain: "mindflow-ai-education.firebaseapp.com",
+                    databaseURL: "https://mindflow-ai-education-default-rtdb.firebaseio.com",
+                    projectId: "mindflow-ai-education",
+                    storageBucket: "mindflow-ai-education.firebasestorage.app",
+                    messagingSenderId: "157615197603",
+                    appId: "1:157615197603:web:540d67781fc55d04c11e16"
+                });
+            }
+            db = firebase.firestore();
+            auth = firebase.auth();
+            storage = firebase.storage();
+            functions = firebase.functions ? firebase.functions() : null;
+        } catch(e) { console.warn('[Firebase] Init error:', e.message); }
+
+        // ============================================================
+        // PARTICLES — SALARYPLAN CALM CONFIG
+        // ============================================================
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55 },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 2.5, random: true },
+                line_linked: { enable: true, distance: 150, color: "#00B4D8", opacity: 0.08 },
+                move: { enable: true, speed: 0.8 }
+            },
+            interactivity: { events: { onhover: { enable: true, mode: "repulse" } } }
+        });
+
+        // ============================================================
+        // NOTIFICATION SYSTEM
+        // ============================================================
+        const NotificationPanel = {
+            toggle: function() {
+                document.getElementById('notificationPanel').classList.toggle('active');
+            },
+            close: function() {
+                document.getElementById('notificationPanel').classList.remove('active');
+            }
+        };
+
+        let notifications = [];
+
+        function renderNotifications() {
+            const list = document.getElementById('notificationList');
+            const badge = document.getElementById('notificationBadge');
+            if (notifications.length === 0) {
+                list.innerHTML = '<div class="notification-empty">🔔 No notifications yet</div>';
+                badge.textContent = '0';
+                badge.style.display = 'none';
+                return;
+            }
+            const unreadCount = notifications.filter(n => n.unread).length;
+            badge.textContent = unreadCount;
+            badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+
+            list.innerHTML = notifications.map((n, i) => `
+                <div class="notification-item ${n.unread ? 'unread' : ''}" onclick="markRead(${i})">
+                    <div class="notification-title">${n.title}</div>
+                    <div class="notification-desc">${n.desc || ''}</div>
+                    <div class="notification-time">${n.time || 'just now'}</div>
+                </div>
+            `).join('');
+        }
+
+        function markRead(index) {
+            notifications[index].unread = false;
+            renderNotifications();
+        }
+
+        function addNotification(title, desc, type) {
+            notifications.unshift({
+                title, desc, type: type || 'info',
+                time: new Date().toLocaleTimeString(),
+                unread: true
+            });
+            if (notifications.length > 30) notifications = notifications.slice(0, 30);
+            renderNotifications();
+        }
+
+        // ============================================================
+        // CORPORATE AD
+        // ============================================================
+        async function loadCorporateAds() {
+            if (!db) return;
+            try {
+                const now = new Date();
+                const snap = await db.collection('corporate_ads')
+                    .where('approved', '==', true)
+                    .orderBy('tier', 'desc')
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) return;
+
+                const validAds = snap.docs
+                    .map(d => ({ id: d.id, ...d.data() }))
+                    .filter(a => {
+                        const end = a.endDate?.toDate?.() || (a.endDate ? new Date(a.endDate) : null);
+                        return !end || end > now;
+                    });
+
+                if (validAds.length === 0) return;
+
+                const ad = validAds[0];
+                const banner = document.getElementById('corporate-ad-center');
+                const logo = document.getElementById('corporate-ad-logo');
+                const title = document.getElementById('corporate-ad-title');
+                const tagline = document.getElementById('corporate-ad-tagline');
+
+                if (logo && ad.logoUrl) {
+                    logo.src = ad.logoUrl;
+                    logo.className = 'kd-rotating-logo ad-anim-' + (ad.animation || 'light');
+                    logo.style.display = '';
+                }
+                if (title) title.textContent = 'Profile Sponsors by ' + (ad.companyName || 'Our Sponsor');
+                if (tagline) tagline.textContent = ad.tagline || 'Supporting African education';
+                if (banner && ad.linkUrl) banner.href = ad.linkUrl;
+
+                try {
+                    db.collection('corporate_ads').doc(ad.id).update({
+                        impressions: firebase.firestore.FieldValue.increment(1)
+                    });
+                } catch(e) {}
+
+                console.log('[Ads] Loaded corporate ad:', ad.companyName);
+            } catch(e) {
+                console.log('[Ads] No live ads, using KD fallback:', e.message);
+            }
+        }
+
+        // ============================================================
+        // PROFILE UPLOAD
+        // ============================================================
+        let selectedFile = null;
+        let currentUser = null;
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+            console.log('📸 Profile picture upload modal opened');
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+            resetUploadModal();
+            console.log('📸 Profile picture upload modal closed');
+        }
+
+        function resetUploadModal() {
+            selectedFile = null;
+            document.getElementById('uploadPreview').style.display = 'none';
+            document.getElementById('uploadBtn').disabled = true;
+            document.getElementById('previewImage').src = '';
+        }
+
+        function openFilePicker() {
+            document.getElementById('fileInput').click();
+        }
+
+        function openCamera() {
+            alert('📷 Camera access would be requested here. For demo purposes, please use file upload.');
+            console.log('Camera access requested for profile picture');
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (!file.type.match('image.*')) {
+                    alert('Please select an image file (JPEG, PNG, etc.)');
+                    return;
+                }
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Please select an image smaller than 5MB');
+                    return;
+                }
+
+                selectedFile = file;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('uploadPreview').style.display = 'block';
+                    document.getElementById('uploadBtn').disabled = false;
+                };
+                reader.readAsDataURL(file);
+
+                console.log('📁 File selected for upload:', file.name);
+            }
+        }
+
+        function uploadProfilePicture() {
+            if (!selectedFile) {
+                alert('Please select a file first');
+                return;
+            }
+
+            const uploadBtn = document.getElementById('uploadBtn');
+            const originalText = uploadBtn.innerHTML;
+
+            uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            uploadBtn.disabled = true;
+
+            if (!storage || !currentUser) {
+                // Demo mode — no real upload
+                setTimeout(() => {
+                    uploadBtn.innerHTML = originalText;
+                    alert('✅ Profile picture updated (demo mode)');
+                    addNotification('Profile picture updated', 'success');
+                    closeUploadModal();
+                }, 1000);
+                return;
+            }
+
+            const storageRef = storage.ref();
+            const profilePicturesRef = storageRef.child('profile-pictures/' + currentUser.uid + '/' + selectedFile.name);
+
+            const uploadTask = profilePicturesRef.put(selectedFile);
+
+            uploadTask.on('state_changed',
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log('Upload is ' + progress + '% done');
+                },
+                (error) => {
+                    console.error('Upload failed:', error);
+                    alert('Upload failed: ' + error.message);
+                    uploadBtn.innerHTML = originalText;
+                    uploadBtn.disabled = false;
+                },
+                () => {
+                    uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                        console.log('File available at', downloadURL);
+
+                        // Update Firestore user doc
+                        db.collection('users').doc(currentUser.uid).set({
+                            profilePicture: downloadURL,
+                            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                        }, { merge: true }).then(() => {
+                            updateProfilePicture(downloadURL);
+                            closeUploadModal();
+                            uploadBtn.innerHTML = originalText;
+                            alert('✅ Profile picture updated successfully!');
+                            addNotification('Profile picture updated', 'success');
+                        }).catch((error) => {
+                            console.error('Firestore update failed:', error);
+                            alert('Profile update failed: ' + error.message);
+                            uploadBtn.innerHTML = originalText;
+                            uploadBtn.disabled = false;
+                        });
+                    });
+                }
+            );
+        }
+
+        function updateProfilePicture(imageUrl) {
+            const profileAvatar = document.getElementById('profileAvatar');
+            const defaultAvatar = document.getElementById('defaultAvatar');
+
+            profileAvatar.src = imageUrl;
+            profileAvatar.style.display = 'block';
+            defaultAvatar.style.display = 'none';
+
+            console.log('🖼️ Profile picture updated in UI');
+        }
+
+        function loadProfilePicture() {
+            if (currentUser && db) {
+                db.collection('users').doc(currentUser.uid).get().then((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        if (data.profilePicture) {
+                            updateProfilePicture(data.profilePicture);
+                        }
+                    }
+                }).catch(e => console.log('[Profile] Load error:', e.message));
+            }
+        }
+
+        // ============================================================
+        // PROFILE ACTION BUTTONS
+        // ============================================================
+        function editProfile() {
+            addNotification('Edit Profile', 'Feature coming soon', 'info');
+            alert('📝 Edit Profile feature coming soon! This will allow you to update your personal information and preferences.');
+        }
+
+        function viewProgressReport() {
+            addNotification('Progress Report', 'Generating detailed analytics', 'info');
+            alert('📊 Detailed progress report generation started. This feature provides comprehensive analytics of your learning journey.');
+        }
+
+        function downloadTranscript() {
+            addNotification('Transcript', 'Preparing download', 'info');
+            alert('📄 Transcript download initiated. Your academic transcript is being prepared for download.');
+        }
+
+        function setLearningGoals() {
+            addNotification('Learning Goals', 'Configuration opened', 'info');
+            alert('🎯 Learning goals configuration opened. Set new academic targets and personal development objectives.');
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        window.addEventListener('load', function() {
+            console.log('👤 Student Profile Portal Loaded');
+            console.log('   ⚛️ CHSH S=2.8284 · SA Patent 2026/05142');
+            console.log('   🌊 Calm particles: 55 · 2 · 0.2 · 0.8');
+            console.log('   📢 Corporate ads: live from Firestore (KD fallback)');
+
+            if (auth) {
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        currentUser = user;
+                        console.log('✅ User authenticated:', user.email);
+                        loadProfilePicture();
+                    } else {
+                        // Demo mode
+                        currentUser = {
+                            uid: 'demo_user_lerato_dube',
+                            email: 'lerato.dube@mindflow.edu'
+                        };
+                        console.log('🎭 Demo mode activated for profile portal');
+                    }
+                });
+            } else {
+                currentUser = { uid: 'demo_user_lerato_dube', email: 'lerato.dube@mindflow.edu' };
+            }
+
+            // Load corporate ads
+            loadCorporateAds();
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('uploadModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeUploadModal();
+            }
+        });
+
+        // Esc key to close modal
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeUploadModal();
+            }
+        });
+
+        // Close notification panel on outside click
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('notificationPanel');
+            const bell = document.querySelector('.notification-bell');
+            if (panel && bell && !panel.contains(event.target) && !bell.contains(event.target)) {
+                NotificationPanel.close();
+            }
+        });
+
+        // Global exports
+        window.NotificationPanel = NotificationPanel;
+        window.markRead = markRead;
+        window.openUploadModal = openUploadModal;
+        window.closeUploadModal = closeUploadModal;
+        window.openFilePicker = openFilePicker;
+        window.openCamera = openCamera;
+        window.handleFileSelect = handleFileSelect;
+        window.uploadProfilePicture = uploadProfilePicture;
+        window.editProfile = editProfile;
+        window.viewProgressReport = viewProgressReport;
+        window.downloadTranscript = downloadTranscript;
+        window.setLearningGoals = setLearningGoals;
+    </script>
+</body>
+</html>
