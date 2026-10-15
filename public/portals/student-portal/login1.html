@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Khensani AI · Sign In</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #00B4D8;
+            --primary-dark: #0096C7;
+            --secondary: #00F5D4;
+            --quantum: #8A2BE2;
+            --quantum-glow: rgba(138, 43, 226, 0.4);
+            --gold: #FFD700;
+            --gold-glow: rgba(255, 215, 0, 0.3);
+            --success: #00FF88;
+            --warning: #FFD166;
+            --danger: #EF476F;
+            --dark-bg: #05080F;
+            --dark-card: #0A0F1A;
+            --glass-bg: rgba(15, 25, 45, 0.45);
+            --glass-border: rgba(0, 180, 216, 0.25);
+            --text-primary: #E8EDF5;
+            --text-secondary: #8A99B0;
+            --font-exo: 'Exo 2', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+            --font-bebas: 'Bebas Neue', sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-exo);
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ============================================================
+           BACKGROUND — Deep navy + African pattern overlay
+           ============================================================ */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* African geometric pattern layer */
+        .african-pattern-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.06;
+            background-image:
+                /* Zulu/Ndebele triangle chevrons */
+                linear-gradient(45deg, transparent 45%, var(--primary) 45%, var(--primary) 55%, transparent 55%),
+                linear-gradient(-45deg, transparent 45%, var(--primary) 45%, var(--primary) 55%, transparent 55%),
+                linear-gradient(45deg, transparent 42%, var(--quantum) 42%, var(--quantum) 58%, transparent 58%),
+                linear-gradient(-45deg, transparent 42%, var(--quantum) 42%, var(--quantum) 58%, transparent 58%);
+            background-size: 120px 120px, 120px 120px, 240px 240px, 240px 240px;
+            background-position: 0 0, 0 0, 60px 60px, 60px 60px;
+            animation: patternDrift 60s linear infinite;
+        }
+
+        @keyframes patternDrift {
+            0% { background-position: 0 0, 0 0, 60px 60px, 60px 60px; }
+            100% { background-position: 240px 240px, -240px 240px, 300px 300px, -180px 300px; }
+        }
+
+        /* African circuit overlay — light traces */
+        .african-circuit-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.15;
+            background-image:
+                radial-gradient(circle at 20% 30%, var(--secondary) 1px, transparent 2px),
+                radial-gradient(circle at 80% 70%, var(--quantum) 1px, transparent 2px),
+                radial-gradient(circle at 50% 50%, var(--primary) 1px, transparent 2px);
+            background-size: 200px 200px, 300px 300px, 400px 400px;
+            animation: circuitPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes circuitPulse {
+            0%, 100% { opacity: 0.10; }
+            50%      { opacity: 0.20; }
+        }
+
+        /* Vignette */
+        .vignette-layer {
+            position: fixed;
+            inset: 0;
+            z-index: 3;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(5, 8, 15, 0.75) 100%);
+        }
+
+        /* ============================================================
+           LOGIN CONTAINER
+           ============================================================ */
+        .login-container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .login-card {
+            max-width: 460px;
+            width: 100%;
+            background: rgba(10, 18, 32, 0.72);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 48px 40px 32px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 80px rgba(0, 180, 216, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+            animation: cardEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(30px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Top gradient accent */
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--quantum), var(--gold), transparent);
+            animation: topAccent 4s ease-in-out infinite;
+        }
+
+        @keyframes topAccent {
+            0%, 100% { opacity: 0.6; transform: translateX(-20%); }
+            50%      { opacity: 1; transform: translateX(20%); }
+        }
+
+        /* Corner brackets */
+        .corner-bracket {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-color: var(--gold);
+            border-style: solid;
+            opacity: 0.5;
+            animation: cornerPulse 3s ease-in-out infinite;
+        }
+        .corner-bracket.tl { top: 16px; left: 16px; border-width: 2px 0 0 2px; border-top-left-radius: 8px; }
+        .corner-bracket.tr { top: 16px; right: 16px; border-width: 2px 2px 0 0; border-top-right-radius: 8px; }
+        .corner-bracket.bl { bottom: 16px; left: 16px; border-width: 0 0 2px 2px; border-bottom-left-radius: 8px; }
+        .corner-bracket.br { bottom: 16px; right: 16px; border-width: 0 2px 2px 0; border-bottom-right-radius: 8px; }
+
+        @keyframes cornerPulse {
+            0%, 100% { opacity: 0.4; }
+            50%      { opacity: 0.9; }
+        }
+
+        /* ============================================================
+           LOGO — Large, floating
+           ============================================================ */
+        .logo-section {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .khensani-logo {
+            max-width: 280px;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 30px rgba(0, 180, 216, 0.5));
+            animation: logoFloat 6s ease-in-out infinite;
+            transition: filter 0.3s ease;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .khensani-logo:hover {
+            filter: drop-shadow(0 0 50px rgba(0, 180, 216, 0.9));
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50%      { transform: translateY(-8px); }
+        }
+
+        /* ============================================================
+           HEADINGS
+           ============================================================ */
+        .login-title {
+            font-family: var(--font-bebas);
+            font-size: 2.2rem;
+            letter-spacing: 3px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+
+        .login-tagline {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+            text-align: center;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 32px;
+            opacity: 0.85;
+        }
+
+        /* ============================================================
+           FORM
+           ============================================================ */
+        .form-group {
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            color: var(--secondary);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            opacity: 0.85;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 18px 15px 48px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: var(--font-exo);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15), 0 0 25px rgba(0, 180, 216, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(138, 153, 176, 0.5);
+        }
+
+        .form-group .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 42px;
+            font-size: 1rem;
+            color: var(--primary);
+            pointer-events: none;
+            transition: color 0.3s ease;
+        }
+
+        .form-group input:focus ~ .input-icon {
+            color: var(--secondary);
+        }
+
+        .form-group .toggle-password {
+            position: absolute;
+            right: 18px;
+            top: 42px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+        }
+
+        .form-group .toggle-password:hover {
+            color: var(--primary);
+        }
+
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--quantum));
+            color: white;
+            font-family: var(--font-exo);
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 180, 216, 0.4), 0 0 40px rgba(138, 43, 226, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-google {
+            background: white;
+            color: #1a1a1a;
+            margin-top: 0;
+        }
+
+        .btn-google:hover {
+            background: #f5f5f5;
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-google i {
+            color: #4285F4;
+            font-size: 1.2rem;
+        }
+
+        .btn-demo {
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--gold);
+            margin-top: 0;
+        }
+
+        .btn-demo:hover {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+            color: var(--gold);
+        }
+
+        /* ============================================================
+           DIVIDER
+           ============================================================ */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 24px 0;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.7;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+        }
+
+        /* ============================================================
+           LINKS / FOOTER
+           ============================================================ */
+        .login-links {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .login-links a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .login-links a:hover {
+            color: var(--secondary);
+            text-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
+        }
+
+        .login-links .separator {
+            margin: 0 8px;
+            opacity: 0.5;
+        }
+
+        /* ============================================================
+           ERROR MESSAGE
+           ============================================================ */
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 14px;
+            min-height: 20px;
+            font-family: var(--font-mono);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-msg.show {
+            opacity: 1;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25%      { transform: translateX(-8px); }
+            75%      { transform: translateX(8px); }
+        }
+
+        /* ============================================================
+           FOOTER — Powered by MindTech ONLY
+           ============================================================ */
+        .login-footer {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0, 180, 216, 0.12);
+            text-align: center;
+        }
+
+        .powered-by {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+
+        .mindtech-brand {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .mindtech-brand:hover {
+            transform: scale(1.05);
+        }
+
+        .mindtech-logo-img {
+            height: 28px;
+            width: auto;
+            filter: drop-shadow(0 0 10px rgba(0, 180, 216, 0.5));
+        }
+
+        .mindtech-name {
+            font-family: var(--font-bebas);
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: mindtechGlow 2.5s ease-in-out infinite;
+        }
+
+        @keyframes mindtechGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(0, 180, 216, 0.4), 0 0 20px rgba(0, 102, 255, 0.2); }
+            50%      { text-shadow: 0 0 20px rgba(0, 180, 216, 0.9), 0 0 40px rgba(0, 102, 255, 0.5), 0 0 60px rgba(138, 43, 226, 0.3); }
+        }
+
+        /* ============================================================
+           SIDE ORNAMENTS — African geometric accents (Runway ML style)
+           ============================================================ */
+        .side-ornament {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 400px;
+            z-index: 4;
+            pointer-events: none;
+            opacity: 0.35;
+        }
+
+        .side-ornament.left  { left: 24px; }
+        .side-ornament.right { right: 24px; }
+
+        @media (max-width: 1100px) {
+            .side-ornament { display: none; }
+        }
+
+        .side-ornament svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .ornament-line {
+            stroke: var(--primary);
+            stroke-width: 1.5;
+            fill: none;
+            stroke-dasharray: 4 4;
+            animation: ornamentFlow 4s linear infinite;
+        }
+
+        .ornament-line.gold {
+            stroke: var(--gold);
+            animation-duration: 6s;
+            animation-direction: reverse;
+        }
+
+        .ornament-line.quantum {
+            stroke: var(--quantum);
+            animation-duration: 5s;
+        }
+
+        @keyframes ornamentFlow {
+            0% { stroke-dashoffset: 0; }
+            100% { stroke-dashoffset: -32; }
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 500px) {
+            .login-card {
+                padding: 36px 24px 24px;
+                border-radius: 24px;
+            }
+            .khensani-logo { max-width: 200px; }
+            .login-title { font-size: 1.8rem; }
+            .login-tagline { font-size: 0.6rem; letter-spacing: 2px; }
+            .mindtech-name { font-size: 1.2rem; }
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            .khensani-logo, .mindtech-name,
+            .african-pattern-layer, .african-circuit-layer,
+            .corner-bracket, .login-card::before, .ornament-line {
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LAYERED BACKGROUNDS ===== -->
+    <div id="particles-js"></div>
+    <div class="african-pattern-layer"></div>
+    <div class="african-circuit-layer"></div>
+    <div class="vignette-layer"></div>
+
+    <!-- Left ornament — African circuit trace -->
+    <div class="side-ornament left">
+        <svg viewBox="0 0 60 400" preserveAspectRatio="none">
+            <!-- Primary trace -->
+            <path class="ornament-line" d="M 10 0 L 10 60 L 45 60 L 45 120 L 10 120 L 10 180 L 50 180 L 50 240 L 10 240 L 10 300 L 40 300 L 40 400" />
+            <!-- Gold trace -->
+            <path class="ornament-line gold" d="M 30 20 L 30 80 L 15 80 L 15 140 L 30 140 L 30 200 L 15 200 L 15 260 L 30 260 L 30 320 L 15 320 L 15 380" />
+            <!-- Quantum trace -->
+            <path class="ornament-line quantum" d="M 50 40 L 50 100 L 35 100 L 35 160 L 55 160 L 55 220 L 35 220 L 35 280 L 55 280 L 55 340" />
+        </svg>
+    </div>
+
+    <!-- Right ornament -->
+    <div class="side-ornament right">
+        <svg viewBox="0 0 60 400" preserveAspectRatio="none">
+            <path class="ornament-line" d="M 50 0 L 50 60 L 15 60 L 15 120 L 50 120 L 50 180 L 10 180 L 10 240 L 50 240 L 50 300 L 20 300 L 20 400" />
+            <path class="ornament-line gold" d="M 30 20 L 30 80 L 45 80 L 45 140 L 30 140 L 30 200 L 45 200 L 45 260 L 30 260 L 30 320 L 45 320 L 45 380" />
+            <path class="ornament-line quantum" d="M 10 40 L 10 100 L 25 100 L 25 160 L 5 160 L 5 220 L 25 220 L 25 280 L 5 280 L 5 340" />
+        </svg>
+    </div>
+
+    <!-- ===== LOGIN CARD ===== -->
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Corner brackets -->
+            <div class="corner-bracket tl"></div>
+            <div class="corner-bracket tr"></div>
+            <div class="corner-bracket bl"></div>
+            <div class="corner-bracket br"></div>
+
+            <!-- Logo -->
+            <div class="logo-section">
+                <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png"
+                     alt="Khensani AI"
+                     class="khensani-logo"
+                     onerror="this.src='https://placehold.co/280x100/00B4D8/white?text=Khensani+AI'">
+            </div>
+
+            <!-- Headings -->
+            <h1 class="login-title">SIGN IN</h1>
+            <div class="login-tagline">Africa's Sovereign Quantum Education Stack</div>
+
+            <!-- ===== EMAIL/PASSWORD FORM ===== -->
+            <form id="loginForm" onsubmit="handleEmailLogin(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <i class="fas fa-envelope input-icon"></i>
+                    <input type="email" id="loginEmail" placeholder="your@email.com" required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <i class="fas fa-lock input-icon"></i>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+                    <button type="button" class="toggle-password" onclick="togglePassword()" aria-label="Show password">
+                        <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-primary" id="emailLoginBtn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <!-- ===== DIVIDER ===== -->
+            <div class="divider">or continue with</div>
+
+            <!-- ===== GOOGLE SIGN IN ===== -->
+            <button class="btn-primary btn-google" onclick="loginWithGoogle()" id="googleBtn">
+                <i class="fab fa-google"></i>
+                Sign in with Google
+            </button>
+
+            <!-- ===== DEMO ACCESS ===== -->
+            <button class="btn-primary btn-demo" onclick="enterDemo()" id="demoBtn" style="margin-top:14px;">
+                <i class="fas fa-rocket"></i>
+                Enter 7-Day Free Trial
+            </button>
+
+            <!-- ===== ERROR MESSAGE ===== -->
+            <div class="error-msg" id="loginError"></div>
+
+            <!-- ===== LOGIN LINKS ===== -->
+            <div class="login-links">
+                <a href="#" onclick="showForgotPassword(); return false;">Forgot password?</a>
+                <span class="separator">·</span>
+                <a href="#" onclick="showRegisterInfo(); return false;">Create account</a>
+            </div>
+
+            <!-- ===== POWERED BY MINDTECH (NO PATENT) ===== -->
+            <div class="login-footer">
+                <div class="powered-by">⚡ Powered by</div>
+                <a href="https://mindtech.africa" target="_blank" rel="noopener" class="mindtech-brand">
+                    <img src="https://i.postimg.cc/zXW78GNH/Mind-Tech-Transparent-Logo.png"
+                         alt="MindTech Industries"
+                         class="mindtech-logo-img"
+                         onerror="this.style.display='none'">
+                    <span class="mindtech-name">MINDTECH</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         SCRIPTS
+         ============================================================ -->
+    <script>
+        // ============================================================
+        // PARTICLES — CALM SALARYPLAN CONFIG
+        // 55 particles · 2 colors · 0.2 opacity · 0.8 speed
+        // Slightly richer for login (adds gold accent)
+        // ============================================================
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55, density: { enable: true, value_area: 1000 } },
+                color: { value: ["#00B4D8", "#00F5D4", "#8A2BE2", "#FFD700"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.25, random: true },
+                size: { value: 2.5, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#00B4D8",
+                    opacity: 0.08,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 0.8,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" }
+                }
+            }
+        });
+
+        // ============================================================
+        // FIREBASE INIT
+        // ============================================================
+        let auth, db;
+        try {
+            if (window.firebase && window.firebase.apps.length === 0) {
+                firebase.initializeApp({
+                    apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+                    authDomain: "mindflow-ai-education.firebaseapp.com",
+                    projectId: "mindflow-ai-education",
+                    storageBucket: "mindflow-ai-education.firebasestorage.app",
+                    messagingSenderId: "157615197603",
+                    appId: "1:157615197603:web:540d67781fc55d04c11e16"
+                });
+            }
+            auth = firebase.auth();
+            db = firebase.firestore();
+        } catch(e) {
+            console.warn('[Login] Firebase init error:', e.message);
+        }
+
+        // ============================================================
+        // AUTO-REDIRECT IF ALREADY SIGNED IN
+        // ============================================================
+        if (auth) {
+            auth.onAuthStateChanged(function(user) {
+                if (user) {
+                    console.log('✅ Already signed in:', user.email);
+                    window.location.replace('portals/student-portal/mindflow-portal.html');
+                }
+            });
+        }
+
+        // ============================================================
+        // PASSWORD TOGGLE
+        // ============================================================
+        function togglePassword() {
+            const input = document.getElementById('loginPassword');
+            const icon = document.getElementById('togglePasswordIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        // ============================================================
+        // ERROR / LOADING HELPERS
+        // ============================================================
+        function showError(msg) {
+            const err = document.getElementById('loginError');
+            err.textContent = msg;
+            err.classList.add('show');
+        }
+
+        function clearError() {
+            const err = document.getElementById('loginError');
+            err.textContent = '';
+            err.classList.remove('show');
+        }
+
+        function setLoading(btnId, loading) {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            if (loading) {
+                btn.disabled = true;
+                btn.dataset.originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading...';
+            } else {
+                btn.disabled = false;
+                if (btn.dataset.originalHtml) btn.innerHTML = btn.dataset.originalHtml;
+            }
+        }
+
+        // ============================================================
+        // EMAIL + PASSWORD LOGIN
+        // ============================================================
+        async function handleEmailLogin(e) {
+            e.preventDefault();
+            clearError();
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showError('Please enter both email and password.');
+                return;
+            }
+            if (!auth) {
+                showError('Authentication unavailable. Please refresh.');
+                return;
+            }
+
+            setLoading('emailLoginBtn', true);
+            try {
+                const result = await auth.signInWithEmailAndPassword(email, password);
+                console.log('✅ Email login successful:', result.user.email);
+                window.location.replace('portals/student-portal/mindflow-portal.html');
+            } catch (err) {
+                console.error('❌ Email login error:', err.code);
+                let msg = 'Sign in failed. Please try again.';
+                if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
+                else if (err.code === 'auth/wrong-password') msg = 'Incorrect password. Please try again.';
+                else if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
+                else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again later.';
+                else if (err.code === 'auth/invalid-credential') msg = 'Invalid email or password.';
+                showError(msg);
+            } finally {
+                setLoading('emailLoginBtn', false);
+            }
+        }
+
+        // ============================================================
+        // GOOGLE SIGN IN
+        // ============================================================
+        async function loginWithGoogle() {
+            clearError();
+            if (!auth) {
+                showError('Authentication unavailable. Please refresh.');
+                return;
+            }
+            setLoading('googleBtn', true);
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
+                const result = await auth.signInWithPopup(provider);
+                console.log('✅ Google login successful:', result.user.email);
+
+                // Create user doc if new
+                try {
+                    const userRef = db.collection('users').doc(result.user.uid);
+                    const doc = await userRef.get();
+                    if (!doc.exists) {
+                        await userRef.set({
+                            email: result.user.email,
+                            displayName: result.user.displayName || '',
+                            photoURL: result.user.photoURL || '',
+                            role: 'student',
+                            trialStart: new Date().toISOString(),
+                            trialEnd: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                            createdAt: new Date().toISOString()
+                        });
+                        console.log('📋 Created new user doc for:', result.user.email);
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Firestore user doc error:', e.message);
+                }
+
+                window.location.replace('portals/student-portal/mindflow-portal.html');
+            } catch (err) {
+                console.error('❌ Google login error:', err.code);
+                if (err.code === 'auth/popup-closed-by-user') {
+                    showError('Sign in cancelled.');
+                } else if (err.code === 'auth/popup-blocked') {
+                    showError('Please allow popups for this site.');
+                } else {
+                    showError('Google sign in failed. Please try again.');
+                }
+            } finally {
+                setLoading('googleBtn', false);
+            }
+        }
+
+        // ============================================================
+        // DEMO ACCESS
+        // ============================================================
+        function enterDemo() {
+            clearError();
+            try {
+                localStorage.setItem('khensani_demo', 'true');
+                localStorage.setItem('khensani_demo_start', new Date().toISOString());
+                localStorage.setItem('khensani_demo_end',
+                    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString());
+                console.log('🚀 Demo access granted');
+                window.location.replace('portals/student-portal/mindflow-portal.html?demo=true');
+            } catch (e) {
+                showError('Could not start demo. Please refresh.');
+            }
+        }
+
+        // ============================================================
+        // FORGOT PASSWORD
+        // ============================================================
+        async function showForgotPassword() {
+            clearError();
+            const email = prompt('Enter your email address to receive a password reset link:');
+            if (!email || !email.trim()) return;
+
+            if (!auth) {
+                showError('Authentication unavailable. Please refresh.');
+                return;
+            }
+
+            try {
+                await auth.sendPasswordResetEmail(email.trim());
+                showError('✅ Reset link sent. Check your email.');
+                document.getElementById('loginError').style.color = 'var(--success)';
+                setTimeout(() => {
+                    document.getElementById('loginError').style.color = 'var(--danger)';
+                }, 5000);
+            } catch (err) {
+                console.error('❌ Reset error:', err.code);
+                let msg = 'Could not send reset email.';
+                if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
+                else if (err.code === 'auth/invalid-email') msg = 'Invalid email address.';
+                showError(msg);
+            }
+        }
+
+        // ============================================================
+        // REGISTER INFO
+        // ============================================================
+        function showRegisterInfo() {
+            clearError();
+            const err = document.getElementById('loginError');
+            err.textContent = '📋 Registration is available through your school administrator. Contact your school for access.';
+            err.style.color = 'var(--gold)';
+            err.classList.add('show');
+            setTimeout(() => {
+                err.style.color = 'var(--danger)';
+                err.classList.remove('show');
+            }, 6000);
+        }
+
+        // ============================================================
+        // KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            // Escape — clear error
+            if (e.key === 'Escape') clearError();
+        });
+
+        // ============================================================
+        // INIT LOG
+        // ============================================================
+        console.log('🔐 Khensani AI · Secure Sign In');
+        console.log('   ⚛️ Africa\'s Sovereign Quantum Education Stack');
+        console.log('   ⚡ Powered by MindTech');
+        console.log('   🎨 Layered animations: African pattern · Circuit trace · Neural flow');
+    </script>
+</body>
+</html>

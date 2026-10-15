@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Response - Khensani AI · MindFlow Security</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <style>
+        :root {
+            /* Khensani Canonical */
+            --khensani-gold: #C8A450;
+            --khensani-cream: #E8D5A3;
+            --creator-pink: #FF69B4;
+            --communication-blue: #00A8FF;
+
+            /* Security Theme */
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #FF8C42;
+            --accent-glow: rgba(255, 140, 66, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --danger-soft: #FF6B6B;
+            --card-bg: rgba(10, 10, 42, 0.7);
+            --card-border: rgba(255, 140, 66, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --security-primary: #FF8C42;
+            --security-secondary: #E67E22;
+            --security-accent: #FFA366;
+            --dark-space: #0f0f1a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        html { background: var(--dark-space); }
+        body {
+            background: transparent;
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            isolation: isolate;
+        }
+
+        /* ============ QUANTUM PARTICLES ============ */
+        #particles-js {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-layer { position: relative; z-index: 1; }
+
+        /* ============ TECH NAVBAR (CANONICAL) ============ */
+        .tech-navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(10, 10, 16, 0.48);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--security-primary);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(255, 140, 66, 0.15);
+        }
+
+        .nav-logo-block {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .khensani-nav-logo {
+            height: 90px;
+            width: auto;
+            object-fit: contain;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 12px rgba(255, 140, 66, 0.5));
+        }
+
+        .khensani-nav-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 22px rgba(255, 140, 66, 0.9));
+        }
+
+        .brand-block { display: flex; align-items: center; gap: 0.6rem; }
+
+        .brand-icon-wrap {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--security-primary), var(--ai-gold));
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 18px rgba(255, 140, 66, 0.6);
+        }
+
+        .brand-icon-wrap i { color: #0a0a16; font-size: 1.2rem; }
+
+        .brand-text {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--security-primary), var(--ai-gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+
+        .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+        .notif-bell {
+            position: relative;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 140, 66, 0.12);
+            border: 2px solid var(--security-primary);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notif-bell:hover {
+            background: rgba(255, 140, 66, 0.28);
+            transform: scale(1.08);
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.6);
+        }
+
+        .notif-bell i { color: var(--security-primary); font-size: 1.05rem; }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            background: var(--danger);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 20px; height: 20px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 5px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 12px rgba(255, 51, 102, 0.8);
+        }
+
+        .notif-panel {
+            position: fixed;
+            top: 0; right: -420px;
+            width: 400px;
+            max-width: 92vw;
+            height: 100vh;
+            background: rgba(10, 10, 26, 0.98);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-left: 2px solid var(--security-primary);
+            z-index: 1200;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding: 1.5rem;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.6);
+        }
+
+        .notif-panel.open { right: 0; }
+
+        .notif-panel-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 140, 66, 0.35);
+        }
+
+        .notif-panel-head h3 {
+            font-family: 'Space Mono', monospace;
+            color: var(--security-primary);
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .notif-close {
+            background: transparent;
+            border: 1px solid var(--security-primary);
+            color: var(--security-primary);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notif-close:hover {
+            background: var(--security-primary);
+            color: #0a0a16;
+            transform: rotate(90deg);
+        }
+
+        .notif-item {
+            background: rgba(255, 140, 66, 0.06);
+            border-left: 4px solid var(--security-primary);
+            border-radius: 8px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .notif-item:hover { transform: translateX(-5px); background: rgba(255, 140, 66, 0.14); }
+        .notif-item.critical { border-left-color: var(--danger); background: rgba(255, 51, 102, 0.1); }
+        .notif-item.critical .notif-title { color: var(--danger); }
+        .notif-item.warning { border-left-color: var(--warning); background: rgba(255, 170, 0, 0.1); }
+        .notif-item.warning .notif-title { color: var(--warning); }
+
+        .notif-title { font-weight: 600; color: var(--security-primary); font-size: 0.95rem; margin-bottom: 0.35rem; }
+        .notif-text { font-size: 0.85rem; color: var(--text-dim); line-height: 1.4; }
+        .notif-time { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.5rem; font-family: 'Space Mono', monospace; opacity: 0.75; }
+
+        .back-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: 2px solid var(--security-primary);
+            color: var(--security-primary);
+            padding: 0.55rem 1.15rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .back-pill:hover {
+            background: var(--security-primary);
+            color: #0a0a16;
+            box-shadow: 0 0 22px rgba(255, 140, 66, 0.75);
+            transform: translateY(-2px);
+        }
+
+        /* ============ PORTAL HEADER ============ */
+        .portal-header {
+            margin-top: 105px;
+            background: rgba(10, 10, 10, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--security-primary);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 900;
+            box-shadow: 0 0 30px rgba(255, 140, 66, 0.3);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-container { display: flex; align-items: center; gap: 1rem; }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--security-primary);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title { font-size: 1.5rem; font-weight: 600; color: white; }
+        .portal-subtitle { font-size: 0.85rem; color: var(--text-dim); font-family: 'Space Mono', monospace; letter-spacing: 1px; }
+
+        .security-status {
+            display: flex; align-items: center; gap: 1rem;
+            background: rgba(255, 140, 66, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--security-primary);
+        }
+
+        .status-indicator {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .user-info { display: flex; align-items: center; gap: 1rem; }
+
+        .avatar-container { position: relative; cursor: pointer; }
+
+        .avatar {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--security-primary), var(--security-secondary));
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid var(--security-primary);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .avatar:hover { transform: scale(1.1); box-shadow: 0 0 20px var(--security-primary); }
+        .user-name { font-weight: 600; font-size: 0.95rem; }
+        .user-role { font-size: 0.78rem; color: var(--text-dim); }
+
+        /* Quantum Line */
+        .quantum-line {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--khensani-gold);
+            letter-spacing: 3px;
+            font-family: 'Space Mono', monospace;
+            padding: 0.6rem 1rem;
+            background: rgba(200, 164, 80, 0.05);
+            border-top: 1px solid rgba(200, 164, 80, 0.2);
+            border-bottom: 1px solid rgba(200, 164, 80, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ BACK NAV ============ */
+        .back-nav {
+            background: rgba(15, 15, 26, 0.62);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 140, 66, 0.3);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+
+        .page-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--security-primary);
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* ============ MAIN ============ */
+        .main-content {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .emergency-layout {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .emergency-monitor {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--security-primary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 25px rgba(255, 140, 66, 0.3);
+            position: relative;
+        }
+
+        .emergency-monitor::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--security-primary), var(--ai-gold));
+            z-index: 10;
+        }
+
+        .emergency-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .emergency-protocol {
+            background: rgba(255, 140, 66, 0.05);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--security-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emergency-protocol::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 4px;
+            background: linear-gradient(90deg, var(--security-primary), var(--ai-gold));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .emergency-protocol:hover::before { transform: scaleX(1); }
+        .emergency-protocol:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 10px 25px rgba(255, 140, 66, 0.3);
+        }
+
+        .emergency-protocol.critical {
+            border-color: var(--danger);
+            background: rgba(255, 51, 102, 0.05);
+        }
+
+        .protocol-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .protocol-title { font-size: 1.3rem; font-weight: 600; color: var(--ai-gold); }
+
+        .protocol-status { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.85rem; font-family: 'Space Mono', monospace; }
+        .status-active { color: var(--danger); animation: blink 1s infinite; }
+        .status-standby { color: var(--success); }
+
+        .protocol-description { margin-bottom: 1.5rem; line-height: 1.6; color: var(--text-dim); font-size: 0.9rem; }
+
+        .protocol-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+        .protocol-btn {
+            background: rgba(255, 140, 66, 0.1);
+            border: 1px solid var(--security-primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            flex: 1;
+            justify-content: center;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 0.9rem;
+            min-width: 140px;
+        }
+
+        .protocol-btn:hover { background: rgba(255, 140, 66, 0.3); transform: translateY(-2px); }
+
+        .protocol-btn.critical {
+            background: rgba(255, 51, 102, 0.2);
+            border-color: var(--danger);
+        }
+
+        .protocol-btn.critical:hover {
+            background: rgba(255, 51, 102, 0.4);
+            animation: pulse 0.5s infinite;
+        }
+
+        .emergency-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .security-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--security-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .security-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .card-title { font-size: 1.2rem; font-weight: 600; color: var(--ai-gold); }
+        .card-icon { font-size: 1.5rem; color: var(--security-primary); }
+
+        .contacts-list { display: flex; flex-direction: column; gap: 0.8rem; }
+
+        .contact-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.8rem;
+            background: rgba(255, 140, 66, 0.05);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            gap: 0.5rem;
+        }
+
+        .contact-item:hover { background: rgba(255, 140, 66, 0.1); transform: translateX(5px); }
+
+        .contact-info { display: flex; flex-direction: column; }
+        .contact-name { font-weight: 600; font-size: 0.9rem; }
+        .contact-role { font-size: 0.75rem; color: var(--text-dim); }
+
+        .contact-action {
+            background: rgba(255, 140, 66, 0.1);
+            border: 1px solid var(--security-primary);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            font-family: 'Exo 2', sans-serif;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .contact-action:hover { background: rgba(255, 140, 66, 0.3); }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--security-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .status-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(255, 140, 66, 0.3); }
+
+        .status-card.critical {
+            border-color: var(--danger);
+            background: rgba(255, 51, 102, 0.1);
+        }
+
+        .status-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.5rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .status-card.critical .status-value { color: var(--danger); animation: blink 1s infinite; }
+        .status-label { font-size: 1rem; color: var(--text-dim); }
+
+        /* ============ CANONICAL KD AD ============ */
+        .corporate-ad-center {
+            background: linear-gradient(135deg, rgba(70,25,115,0.22), rgba(110,80,20,0.18));
+            border: 2px solid rgba(200,164,80,0.4);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+
+        .corporate-ad-center::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(200,164,80,0.08), transparent);
+            animation: kd-shine 4s infinite;
+        }
+
+        @keyframes kd-shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .corporate-ad-center:hover {
+            border-color: var(--khensani-gold);
+            box-shadow: 0 0 40px rgba(200,164,80,0.3);
+            transform: translateY(-3px);
+        }
+
+        .corporate-ad-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--khensani-cream);
+            letter-spacing: 1px;
+        }
+
+        .corporate-ad-text strong { color: var(--khensani-gold); font-size: 1.15rem; display: block; margin-bottom: 4px; }
+
+        .kd-rotating-logo {
+            height: 65px;
+            width: 65px;
+            object-fit: contain;
+            background: transparent;
+            flex-shrink: 0;
+            opacity: 1 !important;
+            filter: brightness(0.78) contrast(1.28) drop-shadow(0 0 7px rgba(80,20,135,0.98)) drop-shadow(0 0 16px rgba(138,43,226,0.95)) drop-shadow(0 0 25px rgba(200,164,80,0.72)) !important;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            animation: kd-superposition-visible 6s ease-in-out infinite !important;
+        }
+
+        @keyframes kd-superposition-visible {
+            0%,100% { transform: perspective(600px) rotateY(0deg) rotateZ(0deg) scale(1); }
+            25% { transform: perspective(600px) rotateY(90deg) rotateZ(4deg) scale(1.08); }
+            50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); }
+            75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); }
+        }
+
+        /* ============ FLOATING FOOTER ============ */
+        .floating-footer {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 2.5rem 1rem 1.5rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            margin-top: 2rem;
+        }
+
+        .footer-logo-row { display: flex; justify-content: center; margin-bottom: 1rem; }
+
+        .footer-logo {
+            height: 55px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.85;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 0 12px rgba(255, 140, 66, 0.4));
+        }
+
+        .footer-logo:hover {
+            opacity: 1;
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(255, 140, 66, 0.9));
+        }
+
+        .floating-footer .copyright {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .floating-footer .copyright a { color: inherit; text-decoration: none; }
+
+        .mindtech-glitch {
+            color: var(--security-primary);
+            font-weight: bold;
+            font-size: 0.9rem;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+
+        .footer-bottom {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--khensani-gold);
+            letter-spacing: 1.5px;
+            margin-top: 0.75rem;
+            opacity: 0.85;
+        }
+
+        /* ============ ANIMATIONS ============ */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--security-primary), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--security-primary), 0 0 30px #0066FF, 0 0 40px #FF8C42; }
+            100% { text-shadow: 0 0 10px var(--security-primary), 0 0 20px #0066FF; }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1200px) {
+            .emergency-layout { grid-template-columns: 1fr; }
+            .emergency-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 900px) {
+            .khensani-nav-logo { height: 60px; }
+            .brand-text { font-size: 0.9rem; }
+        }
+
+        @media (max-width: 768px) {
+            .tech-navbar { padding: 0.5rem 0.75rem; }
+            .khensani-nav-logo { height: 50px; }
+            .portal-header { padding: 1rem; flex-direction: column; align-items: flex-start; margin-top: 80px; }
+            .back-nav { padding: 1rem; }
+            .main-content { padding: 1rem; }
+            .emergency-grid { grid-template-columns: 1fr; }
+            .protocol-actions { flex-direction: column; }
+            .notif-panel { width: 100%; right: -100%; }
+            .back-pill { padding: 0.45rem 0.85rem; font-size: 0.75rem; }
+            .user-info { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- QUANTUM PARTICLES -->
+    <div id="particles-js"></div>
+
+    <div class="content-layer">
+
+    <!-- ============ CANONICAL TECH NAVBAR ============ -->
+    <header class="tech-navbar">
+        <div class="nav-logo-block">
+            <a href="mindflow-portal.html">
+                <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png"
+                     alt="Khensani AI"
+                     class="khensani-nav-logo"
+                     onerror="this.style.display='none'">
+            </a>
+            <div class="brand-block">
+                <div class="brand-icon-wrap"><i class="fas fa-shield-alt"></i></div>
+                <div class="brand-text">EMERGENCY RESPONSE</div>
+            </div>
+        </div>
+
+        <div class="nav-actions">
+            <div class="notif-bell" onclick="toggleNotifPanel()">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">3</span>
+            </div>
+            <a href="mindflow-portal.html" class="back-pill">
+                <i class="fas fa-arrow-left"></i> Back to Portal
+            </a>
+        </div>
+    </header>
+
+    <!-- ============ NOTIFICATION PANEL ============ -->
+    <aside class="notif-panel" id="notifPanel">
+        <div class="notif-panel-head">
+            <h3><i class="fas fa-exclamation-triangle"></i> EMERGENCY ALERTS</h3>
+            <button class="notif-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="notif-item critical">
+            <div class="notif-title"><i class="fas fa-fire"></i> Fire Drill Scheduled</div>
+            <div class="notif-text">Mandatory fire drill scheduled for 14:00 today. All units on standby.</div>
+            <div class="notif-time">30 min ago · PRIORITY HIGH</div>
+        </div>
+
+        <div class="notif-item warning">
+            <div class="notif-title"><i class="fas fa-tools"></i> Backup Generator Test</div>
+            <div class="notif-text">Routine backup power system test scheduled for tomorrow 06:00.</div>
+            <div class="notif-time">2 hours ago · PRIORITY MEDIUM</div>
+        </div>
+
+        <div class="notif-item">
+            <div class="notif-title"><i class="fas fa-check-circle"></i> All Systems Operational</div>
+            <div class="notif-text">Emergency systems full diagnostic completed. Zero issues detected.</div>
+            <div class="notif-time">4 hours ago · PRIORITY LOW</div>
+        </div>
+    </aside>
+
+    <!-- ============ PORTAL HEADER ============ -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo"><i class="fas fa-shield-alt"></i></div>
+            <div>
+                <div class="portal-title">Security Command Center</div>
+                <div class="portal-subtitle">Officer James Wilson · Shift Alpha · Badge SG-247</div>
+            </div>
+        </div>
+        <div class="security-status">
+            <div class="status-indicator"></div>
+            <span>All Systems Operational</span>
+        </div>
+        <div class="user-info">
+            <div class="avatar-container" onclick="EmergencyManager.openProfile()">
+                <div class="avatar">JW</div>
+            </div>
+            <div>
+                <div class="user-name">Officer James Wilson</div>
+                <div class="user-role">Security Supervisor · Shift Alpha</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Quantum Line -->
+    <div class="quantum-line">⚛️ QUANTUM-VERIFIED · CHSH S=2.8284 · SA PATENT 2026/05142</div>
+
+    <!-- ============ BACK NAV ============ -->
+    <nav class="back-nav">
+        <div class="page-title"><i class="fas fa-ambulance"></i> Emergency Response System</div>
+    </nav>
+
+    <!-- ============ MAIN ============ -->
+    <main class="main-content">
+
+        <!-- Emergency Status -->
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-value" id="activeEmergencies">0</div>
+                <div class="status-label">Active Emergencies</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value">100%</div>
+                <div class="status-label">System Ready</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value">28</div>
+                <div class="status-label">Response Team</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value">2.1min</div>
+                <div class="status-label">Avg Response Time</div>
+            </div>
+        </div>
+
+        <div class="emergency-layout">
+            <!-- Emergency Monitor -->
+            <div class="emergency-monitor">
+                <div class="emergency-grid">
+                    <div class="emergency-protocol critical" data-protocol="Campus Lockdown">
+                        <div class="protocol-header">
+                            <div class="protocol-title">Campus Lockdown</div>
+                            <div class="protocol-status status-standby"><i class="fas fa-circle"></i> STANDBY</div>
+                        </div>
+                        <div class="protocol-description">
+                            Complete campus lockdown. All access points secured, emergency alerts activated, and law enforcement notified.
+                        </div>
+                        <div class="protocol-actions">
+                            <button class="protocol-btn critical" onclick="EmergencyManager.activateLockdown()">
+                                <i class="fas fa-lock"></i> ACTIVATE LOCKDOWN
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="emergency-protocol critical" data-protocol="Emergency Evacuation">
+                        <div class="protocol-header">
+                            <div class="protocol-title">Emergency Evacuation</div>
+                            <div class="protocol-status status-standby"><i class="fas fa-circle"></i> STANDBY</div>
+                        </div>
+                        <div class="protocol-description">
+                            Immediate campus evacuation. Activate emergency exits, sound alarms, and coordinate safe evacuation routes.
+                        </div>
+                        <div class="protocol-actions">
+                            <button class="protocol-btn critical" onclick="EmergencyManager.activateEvacuation()">
+                                <i class="fas fa-person-running"></i> ACTIVATE EVACUATION
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="emergency-protocol" data-protocol="Medical Emergency">
+                        <div class="protocol-header">
+                            <div class="protocol-title">Medical Emergency</div>
+                            <div class="protocol-status status-standby"><i class="fas fa-circle"></i> STANDBY</div>
+                        </div>
+                        <div class="protocol-description">
+                            Medical emergency response. Dispatch first aid team, secure area, and coordinate with emergency medical services.
+                        </div>
+                        <div class="protocol-actions">
+                            <button class="protocol-btn" onclick="EmergencyManager.activateMedical()">
+                                <i class="fas fa-plus-square"></i> MEDICAL ALERT
+                            </button>
+                            <button class="protocol-btn" onclick="EmergencyManager.callAmbulance()">
+                                <i class="fas fa-ambulance"></i> CALL AMBULANCE
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="emergency-protocol" data-protocol="Fire Emergency">
+                        <div class="protocol-header">
+                            <div class="protocol-title">Fire Emergency</div>
+                            <div class="protocol-status status-standby"><i class="fas fa-circle"></i> STANDBY</div>
+                        </div>
+                        <div class="protocol-description">
+                            Fire emergency protocol. Activate fire suppression systems, evacuate affected areas, and notify fire department.
+                        </div>
+                        <div class="protocol-actions">
+                            <button class="protocol-btn" onclick="EmergencyManager.activateFireProtocol()">
+                                <i class="fas fa-fire"></i> FIRE ALERT
+                            </button>
+                            <button class="protocol-btn" onclick="EmergencyManager.callFireDepartment()">
+                                <i class="fas fa-fire-extinguisher"></i> CALL FIRE DEPT
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="emergency-protocol" data-protocol="Severe Weather">
+                        <div class="protocol-header">
+                            <div class="protocol-title">Severe Weather</div>
+                            <div class="protocol-status status-standby"><i class="fas fa-circle"></i> STANDBY</div>
+                        </div>
+                        <div class="protocol-description">
+                            Severe weather response. Secure outdoor areas, move to safe zones, and monitor weather alerts.
+                        </div>
+                        <div class="protocol-actions">
+                            <button class="protocol-btn" onclick="EmergencyManager.activateWeatherAlert()">
+                                <i class="fas fa-cloud-showers-heavy"></i> WEATHER ALERT
+                            </button>
+                            <button class="protocol-btn" onclick="EmergencyManager.shelterInPlace()">
+                                <i class="fas fa-house-user"></i> SHELTER IN PLACE
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="emergency-protocol" data-protocol="Utility Failure">
+                        <div class="protocol-header">
+                            <div class="protocol-title">Utility Failure</div>
+                            <div class="protocol-status status-standby"><i class="fas fa-circle"></i> STANDBY</div>
+                        </div>
+                        <div class="protocol-description">
+                            Critical utility failure. Activate backup systems, assess impact, and coordinate with maintenance teams.
+                        </div>
+                        <div class="protocol-actions">
+                            <button class="protocol-btn" onclick="EmergencyManager.activateBackupPower()">
+                                <i class="fas fa-bolt"></i> BACKUP POWER
+                            </button>
+                            <button class="protocol-btn" onclick="EmergencyManager.notifyMaintenance()">
+                                <i class="fas fa-tools"></i> NOTIFY MAINTENANCE
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Sidebar -->
+            <div class="emergency-sidebar">
+                <div class="security-card">
+                    <div class="card-header">
+                        <div class="card-title">Emergency Contacts</div>
+                        <div class="card-icon"><i class="fas fa-address-book"></i></div>
+                    </div>
+                    <div class="contacts-list">
+                        <div class="contact-item">
+                            <div class="contact-info">
+                                <div class="contact-name">Emergency Services</div>
+                                <div class="contact-role">Police • Fire • Medical</div>
+                            </div>
+                            <button class="contact-action" onclick="EmergencyManager.callEmergencyServices()"><i class="fas fa-phone"></i> CALL</button>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-info">
+                                <div class="contact-name">Dr. Sarah Chen</div>
+                                <div class="contact-role">Principal</div>
+                            </div>
+                            <button class="contact-action" onclick="EmergencyManager.callPrincipal()"><i class="fas fa-phone"></i> CALL</button>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-info">
+                                <div class="contact-name">Maintenance Director</div>
+                                <div class="contact-role">Facilities Management</div>
+                            </div>
+                            <button class="contact-action" onclick="EmergencyManager.callMaintenance()"><i class="fas fa-phone"></i> CALL</button>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-info">
+                                <div class="contact-name">Medical Team</div>
+                                <div class="contact-role">First Responders</div>
+                            </div>
+                            <button class="contact-action" onclick="EmergencyManager.callMedicalTeam()"><i class="fas fa-phone"></i> CALL</button>
+                        </div>
+                        <div class="contact-item">
+                            <div class="contact-info">
+                                <div class="contact-name">Security Command</div>
+                                <div class="contact-role">All Security Personnel</div>
+                            </div>
+                            <button class="contact-action" onclick="EmergencyManager.alertAllSecurity()"><i class="fas fa-bullhorn"></i> ALERT ALL</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="security-card">
+                    <div class="card-header">
+                        <div class="card-title">Quick Actions</div>
+                        <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <button class="protocol-btn" onclick="EmergencyManager.testAlerts()"><i class="fas fa-bell"></i> Test Alert System</button>
+                        <button class="protocol-btn" onclick="EmergencyManager.activateBackupSystems()"><i class="fas fa-server"></i> Activate Backup Systems</button>
+                        <button class="protocol-btn" onclick="EmergencyManager.coordinateResponse()"><i class="fas fa-walkie-talkie"></i> Coordinate Response</button>
+                        <button class="protocol-btn" onclick="EmergencyManager.systemStatus()"><i class="fas fa-heartbeat"></i> System Status Check</button>
+                    </div>
+                </div>
+
+                <div class="security-card">
+                    <div class="card-header">
+                        <div class="card-title">Emergency Checklist</div>
+                        <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.8rem;">
+                        <div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-check-circle" style="color: var(--success);"></i><span>All systems operational</span></div>
+                        <div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-check-circle" style="color: var(--success);"></i><span>Backup power ready</span></div>
+                        <div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-check-circle" style="color: var(--success);"></i><span>Communication systems online</span></div>
+                        <div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-check-circle" style="color: var(--success);"></i><span>Response teams on standby</span></div>
+                        <div style="display:flex; align-items:center; gap:0.5rem;"><i class="fas fa-check-circle" style="color: var(--success);"></i><span>Emergency supplies stocked</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CANONICAL KD CORPORATE AD -->
+        <a href="https://kdconcepts.com" target="_blank" rel="noopener" id="corporate-ad-center" class="corporate-ad-center">
+            <img id="corporate-ad-logo" src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png" class="kd-rotating-logo" onerror="this.style.display='none'">
+            <div class="corporate-ad-text">
+                <strong id="corporate-ad-title">Emergency Response Sponsored by KD Concepts</strong>
+                <span id="corporate-ad-tagline">Advertising · Platform Exposure · Circular Economy Partner</span>
+            </div>
+            <i class="fas fa-external-link-alt" style="color: var(--khensani-gold); font-size: 1.2rem;"></i>
+        </a>
+
+        <!-- FLOATING FOOTER -->
+        <footer class="floating-footer">
+            <div class="footer-logo-row">
+                <a href="https://mindtech.africa" target="_blank">
+                    <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                         class="footer-logo"
+                         alt="EntangleGuard"
+                         onerror="this.style.display='none'">
+                </a>
+            </div>
+            <p class="copyright">© 2026 MindFlow · Khensani AI · Powered by <a href="https://mindtech.africa"><span class="mindtech-glitch">MindTech</span></a> · Transforming African education</p>
+            <div class="footer-bottom">⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Jobs db6h46o4qg6s73c4q1n0 · db6h3eslf4us73c5c80g</div>
+        </footer>
+
+    </main>
+
+    </div><!-- /content-layer -->
+
+    <!-- ============ FIREBASE 10.8.0 MODULAR ============ -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, collection, query, where, orderBy, getDocs, addDoc, updateDoc, doc, increment, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.__khensaniFirebase = { app, auth, db };
+        window.__khensaniFirestore = { collection, query, where, orderBy, getDocs, addDoc, updateDoc, doc, increment, serverTimestamp };
+
+        window.loadCorporateAds = async function() {
+            try {
+                const adsRef = collection(db, 'corporate_ads');
+                const q = query(adsRef, where('approved', '==', true), orderBy('tier', 'desc'));
+                const snap = await getDocs(q);
+                const now = new Date();
+
+                for (const docSnap of snap.docs) {
+                    const ad = docSnap.data();
+                    if (ad.endDate && new Date(ad.endDate.toDate ? ad.endDate.toDate() : ad.endDate) < now) continue;
+
+                    const logoEl = document.getElementById('corporate-ad-logo');
+                    const titleEl = document.getElementById('corporate-ad-title');
+                    const taglineEl = document.getElementById('corporate-ad-tagline');
+                    const linkEl = document.getElementById('corporate-ad-center');
+
+                    if (ad.logoUrl && logoEl) logoEl.src = ad.logoUrl;
+                    if (ad.title && titleEl) titleEl.textContent = ad.title;
+                    if (ad.tagline && taglineEl) taglineEl.textContent = ad.tagline;
+                    if (ad.linkUrl && linkEl) linkEl.href = ad.linkUrl;
+
+                    try {
+                        await updateDoc(doc(db, 'corporate_ads', docSnap.id), { impressions: increment(1) });
+                    } catch (e) { /* silent */ }
+
+                    break; // first highest tier only
+                }
+            } catch (e) {
+                console.warn('Corporate ads loader (canonical fallback):', e.message);
+            }
+        };
+
+        window.openKDConcepts = function() {
+            window.open('https://kdconcepts.com', '_blank');
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => window.loadCorporateAds());
+        } else {
+            window.loadCorporateAds();
+        }
+    </script>
+
+    <!-- ============ PARTICLES (CANONICAL CALM) ============ -->
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55, density: { enable: true, value_area: 800 } },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#00B4D8", opacity: 0.08, width: 1 },
+                move: { enable: true, speed: 0.8, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: false }
+                }
+            }
+        });
+    </script>
+
+    <!-- ============ EMERGENCY MANAGER ============ -->
+    <script>
+        function toggleNotifPanel() {
+            document.getElementById('notifPanel').classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.querySelector('.notif-bell');
+            if (panel && bell && panel.classList.contains('open')) {
+                if (!panel.contains(e.target) && !bell.contains(e.target)) {
+                    panel.classList.remove('open');
+                }
+            }
+        });
+
+        const EmergencyManager = {
+            openProfile: function() {
+                alert('👮 Security Profile\n\nOfficer: James Wilson\nBadge: SG-247\nShift: Alpha (06:00-14:00)\n\nSpecializations:\n• Emergency Response\n• Crisis Management\n• Protocol Execution');
+            },
+
+            activateLockdown: function() {
+                if (confirm('🚨 ACTIVATE CAMPUS LOCKDOWN?\n\nThis will:\n• Secure all access points\n• Notify emergency services\n• Alert all staff and students\n• Activate emergency protocols')) {
+                    alert('🔒 CAMPUS LOCKDOWN ACTIVATED\n\nAll security protocols engaged. Emergency services notified.');
+                    this.logEmergency('Campus Lockdown Activated', 'critical');
+                    this.updateProtocolStatus('Campus Lockdown', 'ACTIVE');
+                    this.bumpActive();
+                }
+            },
+
+            activateEvacuation: function() {
+                if (confirm('🚨 ACTIVATE EMERGENCY EVACUATION?\n\nThis will:\n• Sound evacuation alarms\n• Dispatch emergency teams\n• Coordinate evacuation routes\n• Notify emergency services')) {
+                    alert('🏃 EMERGENCY EVACUATION ACTIVATED\n\nAll evacuation protocols engaged. Emergency services notified.');
+                    this.logEmergency('Emergency Evacuation Activated', 'critical');
+                    this.updateProtocolStatus('Emergency Evacuation', 'ACTIVE');
+                    this.bumpActive();
+                }
+            },
+
+            activateMedical: function() {
+                alert('🏥 Medical Emergency Alert Activated\n\nFirst aid team dispatched to location.');
+                this.logEmergency('Medical Emergency Alert', 'high');
+                this.updateProtocolStatus('Medical Emergency', 'ACTIVE');
+                this.bumpActive();
+            },
+
+            callAmbulance: function() {
+                alert('🚑 Ambulance Dispatch Requested\n\nEmergency medical services notified and en route.');
+                this.logEmergency('Ambulance Called', 'high');
+            },
+
+            activateFireProtocol: function() {
+                alert('🔥 Fire Emergency Protocol Activated\n\nFire suppression systems engaged. Evacuation initiated.');
+                this.logEmergency('Fire Emergency Protocol', 'high');
+                this.updateProtocolStatus('Fire Emergency', 'ACTIVE');
+                this.bumpActive();
+            },
+
+            callFireDepartment: function() {
+                alert('🚒 Fire Department Notified\n\nFire emergency services dispatched to location.');
+                this.logEmergency('Fire Department Called', 'high');
+            },
+
+            activateWeatherAlert: function() {
+                alert('⛈️ Severe Weather Alert Activated\n\nWeather emergency protocols engaged.');
+                this.logEmergency('Severe Weather Alert', 'medium');
+                this.updateProtocolStatus('Severe Weather', 'ACTIVE');
+                this.bumpActive();
+            },
+
+            shelterInPlace: function() {
+                alert('🏠 Shelter in Place Order Activated\n\nAll personnel directed to secure locations.');
+                this.logEmergency('Shelter in Place', 'medium');
+            },
+
+            activateBackupPower: function() {
+                alert('⚡ Backup Power Systems Activated\n\nCritical systems running on backup generators.');
+                this.logEmergency('Backup Power Activated', 'medium');
+                this.updateProtocolStatus('Utility Failure', 'ACTIVE');
+                this.bumpActive();
+            },
+
+            notifyMaintenance: function() {
+                alert('🔧 Maintenance Team Alerted\n\nFacilities team dispatched for utility assessment.');
+                this.logEmergency('Maintenance Notified', 'low');
+            },
+
+            callEmergencyServices: function() {
+                alert('📞 Connecting to Emergency Services\n\nDialing 911 for immediate assistance.');
+            },
+
+            callPrincipal: function() {
+                alert('📞 Calling Principal Chen\n\nNotifying school administration of emergency situation.');
+            },
+
+            callMaintenance: function() {
+                alert('📞 Contacting Maintenance Director\n\nCoordinating facility emergency response.');
+            },
+
+            callMedicalTeam: function() {
+                alert('📞 Alerting Medical Response Team\n\nAll medical personnel notified and mobilized.');
+            },
+
+            alertAllSecurity: function() {
+                alert('📢 Security Team Wide Alert\n\nAll security personnel notified of emergency situation.');
+            },
+
+            testAlerts: function() {
+                alert('🔔 Testing Emergency Alert System\n\nAll alert systems will be tested momentarily.');
+            },
+
+            activateBackupSystems: function() {
+                alert('🔄 Activating All Backup Systems\n\nCritical infrastructure running on backup power and communications.');
+            },
+
+            coordinateResponse: function() {
+                alert('📡 Opening Response Coordination\n\nEmergency response team coordination interface.');
+            },
+
+            systemStatus: function() {
+                alert('💚 All Emergency Systems Operational\n\nFull system status check completed successfully.');
+            },
+
+            updateProtocolStatus: function(protocolName, status) {
+                const cards = document.querySelectorAll('.emergency-protocol');
+                cards.forEach(card => {
+                    if (card.dataset.protocol === protocolName) {
+                        const statusEl = card.querySelector('.protocol-status');
+                        if (statusEl) {
+                            statusEl.innerHTML = `<i class="fas fa-circle"></i> ${status}`;
+                            statusEl.className = `protocol-status status-${status.toLowerCase()}`;
+                        }
+                    }
+                });
+            },
+
+            bumpActive: function() {
+                const el = document.getElementById('activeEmergencies');
+                if (el) {
+                    const n = parseInt(el.textContent || '0', 10) + 1;
+                    el.textContent = n;
+                }
+            },
+
+            logEmergency: function(message, priority) {
+                console.log(`🚨 EMERGENCY: ${message} [${priority}]`);
+                try {
+                    const fb = window.__khensaniFirebase;
+                    const fs = window.__khensaniFirestore;
+                    if (fb && fs) {
+                        fs.addDoc(fs.collection(fb.db, 'emergency_logs'), {
+                            emergency: message,
+                            priority: priority,
+                            timestamp: fs.serverTimestamp(),
+                            officer: 'James Wilson',
+                            action: 'emergency_activation'
+                        });
+                    }
+                } catch (e) { console.warn('Emergency log write failed:', e.message); }
+            }
+        };
+        window.EmergencyManager = EmergencyManager;
+
+        // Page view logging
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                const fb = window.__khensaniFirebase;
+                const fs = window.__khensaniFirestore;
+                if (fb && fs) {
+                    fs.addDoc(fs.collection(fb.db, 'navigation_logs'), {
+                        page: 'security-emergency-response',
+                        timestamp: fs.serverTimestamp(),
+                        user: 'Security Officer Wilson',
+                        role: 'security',
+                        action: 'page_view'
+                    });
+                }
+            } catch (e) { /* silent */ }
+        });
+
+        // Keyboard shortcuts (preserved 100%)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                window.location.href = 'mindflow-portal.html';
+            }
+            if (!e.target.matches('input, textarea')) {
+                switch(e.key.toLowerCase()) {
+                    case 'l': EmergencyManager.activateLockdown(); break;
+                    case 'e': EmergencyManager.activateEvacuation(); break;
+                    case 'm': EmergencyManager.activateMedical(); break;
+                    case 'f': EmergencyManager.activateFireProtocol(); break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

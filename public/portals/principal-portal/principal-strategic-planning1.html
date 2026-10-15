@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Planning - Principal Portal · Khensani AI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDK 10.8.0 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.__khensaniFirebase = { app, auth, db };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) console.log('⚛️ Principal authenticated:', user.email);
+            else console.log('⚛️ Principal session: demo mode active');
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #FF6B6B;
+            --accent-glow: rgba(255, 107, 107, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(15, 20, 35, 0.48);
+            --card-border: rgba(255, 107, 107, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --principal-primary: #FF6B6B;
+            --principal-secondary: #E05555;
+            --principal-accent: #FF8E8E;
+            --creator-pink: #FF69B4;
+            --communication-blue: #00A8FF;
+            --analytics-purple: #8A2BE2;
+            --khensani-gold: #C8A450;
+            --khensani-cream: #E8D5A3;
+            --dark-space: #0f0f1a;
+            --strategy-purple: #8A2BE2;
+            --development-blue: #0066FF;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Exo 2', sans-serif; }
+
+        html { background: var(--dark-space); }
+        body {
+            background: transparent;
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-top: 90px;
+            position: relative;
+            isolation: isolate;
+        }
+
+        #particles-js {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+            opacity: 1 !important;
+        }
+        #particles-js canvas {
+            display: block;
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* ============ TECH NAVBAR ============ */
+        .tech-navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 72px;
+            background: rgba(10, 10, 18, 0.48);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--principal-primary);
+            display: flex; align-items: center;
+            padding: 0 1.5rem; gap: 1rem;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(255, 107, 107, 0.35);
+        }
+
+        .tech-navbar .khensani-logo {
+            height: 90px; width: auto;
+            margin-top: 4px;
+            filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.6));
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .tech-navbar .khensani-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.8));
+        }
+
+        .brand-block { display: flex; align-items: center; gap: 0.6rem; }
+
+        .brand-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--principal-primary), var(--ai-gold));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 0 18px rgba(255, 107, 107, 0.6);
+        }
+
+        .brand-name {
+            font-size: 1.15rem; font-weight: 800; letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+
+        .brand-sub {
+            font-size: 0.65rem; color: var(--text-dim);
+            letter-spacing: 2px; font-family: 'Space Mono', monospace;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        .nav-back-btn {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.55rem 1.25rem;
+            border: 2px solid var(--principal-primary);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--ai-gold);
+            font-weight: 600; font-size: 0.85rem;
+            text-decoration: none; letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+        }
+        .nav-back-btn:hover {
+            background: var(--principal-primary);
+            color: #fff;
+            box-shadow: 0 0 22px rgba(255, 107, 107, 0.75);
+            transform: translateX(-3px);
+        }
+
+        .notif-wrap { position: relative; }
+
+        .notif-bell {
+            position: relative;
+            width: 46px; height: 46px; border-radius: 50%;
+            border: 2px solid var(--principal-primary);
+            background: rgba(255, 107, 107, 0.15);
+            color: var(--ai-gold);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.3s ease; font-size: 1.1rem;
+        }
+        .notif-bell:hover { background: rgba(255, 107, 107, 0.35); box-shadow: 0 0 20px rgba(255, 107, 107, 0.7); }
+
+        .notif-badge {
+            position: absolute; top: -4px; right: -4px;
+            min-width: 20px; height: 20px; padding: 0 5px;
+            border-radius: 999px; background: var(--creator-pink); color: #fff;
+            font-size: 0.7rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid #0a0a16;
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        .notif-panel {
+            position: absolute; top: 60px; right: 0;
+            width: 360px; max-height: 0; overflow: hidden;
+            background: rgba(15, 20, 35, 0.92);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            z-index: 2500;
+        }
+        .notif-panel.open { max-height: 460px; padding: 1rem; }
+
+        .notif-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 0.8rem; padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(255, 107, 107, 0.4);
+        }
+        .notif-title { font-size: 0.95rem; font-weight: 700; color: var(--ai-gold); }
+        .notif-clear { font-size: 0.75rem; color: var(--text-dim); cursor: pointer; }
+        .notif-clear:hover { color: var(--creator-pink); }
+
+        .notif-item {
+            padding: 0.7rem 0.8rem; border-radius: 8px;
+            background: rgba(255, 107, 107, 0.12);
+            border-left: 3px solid var(--principal-primary);
+            margin-bottom: 0.6rem;
+            transition: all 0.3s ease; cursor: pointer;
+        }
+        .notif-item:hover { background: rgba(255, 107, 107, 0.25); transform: translateX(3px); }
+        .notif-item.creator { border-left-color: var(--creator-pink); background: rgba(255, 105, 180, 0.1); }
+        .notif-item.creator .notif-item-title { color: var(--creator-pink); }
+        .notif-item-title { font-size: 0.85rem; font-weight: 600; color: var(--ai-gold); margin-bottom: 0.25rem; }
+        .notif-item-text { font-size: 0.78rem; color: var(--text-dim); line-height: 1.4; }
+        .notif-item-time { font-size: 0.7rem; color: #666; margin-top: 0.3rem; font-family: 'Space Mono', monospace; }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-content {
+            padding: 2rem; max-width: 1400px; margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+
+        .welcome-header { margin-bottom: 2rem; animation: fadeIn 0.6s ease; }
+
+        .welcome-title {
+            font-size: 2rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle { font-size: 0.95rem; color: var(--text-dim); margin-bottom: 0.5rem; }
+
+        .quantum-line {
+            font-size: 0.75rem; color: var(--khensani-gold);
+            letter-spacing: 3px; font-family: 'Space Mono', monospace; text-transform: uppercase;
+        }
+
+        /* Strategic Overview */
+        .strategic-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 15px; padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .metric-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1rem;
+        }
+        .metric-icon { font-size: 2rem; color: var(--principal-primary); }
+        .metric-value {
+            font-size: 2.5rem; font-weight: 700;
+            background: linear-gradient(45deg, var(--ai-gold), var(--principal-primary));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .metric-label { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .metric-trend { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+        .trend-up { color: var(--learning-green); }
+        .trend-down { color: var(--danger); }
+
+        .progress-container { margin-top: 1rem; }
+        .progress-label {
+            display: flex; justify-content: space-between;
+            margin-bottom: 0.5rem; font-size: 0.9rem;
+        }
+        .progress-bar {
+            height: 8px; background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 0.3s ease;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem; margin-bottom: 2rem;
+        }
+        .action-btn {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 12px; padding: 1.5rem; color: white;
+            display: flex; flex-direction: column; align-items: center;
+            gap: 0.8rem; cursor: pointer;
+            transition: all 0.3s ease; text-align: center;
+        }
+        .action-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+        }
+        .action-icon { font-size: 1.8rem; color: var(--principal-primary); }
+        .action-text { font-size: 0.9rem; font-weight: 500; }
+
+        /* Chart Grid */
+        .chart-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .chart-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 15px; padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .chart-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--principal-primary), var(--ai-gold));
+            border-radius: 15px 15px 0 0;
+        }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .chart-title { font-size: 1.2rem; font-weight: 600; color: var(--ai-gold); }
+        .chart-container { width: 100%; height: 300px; position: relative; }
+
+        .initiative-chart { height: 350px; }
+        .timeline-chart { height: 350px; }
+        .milestone-chart { height: 320px; }
+        .impact-chart { height: 320px; }
+
+        .form-control {
+            background: rgba(15, 20, 35, 0.48);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 6px; color: var(--text);
+            padding: 0.5rem 1rem; font-size: 0.9rem;
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+        }
+        .form-control:focus { outline: none; border-color: var(--ai-gold); }
+        .form-control option { background: #0a0a2a; color: var(--text); }
+
+        /* Initiatives */
+        .initiatives-section {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 15px; padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            margin-bottom: 2rem;
+        }
+        .section-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .section-icon { font-size: 1.5rem; color: var(--principal-primary); }
+        .section-title { font-size: 1.4rem; font-weight: 700; color: var(--ai-gold); }
+
+        .initiatives-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .initiative-card {
+            background: rgba(255, 107, 107, 0.1);
+            padding: 1.5rem; border-radius: 10px;
+            border-left: 4px solid var(--strategy-purple);
+            transition: all 0.3s ease;
+        }
+        .initiative-card.creator-initiative {
+            border-left-color: var(--creator-pink);
+            background: rgba(255, 105, 180, 0.08);
+        }
+        .initiative-card:hover { background: rgba(255, 107, 107, 0.15); transform: translateY(-3px); }
+
+        .initiative-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .initiative-name { font-weight: 600; font-size: 1.1rem; color: var(--strategy-purple); }
+        .initiative-card.creator-initiative .initiative-name { color: var(--creator-pink); }
+        .initiative-status {
+            display: inline-block; padding: 0.3rem 0.8rem;
+            border-radius: 15px; font-size: 0.8rem; font-weight: 600;
+        }
+        .status-active { background: rgba(0, 255, 170, 0.2); color: var(--learning-green); border: 1px solid var(--learning-green); }
+        .status-planning { background: rgba(255, 170, 0, 0.2); color: var(--warning); border: 1px solid var(--warning); }
+        .status-completed { background: rgba(0, 168, 255, 0.2); color: var(--development-blue); border: 1px solid var(--development-blue); }
+
+        .initiative-content { font-size: 0.9rem; opacity: 0.9; line-height: 1.5; margin-bottom: 1rem; }
+        .initiative-metrics {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem; margin-bottom: 1rem;
+        }
+        .metric {
+            text-align: center; padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+        }
+        .metric-value { font-size: 1.2rem; font-weight: 700; color: var(--ai-gold); }
+        .metric-label { font-size: 0.7rem; color: var(--text-dim); margin: 0; }
+
+        /* Timeline */
+        .timeline-section {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--principal-primary);
+            border-radius: 15px; padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.3);
+            margin-bottom: 2rem;
+        }
+        .timeline { position: relative; padding-left: 2rem; }
+        .timeline::before {
+            content: ''; position: absolute;
+            left: 0; top: 0; bottom: 0; width: 2px;
+            background: linear-gradient(to bottom, var(--principal-primary), var(--ai-gold));
+        }
+        .timeline-item { position: relative; margin-bottom: 2rem; padding-left: 2rem; }
+        .timeline-item::before {
+            content: ''; position: absolute;
+            left: -1.5rem; top: 0.5rem;
+            width: 12px; height: 12px; border-radius: 50%;
+            background: var(--principal-primary);
+            border: 2px solid var(--ai-gold);
+        }
+        .timeline-date { font-weight: 600; color: var(--principal-primary); margin-bottom: 0.5rem; }
+        .timeline-content {
+            background: rgba(255, 107, 107, 0.1);
+            padding: 1rem; border-radius: 8px;
+            border-left: 3px solid var(--principal-primary);
+        }
+        .timeline-title { font-weight: 600; margin-bottom: 0.5rem; color: var(--ai-gold); }
+
+        /* Creator Strategic Section */
+        .creator-strategy {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--creator-pink);
+            border-radius: 15px; padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
+            position: relative;
+        }
+        .creator-strategy::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            border-radius: 15px 15px 0 0;
+        }
+        .creator-strategy-title {
+            font-size: 1.4rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.4rem;
+        }
+        .creator-strategy-sub { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+        .creator-strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+        .creator-strategy-card {
+            background: rgba(255, 105, 180, 0.08);
+            border: 1px solid rgba(255, 105, 180, 0.4);
+            border-radius: 10px; padding: 1rem; text-align: center;
+            transition: all 0.3s ease;
+        }
+        .creator-strategy-card:hover {
+            background: rgba(255, 105, 180, 0.18);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+        }
+        .creator-strategy-icon { font-size: 1.6rem; color: var(--creator-pink); margin-bottom: 0.5rem; }
+        .creator-strategy-value {
+            font-size: 1.5rem; font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+        .creator-strategy-label { font-size: 0.78rem; color: var(--text-dim); }
+
+        /* Alerts */
+        .alert-system {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--warning);
+            border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;
+            box-shadow: 0 0 25px rgba(255, 170, 0, 0.3);
+        }
+        .alert-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .alert-icon { font-size: 1.5rem; color: var(--warning); animation: pulse 1.5s infinite; }
+        .alert-item {
+            padding: 1rem; background: rgba(255, 170, 0, 0.1);
+            border-radius: 8px; margin-bottom: 0.5rem;
+            border-left: 4px solid var(--warning);
+            transition: all 0.3s ease;
+        }
+        .alert-item:hover { background: rgba(255, 170, 0, 0.15); transform: translateX(5px); }
+        .alert-time { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem; }
+
+        /* ============ CORPORATE AD — CANONICAL KD ROTATING LOGO ============ */
+        .corporate-ad-center {
+            background: linear-gradient(135deg, rgba(70, 25, 115, 0.22), rgba(110, 80, 20, 0.18));
+            border: 2px solid rgba(200, 164, 80, 0.4);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            display: flex; align-items: center; justify-content: center;
+            gap: 1.5rem; flex-wrap: wrap;
+            text-decoration: none; color: inherit;
+            transition: all 0.3s ease;
+            position: relative; overflow: hidden;
+            min-height: 100px;
+        }
+        .corporate-ad-center::before {
+            content: '';
+            position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(200, 164, 80, 0.08), transparent);
+            animation: kd-shine 4s infinite;
+        }
+        @keyframes kd-shine { 0% { left: -100%; } 100% { left: 100%; } }
+        .corporate-ad-center:hover {
+            border-color: var(--khensani-gold);
+            box-shadow: 0 0 40px rgba(200, 164, 80, 0.3);
+            transform: translateY(-3px);
+        }
+        .corporate-ad-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--khensani-cream);
+            letter-spacing: 1px;
+        }
+        .corporate-ad-text strong {
+            color: var(--khensani-gold);
+            font-size: 1.15rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .kd-rotating-logo {
+            height: 65px; width: 65px;
+            object-fit: contain; background: transparent; flex-shrink: 0;
+            opacity: 1 !important;
+            filter: brightness(0.78) contrast(1.28)
+                    drop-shadow(0 0 7px rgba(80, 20, 135, 0.98))
+                    drop-shadow(0 0 16px rgba(138, 43, 226, 0.95))
+                    drop-shadow(0 0 25px rgba(200, 164, 80, 0.72)) !important;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            animation: kd-superposition-visible 6s ease-in-out infinite !important;
+        }
+        @keyframes kd-superposition-visible {
+            0%, 100% { transform: perspective(600px) rotateY(0deg) rotateZ(0deg) scale(1); }
+            25% { transform: perspective(600px) rotateY(90deg) rotateZ(4deg) scale(1.08); }
+            50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); }
+            75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); }
+        }
+
+        /* ============ FLOATING FOOTER ============ */
+        .floating-footer {
+            padding: 30px 20px 20px;
+            margin-top: 60px;
+            text-align: center;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            position: relative; z-index: 1;
+        }
+        .footer-logo-row {
+            display: flex; justify-content: center; align-items: center;
+            gap: 40px; margin-bottom: 15px; flex-wrap: wrap;
+        }
+        .footer-logo {
+            height: 55px; width: auto; opacity: 0.85;
+            transition: all 0.3s ease; background: transparent;
+            filter: drop-shadow(0 0 15px rgba(255, 107, 107, 0.3));
+        }
+        .footer-logo:hover {
+            opacity: 1; transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(255, 107, 107, 0.5));
+        }
+        .mindtech-glitch {
+            color: #FF6B6B; font-weight: bold; font-size: 15px;
+            position: relative; display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px #FF6B6B, 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px #FF6B6B, 0 0 30px #0066FF, 0 0 40px #8A2BE2; }
+            100% { text-shadow: 0 0 10px #FF6B6B, 0 0 20px #0066FF; }
+        }
+        .floating-footer .copyright { font-size: 0.78rem; color: #A0AAB8; margin-bottom: 6px; }
+        .floating-footer .footer-bottom {
+            margin-top: 12px; font-size: 10px;
+            color: #666; font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        /* Animations */
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInRight { from { transform: translateX(50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Responsive */
+        @media (max-width: 1200px) { .chart-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) {
+            .tech-navbar .khensani-logo { height: 70px; }
+            .brand-name { font-size: 1rem; }
+        }
+        @media (max-width: 768px) {
+            body { padding-top: 80px; }
+            .tech-navbar { height: 64px; padding: 0 0.8rem; }
+            .tech-navbar .khensani-logo { height: 60px; }
+            .brand-sub { display: none; }
+            .main-content { padding: 1rem; }
+            .strategic-overview { grid-template-columns: 1fr; }
+            .chart-grid { grid-template-columns: 1fr; }
+            .initiatives-grid { grid-template-columns: 1fr; }
+            .quick-actions { grid-template-columns: repeat(2, 1fr); }
+            .initiative-chart, .timeline-chart, .milestone-chart, .impact-chart { height: 280px; }
+            .notif-panel { width: 300px; right: -60px; }
+            .footer-logo-row { gap: 20px; }
+            .footer-logo { height: 42px; }
+        }
+        @media (max-width: 480px) {
+            .creator-strategy-grid { grid-template-columns: 1fr; }
+            .welcome-title { font-size: 1.5rem; }
+            .nav-back-btn span { display: none; }
+            .quick-actions { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .kd-rotating-logo, .corporate-ad-center::before { animation: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <!-- ============ TECH NAVBAR ============ -->
+    <nav class="tech-navbar">
+        <a href="mindflow-portal.html" title="Khensani AI · MindFlow Portal">
+            <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png" alt="Khensani AI" class="khensani-logo">
+        </a>
+
+        <div class="brand-block">
+            <div class="brand-icon">⚛️</div>
+            <div>
+                <div class="brand-name">KHENSANI AI</div>
+                <div class="brand-sub">PRINCIPAL · STRATEGIC PLANNING</div>
+            </div>
+        </div>
+
+        <div class="nav-spacer"></div>
+
+        <a href="mindflow-portal.html" class="nav-back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </a>
+
+        <div class="notif-wrap">
+            <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">5</span>
+            </div>
+            <div class="notif-panel" id="notifPanel">
+                <div class="notif-header">
+                    <div class="notif-title">🔔 Notifications</div>
+                    <div class="notif-clear" onclick="clearNotifications()">Clear all</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">🎬 Creator Platform Strategic Milestone</div>
+                    <div class="notif-item-text">Creator platform hit 96% quantum screen pass rate — strategic success.</div>
+                    <div class="notif-item-time">12 min ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">💰 Resource Allocation Review Needed</div>
+                    <div class="notif-item-text">Digital Transformation initiative requires additional R800,000.</div>
+                    <div class="notif-item-time">2 days ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">🤝 Community Partnership Opportunity</div>
+                    <div class="notif-item-text">Local tech company offering R1.2M sponsorship for STEM expansion.</div>
+                    <div class="notif-item-time">1 week ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">🎯 Strategic Goal Adjustment</div>
+                    <div class="notif-item-text">Q3 performance metrics indicate recalibration needed.</div>
+                    <div class="notif-item-time">2 weeks ago</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">⭐ Creator Sponsorship Pipeline</div>
+                    <div class="notif-item-text">4 new sponsors expressing interest in creator content platform.</div>
+                    <div class="notif-item-time">3 weeks ago</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content">
+
+        <div class="welcome-header">
+            <h1 class="welcome-title">Strategic Planning Command</h1>
+            <p class="welcome-subtitle">Dr. Sarah Chen · Principal · Institutional Vision & Long-Term Strategy</p>
+            <p class="quantum-line">⚛️ QUANTUM-VERIFIED · CHSH S=2.8284 · SA PATENT 2026/05142</p>
+        </div>
+
+        <!-- Strategic Overview -->
+        <div class="strategic-overview">
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon"><i class="fas fa-bullseye"></i></div>
+                    <div class="metric-value">12</div>
+                </div>
+                <div class="metric-label">Active Strategic Initiatives</div>
+                <div class="metric-trend trend-up"><i class="fas fa-arrow-up"></i><span>3 new initiatives this quarter</span></div>
+                <div class="progress-container">
+                    <div class="progress-label"><span>Overall Progress</span><span>68%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 68%"></div></div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon"><i class="fas fa-flag-checkered"></i></div>
+                    <div class="metric-value">8</div>
+                </div>
+                <div class="metric-label">Milestones Achieved</div>
+                <div class="metric-trend trend-up"><i class="fas fa-arrow-up"></i><span>2 milestones completed</span></div>
+                <div class="progress-container">
+                    <div class="progress-label"><span>Annual Target</span><span>67%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 67%"></div></div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon"><i class="fas fa-chart-line"></i></div>
+                    <div class="metric-value">85%</div>
+                </div>
+                <div class="metric-label">Performance vs Goals</div>
+                <div class="metric-trend trend-up"><i class="fas fa-arrow-up"></i><span>5% above target</span></div>
+                <div class="progress-container">
+                    <div class="progress-label"><span>Goal Achievement</span><span>85%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="metric-value">4</div>
+                </div>
+                <div class="metric-label">Strategic Risks</div>
+                <div class="metric-trend trend-down"><i class="fas fa-exclamation-circle"></i><span>Requires attention</span></div>
+                <div class="progress-container">
+                    <div class="progress-label"><span>Risk Mitigation</span><span>75%</span></div>
+                    <div class="progress-bar"><div class="progress-fill" style="width: 75%"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-btn" onclick="StrategicPlanning.newInitiative()">
+                <i class="fas fa-plus-circle action-icon"></i>
+                <div class="action-text">New Initiative</div>
+            </div>
+            <div class="action-btn" onclick="StrategicPlanning.performanceReview()">
+                <i class="fas fa-chart-bar action-icon"></i>
+                <div class="action-text">Performance Review</div>
+            </div>
+            <div class="action-btn" onclick="StrategicPlanning.riskAssessment()">
+                <i class="fas fa-shield-alt action-icon"></i>
+                <div class="action-text">Risk Assessment</div>
+            </div>
+            <div class="action-btn" onclick="StrategicPlanning.resourceAllocation()">
+                <i class="fas fa-tasks action-icon"></i>
+                <div class="action-text">Resource Allocation</div>
+            </div>
+            <div class="action-btn" onclick="StrategicPlanning.aiStrategy()">
+                <i class="fas fa-robot action-icon"></i>
+                <div class="action-text">Khensani AI Strategy</div>
+            </div>
+            <div class="action-btn" onclick="StrategicPlanning.roadmapView()">
+                <i class="fas fa-road action-icon"></i>
+                <div class="action-text">Strategic Roadmap</div>
+            </div>
+        </div>
+
+        <!-- Chart Grid -->
+        <div class="chart-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Strategic Initiative Progress</div>
+                    <select id="initiativeFilter" class="form-control">
+                        <option>All Initiatives</option>
+                        <option>Academic Excellence</option>
+                        <option>Infrastructure</option>
+                        <option>Community Engagement</option>
+                    </select>
+                </div>
+                <div class="chart-container initiative-chart"><canvas id="initiativeChart"></canvas></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Strategic Timeline & Milestones</div>
+                    <select id="timelineFilter" class="form-control">
+                        <option>2024 Roadmap</option>
+                        <option>3-Year Vision</option>
+                        <option>5-Year Plan</option>
+                    </select>
+                </div>
+                <div class="chart-container timeline-chart"><canvas id="timelineChart"></canvas></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Milestone Achievement Status</div>
+                </div>
+                <div class="chart-container milestone-chart"><canvas id="milestoneChart"></canvas></div>
+            </div>
+
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">Strategic Impact Measurement</div>
+                </div>
+                <div class="chart-container impact-chart"><canvas id="impactChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- Creator Platform Strategic Vision -->
+        <div class="creator-strategy">
+            <div class="creator-strategy-title">🎬 Creator Platform — Strategic Vision</div>
+            <div class="creator-strategy-sub">Long-term strategy for curriculum-gated student creator platform · sponsor expansion · quantum-verified content governance</div>
+
+            <div class="creator-strategy-grid">
+                <div class="creator-strategy-card">
+                    <div class="creator-strategy-icon"><i class="fas fa-rocket"></i></div>
+                    <div class="creator-strategy-value" id="creatorGrowthTarget">200%</div>
+                    <div class="creator-strategy-label">3-Year Growth Target</div>
+                </div>
+                <div class="creator-strategy-card">
+                    <div class="creator-strategy-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                    <div class="creator-strategy-value" id="creatorSponsorPipeline">4</div>
+                    <div class="creator-strategy-label">Sponsor Pipeline</div>
+                </div>
+                <div class="creator-strategy-card">
+                    <div class="creator-strategy-icon"><i class="fas fa-star"></i></div>
+                    <div class="creator-strategy-value" id="creatorSponsorPicks">63</div>
+                    <div class="creator-strategy-label">⭐ Sponsor Picks YTD</div>
+                </div>
+                <div class="creator-strategy-card">
+                    <div class="creator-strategy-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="creator-strategy-value" id="creatorQuantumPass">96%</div>
+                    <div class="creator-strategy-label">Quantum Screen Pass</div>
+                </div>
+                <div class="creator-strategy-card">
+                    <div class="creator-strategy-icon"><i class="fas fa-chess"></i></div>
+                    <div class="creator-strategy-value" id="creatorChessTarget">50</div>
+                    <div class="creator-strategy-label">Chess Events Target</div>
+                </div>
+                <div class="creator-strategy-card">
+                    <div class="creator-strategy-icon"><i class="fas fa-globe-africa"></i></div>
+                    <div class="creator-strategy-value" id="creatorReach">12</div>
+                    <div class="creator-strategy-label">Provinces Reached</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Initiatives Section -->
+        <div class="initiatives-section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-chess-queen"></i></div>
+                <h3 class="section-title">Key Strategic Initiatives</h3>
+            </div>
+            <div class="initiatives-grid">
+                <div class="initiative-card">
+                    <div class="initiative-header">
+                        <div class="initiative-name">STEM Excellence Program</div>
+                        <span class="initiative-status status-active">Active</span>
+                    </div>
+                    <div class="initiative-content">Enhance science and technology education through advanced labs, teacher training, and industry partnerships.</div>
+                    <div class="initiative-metrics">
+                        <div class="metric"><div class="metric-value">75%</div><div class="metric-label">Progress</div></div>
+                        <div class="metric"><div class="metric-value">R2.5M</div><div class="metric-label">Budget</div></div>
+                        <div class="metric"><div class="metric-value">Q3</div><div class="metric-label">Deadline</div></div>
+                    </div>
+                    <div class="progress-container"><div class="progress-bar"><div class="progress-fill" style="width: 75%"></div></div></div>
+                </div>
+
+                <div class="initiative-card">
+                    <div class="initiative-header">
+                        <div class="initiative-name">Digital Transformation</div>
+                        <span class="initiative-status status-active">Active</span>
+                    </div>
+                    <div class="initiative-content">Implement comprehensive digital learning infrastructure and AI-powered educational tools across all departments.</div>
+                    <div class="initiative-metrics">
+                        <div class="metric"><div class="metric-value">60%</div><div class="metric-label">Progress</div></div>
+                        <div class="metric"><div class="metric-value">R4.2M</div><div class="metric-label">Budget</div></div>
+                        <div class="metric"><div class="metric-value">Q4</div><div class="metric-label">Deadline</div></div>
+                    </div>
+                    <div class="progress-container"><div class="progress-bar"><div class="progress-fill" style="width: 60%"></div></div></div>
+                </div>
+
+                <div class="initiative-card">
+                    <div class="initiative-header">
+                        <div class="initiative-name">Community Outreach</div>
+                        <span class="initiative-status status-planning">Planning</span>
+                    </div>
+                    <div class="initiative-content">Develop partnerships with local communities and businesses to enhance student opportunities and school resources.</div>
+                    <div class="initiative-metrics">
+                        <div class="metric"><div class="metric-value">25%</div><div class="metric-label">Progress</div></div>
+                        <div class="metric"><div class="metric-value">R1.8M</div><div class="metric-label">Budget</div></div>
+                        <div class="metric"><div class="metric-value">2025</div><div class="metric-label">Deadline</div></div>
+                    </div>
+                    <div class="progress-container"><div class="progress-bar"><div class="progress-fill" style="width: 25%"></div></div></div>
+                </div>
+
+                <div class="initiative-card creator-initiative">
+                    <div class="initiative-header">
+                        <div class="initiative-name">🎬 Creator Platform Scale-Up</div>
+                        <span class="initiative-status status-active">Active</span>
+                    </div>
+                    <div class="initiative-content">Scale curriculum-gated student creator platform nationally with sponsor-backed content and quantum-verified governance.</div>
+                    <div class="initiative-metrics">
+                        <div class="metric"><div class="metric-value">48%</div><div class="metric-label">Progress</div></div>
+                        <div class="metric"><div class="metric-value">R3.2M</div><div class="metric-label">Budget</div></div>
+                        <div class="metric"><div class="metric-value">2026</div><div class="metric-label">Deadline</div></div>
+                    </div>
+                    <div class="progress-container"><div class="progress-bar"><div class="progress-fill" style="width: 48%; background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));"></div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="timeline-section">
+            <div class="section-header">
+                <div class="section-icon"><i class="fas fa-road"></i></div>
+                <h3 class="section-title">Strategic Development Timeline</h3>
+            </div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Q1 2024 - Completed</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Digital Infrastructure Phase 1</div>
+                        <p>Successfully implemented smart classrooms and upgraded network infrastructure across campus.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Q2 2024 - In Progress</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">STEM Lab Expansion</div>
+                        <p>Advanced science laboratories under construction. Equipment procurement 75% complete.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Q3 2024 - Upcoming</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Teacher Development Program</div>
+                        <p>Comprehensive professional development and AI training for all teaching staff.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2025 - Future Planning</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Sustainability Initiative</div>
+                        <p>Green campus development and renewable energy integration planning phase.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026 - National Expansion</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">🎬 Creator Platform National Rollout</div>
+                        <p>Nationwide expansion of curriculum-gated student creator platform with sponsor network.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        <div class="alert-system">
+            <div class="alert-header">
+                <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <h3>Strategic Planning Alerts</h3>
+            </div>
+            <div class="alert-item">
+                <strong>Resource Allocation Review Needed</strong>
+                <p>Digital Transformation initiative requires additional R800,000 for AI integration components.</p>
+                <div class="alert-time">Updated 2 days ago</div>
+            </div>
+            <div class="alert-item">
+                <strong>Community Partnership Opportunity</strong>
+                <p>Local tech company offering R1.2M sponsorship for STEM program expansion. Response needed within 14 days.</p>
+                <div class="alert-time">1 week ago</div>
+            </div>
+            <div class="alert-item">
+                <strong>Strategic Goal Adjustment</strong>
+                <p>Q3 performance metrics indicate need to recalibrate academic excellence targets based on current trends.</p>
+                <div class="alert-time">2 weeks ago</div>
+            </div>
+        </div>
+
+        <!-- ============ CORPORATE AD — CANONICAL KD ROTATING LOGO ============ -->
+        <a href="https://kdconcepts.com" target="_blank" rel="noopener" id="corporate-ad-center" class="corporate-ad-center">
+            <img id="corporate-ad-logo"
+                 src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png"
+                 alt="KD Concepts"
+                 class="kd-rotating-logo"
+                 onerror="this.style.display='none'">
+            <div class="corporate-ad-text">
+                <strong id="corporate-ad-title">Strategic Planning Sponsored by KD Concepts</strong>
+                <span id="corporate-ad-tagline">Advertising · Platform Exposure · Circular Economy Partner</span>
+            </div>
+            <i class="fas fa-external-link-alt" style="color: var(--khensani-gold); font-size: 1.2rem;"></i>
+        </a>
+    </main>
+
+    <!-- ============ FLOATING FOOTER ============ -->
+    <footer class="floating-footer">
+        <div class="footer-logo-row">
+            <a href="https://mindtech.africa" target="_blank" rel="noopener" aria-label="MindTech Industries">
+                <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                     alt="EntangleGuard · MindTech Industries"
+                     class="footer-logo"
+                     onerror="this.style.display='none'">
+            </a>
+        </div>
+        <p class="copyright">
+            © 2026 MindFlow · Khensani AI · Powered by
+            <a href="https://mindtech.africa" target="_blank" style="text-decoration:none;">
+                <span class="mindtech-glitch">MindTech</span>
+            </a>
+            · Transforming African education
+        </p>
+        <div class="footer-bottom">
+            ⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Jobs db6h46o4qg6s73c4q1n0 · db6h3eslf4us73c5c80g
+        </div>
+    </footer>
+
+    <script>
+        // ============ PARTICLES — SALARYPLAN CALM ============
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55 },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 2.5, random: true },
+                line_linked: { enable: true, distance: 150, color: "#00B4D8", opacity: 0.08 },
+                move: { enable: true, speed: 0.8 }
+            },
+            interactivity: { events: { onhover: { enable: true, mode: "repulse" } } }
+        });
+
+        // ============ NOTIFICATIONS ============
+        function toggleNotifPanel() { document.getElementById('notifPanel').classList.toggle('open'); }
+        function clearNotifications() {
+            const badge = document.getElementById('notifBadge');
+            badge.textContent = '0';
+            badge.style.display = 'none';
+            document.querySelectorAll('.notif-item').forEach(item => { item.style.opacity = '0.4'; });
+        }
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.getElementById('notifBell');
+            if (panel && bell && !panel.contains(e.target) && !bell.contains(e.target)) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // ============ STRATEGIC PLANNING ============
+        const StrategicPlanning = {
+            newInitiative: function() { this.showNotification('🎯 Opening new strategic initiative planner...', 'info'); },
+            performanceReview: function() { this.showNotification('📊 Loading strategic performance dashboard...', 'info'); },
+            riskAssessment: function() { this.showNotification('🛡️ Accessing risk assessment and mitigation tools...', 'info'); },
+            resourceAllocation: function() { this.showNotification('💰 Opening resource allocation and budget planning...', 'info'); },
+            aiStrategy: function() {
+                this.showNotification('🤖 Khensani AI analyzing strategic patterns...', 'info');
+                setTimeout(() => {
+                    const insights = [
+                        "🎯 STEM program showing 92% success rate - consider expansion to junior grades",
+                        "📈 Digital transformation on track - recommend accelerating teacher AI training",
+                        "🤝 Community engagement metrics below target - suggest partnership accelerator",
+                        "🚀 Infrastructure development aligned with 3-year vision - maintain current pace",
+                        "🎬 Creator platform scale-up on track — sponsor pipeline growing"
+                    ];
+                    const randomInsight = insights[Math.floor(Math.random() * insights.length)];
+                    this.showNotification(`💡 Khensani AI Strategic Insight:\n${randomInsight}`, 'success');
+                }, 3000);
+            },
+            roadmapView: function() { this.showNotification('🗺️ Loading comprehensive strategic roadmap...', 'info'); },
+
+            showNotification: function(message, type) {
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed; top: 100px; right: 20px;
+                    background: ${type === 'success' ? 'rgba(0, 255, 170, 0.9)' :
+                                 type === 'info' ? 'rgba(255, 107, 107, 0.9)' :
+                                 'rgba(255, 51, 102, 0.9)'};
+                    color: white; padding: 15px 20px;
+                    border-radius: 10px; z-index: 10000;
+                    max-width: 400px;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                    border-left: 4px solid ${type === 'success' ? 'var(--learning-green)' :
+                                         type === 'info' ? 'var(--principal-primary)' :
+                                         'var(--danger)'};
+                    animation: slideInRight 0.3s ease;
+                    white-space: pre-line;
+                `;
+                notification.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas ${type === 'success' ? 'fa-check-circle' :
+                                      type === 'info' ? 'fa-info-circle' :
+                                      'fa-exclamation-triangle'}"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => notification.remove(), 500);
+                }, 4000);
+            }
+        };
+
+        // ============ CHARTS ============
+        let charts = {};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                initializeCharts();
+                animateCreatorStrategy();
+                console.log('✅ Strategic Planning charts initialized successfully');
+            } catch (error) {
+                console.error('❌ Chart initialization failed:', error);
+                document.querySelectorAll('.chart-container').forEach(container => {
+                    container.innerHTML = '<div style="color: #FF6B6B; text-align: center; padding: 2rem;">Chart loading failed. Please refresh the page.</div>';
+                });
+            }
+        });
+
+        function initializeCharts() {
+            // Initiative Chart
+            const initiativeCtx = document.getElementById('initiativeChart').getContext('2d');
+            charts.initiative = new Chart(initiativeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['STEM Excellence', 'Digital Transformation', 'Teacher Development', 'Infrastructure', 'Community Outreach', 'Creator Platform'],
+                    datasets: [{
+                        label: 'Progress (%)',
+                        data: [75, 60, 45, 80, 25, 48],
+                        backgroundColor: [
+                            'rgba(255, 107, 107, 0.7)', 'rgba(0, 168, 255, 0.7)', 'rgba(0, 255, 170, 0.7)',
+                            'rgba(255, 215, 0, 0.7)', 'rgba(138, 43, 226, 0.7)', 'rgba(255, 105, 180, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 107, 107, 1)', 'rgba(0, 168, 255, 1)', 'rgba(0, 255, 170, 1)',
+                            'rgba(255, 215, 0, 1)', 'rgba(138, 43, 226, 1)', 'rgba(255, 105, 180, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    },
+                    plugins: { legend: { labels: { color: 'rgba(255, 255, 255, 0.7)' } } }
+                }
+            });
+
+            // Timeline Chart
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            charts.timeline = new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'],
+                    datasets: [
+                        { label: 'Strategic Goal Achievement', data: [25, 35, 45, 55, 65, 75, 80, 85], borderColor: 'rgba(255, 107, 107, 1)', backgroundColor: 'rgba(255, 107, 107, 0.1)', borderWidth: 3, fill: true, tension: 0.4 },
+                        { label: 'Target Trajectory', data: [20, 30, 45, 60, 70, 80, 85, 90], borderColor: 'rgba(0, 168, 255, 1)', backgroundColor: 'rgba(0, 168, 255, 0.1)', borderWidth: 2, borderDash: [5, 5], fill: false, tension: 0.4 },
+                        { label: '🎬 Creator Platform Trajectory', data: [5, 10, 18, 25, 32, 40, 44, 48], borderColor: 'rgba(255, 105, 180, 1)', backgroundColor: 'rgba(255, 105, 180, 0.1)', borderWidth: 3, fill: true, tension: 0.4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, max: 100, ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: 'rgba(255, 255, 255, 0.7)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
+                    },
+                    plugins: { legend: { labels: { color: 'rgba(255, 255, 255, 0.7)' } } }
+                }
+            });
+
+            // Milestone Chart
+            const milestoneCtx = document.getElementById('milestoneChart').getContext('2d');
+            charts.milestone = new Chart(milestoneCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'In Progress', 'On Track', 'At Risk', 'Not Started'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: ['#00FFAA', '#00A8FF', '#FFD700', '#FF6B6B', '#8A2BE2'],
+                        borderColor: ['#00FFAA', '#00A8FF', '#FFD700', '#FF6B6B', '#8A2BE2'],
+                        borderWidth: 3, hoverOffset: 20
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: { legend: { position: 'bottom', labels: { color: 'white', padding: 15, font: { size: 11 } } } }
+                }
+            });
+
+            // Impact Chart
+            const impactCtx = document.getElementById('impactChart').getContext('2d');
+            charts.impact = new Chart(impactCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Academic Excellence', 'Infrastructure', 'Technology', 'Community', 'Sustainability', 'Innovation'],
+                    datasets: [
+                        {
+                            label: 'Current Performance',
+                            data: [85, 75, 80, 60, 45, 70],
+                            backgroundColor: 'rgba(255, 107, 107, 0.3)',
+                            borderColor: '#FF6B6B',
+                            pointBackgroundColor: '#FF6B6B',
+                            pointBorderColor: '#ffffff',
+                            pointHoverBackgroundColor: '#ffffff',
+                            pointHoverBorderColor: '#FF6B6B',
+                            pointBorderWidth: 2, pointRadius: 4, borderWidth: 3
+                        },
+                        {
+                            label: 'Strategic Target',
+                            data: [90, 85, 95, 80, 70, 85],
+                            backgroundColor: 'rgba(0, 168, 255, 0.3)',
+                            borderColor: '#00A8FF',
+                            pointBackgroundColor: '#00A8FF',
+                            pointBorderColor: '#ffffff',
+                            pointHoverBackgroundColor: '#ffffff',
+                            pointHoverBorderColor: '#00A8FF',
+                            pointBorderWidth: 2, pointRadius: 4, borderWidth: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { color: 'white', font: { size: 11, weight: 'bold' }, padding: 15 } },
+                        tooltip: { backgroundColor: 'rgba(0, 0, 0, 0.8)', titleColor: '#00FFAA', bodyColor: 'white' }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            pointLabels: { color: 'white', font: { size: 11, weight: 'bold' } },
+                            ticks: { color: 'white', backdropColor: 'transparent', font: { size: 9 }, stepSize: 10 },
+                            min: 0, max: 100
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============ CREATOR STRATEGY ANIMATION ============
+        function animateCreatorStrategy() {
+            const metrics = [
+                { id: 'creatorSponsorPipeline', target: 4, suffix: '' },
+                { id: 'creatorSponsorPicks', target: 63, suffix: '' },
+                { id: 'creatorQuantumPass', target: 96, suffix: '%' },
+                { id: 'creatorChessTarget', target: 50, suffix: '' },
+                { id: 'creatorReach', target: 12, suffix: '' }
+            ];
+            metrics.forEach(m => {
+                const el = document.getElementById(m.id);
+                if (!el) return;
+                let current = 0;
+                const step = m.target / 40;
+                const interval = setInterval(() => {
+                    current += step;
+                    if (current >= m.target) { current = m.target; clearInterval(interval); }
+                    el.textContent = Math.floor(current) + m.suffix;
+                }, 30);
+            });
+        }
+
+        // ============ CORPORATE AD DYNAMIC LOADER (CANONICAL) ============
+        async function loadCorporateAds() {
+            const db = window.__khensaniFirebase?.db;
+            if (!db) return;
+            try {
+                const { collection, query, where, orderBy, limit, getDocs, updateDoc, doc, increment } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js");
+                const now = new Date();
+                const q = query(collection(db, 'corporate_ads'), where('approved', '==', true), orderBy('tier', 'desc'), limit(5));
+                const snap = await getDocs(q);
+                if (snap.empty) return;
+                const validAds = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                    .filter(a => {
+                        const end = a.endDate?.toDate?.() || (a.endDate ? new Date(a.endDate) : null);
+                        return !end || end > now;
+                    });
+                if (validAds.length === 0) return;
+                const ad = validAds[0];
+                const banner = document.getElementById('corporate-ad-center');
+                const logo = document.getElementById('corporate-ad-logo');
+                const title = document.getElementById('corporate-ad-title');
+                const tagline = document.getElementById('corporate-ad-tagline');
+                if (logo && ad.logoUrl) { logo.src = ad.logoUrl; logo.style.display = ''; }
+                if (title) title.textContent = 'Strategic Planning Sponsored by ' + (ad.companyName || 'Our Sponsor');
+                if (tagline) tagline.textContent = ad.tagline || 'Supporting African education';
+                if (banner && ad.linkUrl) banner.href = ad.linkUrl;
+                try { await updateDoc(doc(db, 'corporate_ads', ad.id), { impressions: increment(1) }); } catch(e) {}
+                console.log('[Ads] Loaded:', ad.companyName);
+            } catch(e) {
+                console.log('[Ads] KD fallback active:', e.message);
+            }
+        }
+
+        function openKDConcepts() { window.open('https://kdconcepts.com', '_blank'); }
+
+        // ============ INIT ============
+        window.addEventListener('load', function() {
+            loadCorporateAds();
+            console.log('⚛️ Principal Strategic Planning — Quantum Verified');
+            console.log('   CHSH S=2.8284 · SA Patent 2026/05142');
+            console.log('   🌊 Calm particles: 55 · 2 · 0.2 · 0.8');
+            console.log('   🎬 Creator platform strategic vision integrated');
+            console.log('🎉 PRINCIPAL PORTAL COMPLETE — ALL 6 FILES DELIVERED');
+        });
+
+        window.addEventListener('resize', function() {
+            Object.values(charts).forEach(chart => { if (chart) chart.resize(); });
+        });
+
+        window.toggleNotifPanel = toggleNotifPanel;
+        window.clearNotifications = clearNotifications;
+        window.StrategicPlanning = StrategicPlanning;
+        window.openKDConcepts = openKDConcepts;
+    </script>
+</body>
+</html>

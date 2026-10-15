@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Allocation - HOD Portal · Khensani AI</title>
+
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase SDK 10.8.0 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDummyKeyForMindFlowEducationSuite",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.__khensaniFirebase = { app, auth, db };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log('⚛️ HOD authenticated:', user.email);
+            } else {
+                console.log('⚛️ HOD session: demo mode active');
+            }
+        });
+    </script>
+
+    <style>
+        :root {
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #6A0DAD;
+            --accent-glow: rgba(106, 13, 173, 0.5);
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --card-bg: rgba(15, 20, 35, 0.48);
+            --card-border: rgba(106, 13, 173, 0.3);
+            --ai-gold: #FFD700;
+            --learning-green: #00FFAA;
+            --safety-orange: #FF8C42;
+            --hod-primary: #6A0DAD;
+            --hod-secondary: #8A2BE2;
+            --hod-accent: #9B4DE3;
+            --creator-pink: #FF69B4;
+            --glass-bg: rgba(15, 20, 35, 0.48);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary) 0%, #000022 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-top: 90px;
+        }
+
+        /* Quantum Particles Container */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* ============ TECH NAVBAR (LOCKED STANDARD) ============ */
+        .tech-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background: rgba(10, 10, 16, 0.48);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--hod-primary);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            gap: 1rem;
+            z-index: 2000;
+            box-shadow: 0 0 30px rgba(106, 13, 173, 0.35);
+        }
+
+        .tech-navbar .khensani-logo {
+            height: 90px;
+            width: auto;
+            margin-top: 4px;
+            filter: drop-shadow(0 0 10px rgba(106, 13, 173, 0.6));
+            transition: transform 0.3s ease, filter 0.3s ease;
+            text-decoration: none;
+        }
+
+        .tech-navbar .khensani-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.8));
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--hod-primary), var(--ai-gold));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 0 18px rgba(106, 13, 173, 0.6);
+        }
+
+        .brand-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--hod-primary), var(--ai-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-sub {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .nav-spacer { flex: 1; }
+
+        .nav-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.55rem 1.25rem;
+            border: 2px solid var(--hod-primary);
+            border-radius: 999px;
+            background: transparent;
+            color: var(--ai-gold);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .nav-back-btn:hover {
+            background: var(--hod-primary);
+            color: #fff;
+            box-shadow: 0 0 22px rgba(106, 13, 173, 0.75);
+            transform: translateX(-3px);
+        }
+
+        /* Notification Bell */
+        .notif-wrap {
+            position: relative;
+        }
+
+        .notif-bell {
+            position: relative;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 2px solid var(--hod-primary);
+            background: rgba(106, 13, 173, 0.15);
+            color: var(--ai-gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .notif-bell:hover {
+            background: rgba(106, 13, 173, 0.35);
+            box-shadow: 0 0 20px rgba(106, 13, 173, 0.7);
+        }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 5px;
+            border-radius: 999px;
+            background: var(--creator-pink);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #0a0a16;
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+
+        .notif-panel {
+            position: absolute;
+            top: 60px;
+            right: 0;
+            width: 360px;
+            max-height: 0;
+            overflow: hidden;
+            background: rgba(15, 20, 35, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 2px solid var(--hod-primary);
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            z-index: 2500;
+        }
+
+        .notif-panel.open {
+            max-height: 460px;
+            padding: 1rem;
+        }
+
+        .notif-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid rgba(106, 13, 173, 0.4);
+        }
+
+        .notif-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+        }
+
+        .notif-clear {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .notif-clear:hover { color: var(--creator-pink); }
+
+        .notif-item {
+            padding: 0.7rem 0.8rem;
+            border-radius: 8px;
+            background: rgba(106, 13, 173, 0.12);
+            border-left: 3px solid var(--hod-primary);
+            margin-bottom: 0.6rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notif-item:hover {
+            background: rgba(106, 13, 173, 0.25);
+            transform: translateX(3px);
+        }
+
+        .notif-item.creator {
+            border-left-color: var(--creator-pink);
+            background: rgba(255, 105, 180, 0.1);
+        }
+
+        .notif-item.creator .notif-item-title {
+            color: var(--creator-pink);
+        }
+
+        .notif-item-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+            margin-bottom: 0.25rem;
+        }
+
+        .notif-item-text {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            line-height: 1.4;
+        }
+
+        .notif-item-time {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 0.3rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* ============ MAIN CONTENT ============ */
+        .main-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Welcome Header */
+        .welcome-header {
+            margin-bottom: 2rem;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .welcome-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--hod-primary), var(--ai-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-subtitle {
+            font-size: 0.95rem;
+            color: var(--text-dim);
+            margin-bottom: 0.5rem;
+        }
+
+        .quantum-line {
+            font-size: 0.75rem;
+            color: #C8A450;
+            letter-spacing: 3px;
+            font-family: 'Space Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        /* Glass Layer */
+        .glass-layer {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+
+        /* Resource Sections */
+        .resource-section {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--hod-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 25px rgba(106, 13, 173, 0.3);
+            position: relative;
+        }
+
+        .resource-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--hod-primary), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+
+        /* Budget Overview */
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .budget-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--hod-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(106, 13, 173, 0.3);
+            text-align: center;
+        }
+
+        .budget-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .budget-icon {
+            font-size: 2.5rem;
+            color: var(--hod-primary);
+            margin-bottom: 1rem;
+        }
+
+        .budget-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--ai-gold), var(--hod-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .budget-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .budget-progress {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-high { background: var(--learning-green); }
+        .progress-medium { background: var(--ai-gold); }
+        .progress-low { background: var(--danger); }
+
+        /* Resource Allocation Grid */
+        .allocation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .allocation-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--hod-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(106, 13, 173, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .allocation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--hod-primary), var(--ai-gold));
+        }
+
+        .allocation-card.creator-card::before {
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+        }
+
+        .allocation-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .allocation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .allocation-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        .allocation-department {
+            background: rgba(106, 13, 173, 0.2);
+            color: var(--hod-accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .allocation-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        .allocation-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--ai-gold);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .allocation-actions {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        /* Creator Resource Pill */
+        .creator-resource-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            background: linear-gradient(90deg, rgba(255, 105, 180, 0.2), rgba(255, 215, 0, 0.15));
+            border: 1px solid var(--creator-pink);
+            color: var(--creator-pink);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+        }
+
+        /* Creator Oversight Section */
+        .creator-oversight {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--creator-pink);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.25);
+            position: relative;
+        }
+
+        .creator-oversight::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+
+        .creator-oversight-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.4rem;
+        }
+
+        .creator-oversight-sub {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 1.5rem;
+        }
+
+        .creator-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .creator-metric-card {
+            background: rgba(255, 105, 180, 0.08);
+            border: 1px solid rgba(255, 105, 180, 0.4);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .creator-metric-card:hover {
+            background: rgba(255, 105, 180, 0.18);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.4);
+        }
+
+        .creator-metric-icon {
+            font-size: 1.6rem;
+            color: var(--creator-pink);
+            margin-bottom: 0.5rem;
+        }
+
+        .creator-metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--creator-pink), var(--ai-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+        }
+
+        .creator-metric-label {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--hod-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 0 25px rgba(106, 13, 173, 0.3);
+            position: relative;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--hod-primary), var(--ai-gold));
+            border-radius: 12px 12px 0 0;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--ai-gold);
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            position: relative;
+        }
+
+        /* Form Controls */
+        .form-control {
+            background: rgba(15, 20, 35, 0.48);
+            border: 1px solid var(--hod-primary);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--ai-gold);
+            box-shadow: 0 0 10px rgba(106, 13, 173, 0.5);
+        }
+
+        .form-control option {
+            background: #0a0a2a;
+            color: var(--text);
+        }
+
+        /* Status and Priority Colors */
+        .status-pending { color: var(--warning); }
+        .status-approved { color: var(--learning-green); }
+        .status-in-progress { color: var(--ai-gold); }
+        .status-completed { color: var(--success); }
+
+        .priority-low { background: rgba(0, 168, 255, 0.2); color: #00a8ff; }
+        .priority-medium { background: rgba(255, 215, 0, 0.2); color: var(--ai-gold); }
+        .priority-high { background: rgba(255, 170, 0, 0.2); color: var(--warning); }
+        .priority-critical { background: rgba(255, 51, 102, 0.2); color: var(--danger); }
+
+        /* Action Buttons */
+        .action-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--hod-primary);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .action-btn:hover {
+            background: var(--hod-primary);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.primary {
+            background: var(--hod-primary);
+        }
+
+        .action-btn.primary:hover {
+            background: var(--hod-secondary);
+        }
+
+        /* ============ CORPORATE AD — KD ROTATING LOGO ============ */
+        #corporate-ad-center {
+            background: linear-gradient(135deg, var(--hod-primary), #0066FF);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            border-top: 3px solid var(--learning-green);
+            border-bottom: 3px solid var(--ai-gold);
+            font-family: 'Exo 2', sans-serif;
+            margin: 3rem 0 2rem 0;
+            border-radius: 15px;
+            box-shadow: 0 0 40px rgba(106, 13, 173, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #corporate-ad-center::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        #corporate-ad-center:hover::before {
+            left: 100%;
+        }
+
+        .ad-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .kd-logo-wrap {
+            perspective: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .kd-rotating-logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            animation: kd-superposition-visible 6s linear infinite;
+            filter: brightness(0.78) contrast(1.28) drop-shadow(0 0 14px rgba(255, 215, 0, 0.7));
+        }
+
+        @keyframes kd-superposition-visible {
+            0%   { transform: rotateY(0deg) rotateX(0deg); }
+            25%  { transform: rotateY(90deg) rotateX(8deg); }
+            50%  { transform: rotateY(180deg) rotateX(0deg); }
+            75%  { transform: rotateY(270deg) rotateX(-8deg); }
+            100% { transform: rotateY(360deg) rotateX(0deg); }
+        }
+
+        .ad-text {
+            text-align: left;
+            flex: 1;
+            margin: 0 2rem;
+        }
+
+        .ad-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .ad-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .ad-button {
+            background: var(--learning-green);
+            color: #000;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 25px var(--learning-green);
+            font-family: 'Exo 2', sans-serif;
+            font-size: 14px;
+        }
+
+        .ad-button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 35px var(--learning-green);
+        }
+
+        /* ============ FLOATING FOOTER (LOCKED STANDARD) ============ */
+        .floating-footer {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 2rem 1rem 1.5rem 1rem;
+            text-align: center;
+            margin-top: 3rem;
+            position: relative;
+        }
+
+        .floating-footer .entangleguard-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 0.8rem;
+            filter: drop-shadow(0 0 12px rgba(106, 13, 173, 0.6));
+            transition: transform 0.4s ease;
+        }
+
+        .floating-footer .entangleguard-logo:hover {
+            transform: rotate(8deg) scale(1.08);
+        }
+
+        .floating-footer .footer-copyright {
+            font-size: 0.85rem;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 0.4rem;
+        }
+
+        .mindtech-glitch {
+            color: var(--hod-primary);
+            font-weight: bold;
+            font-size: 0.95rem;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--hod-primary), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--hod-primary), 0 0 30px #0066FF, 0 0 40px #6A0DAD; }
+            100% { text-shadow: 0 0 10px var(--hod-primary), 0 0 20px #0066FF; }
+        }
+
+        .floating-footer .footer-patent {
+            font-size: 0.72rem;
+            color: #C8A450;
+            letter-spacing: 2px;
+            font-family: 'Space Mono', monospace;
+            margin-top: 0.5rem;
+        }
+
+        .floating-footer .footer-links {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-dim);
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .floating-footer .footer-links span {
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .floating-footer .footer-links span:hover {
+            color: var(--ai-gold);
+        }
+
+        /* ============ ANIMATIONS ============ */
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px var(--ai-gold); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px var(--ai-gold); }
+            100% { transform: scale(1); box-shadow: 0 0 20px var(--ai-gold); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1200px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 900px) {
+            .tech-navbar .khensani-logo { height: 70px; }
+            .brand-name { font-size: 1rem; }
+        }
+
+        @media (max-width: 768px) {
+            body { padding-top: 80px; }
+            .tech-navbar { height: 64px; padding: 0 0.8rem; }
+            .tech-navbar .khensani-logo { height: 60px; }
+            .brand-sub { display: none; }
+
+            .main-content { padding: 1rem; }
+
+            .charts-grid { grid-template-columns: 1fr; }
+            .allocation-grid { grid-template-columns: 1fr; }
+            .budget-grid { grid-template-columns: repeat(2, 1fr); }
+
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .allocation-actions { flex-direction: column; }
+
+            .ad-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+
+            .ad-text { text-align: center; margin: 0; }
+
+            .floating-footer .footer-links { gap: 0.8rem; }
+
+            .notif-panel { width: 300px; right: -60px; }
+        }
+
+        @media (max-width: 480px) {
+            .budget-grid { grid-template-columns: 1fr; }
+            .allocation-stats { grid-template-columns: 1fr; }
+            .creator-metrics-grid { grid-template-columns: 1fr; }
+            .floating-footer .footer-links { flex-direction: column; gap: 0.5rem; }
+            .welcome-title { font-size: 1.5rem; }
+            .nav-back-btn span { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Quantum Particles Component -->
+    <div id="particles-js"></div>
+
+    <!-- ============ TECH NAVBAR (LOCKED STANDARD) ============ -->
+    <nav class="tech-navbar">
+        <a href="mindflow-portal.html" title="Khensani AI · MindFlow Portal">
+            <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png" alt="Khensani AI" class="khensani-logo">
+        </a>
+
+        <div class="brand-block">
+            <div class="brand-icon">⚛️</div>
+            <div>
+                <div class="brand-name">KHENSANI AI</div>
+                <div class="brand-sub">HOD · RESOURCE ALLOCATION</div>
+            </div>
+        </div>
+
+        <div class="nav-spacer"></div>
+
+        <a href="mindflow-portal.html" class="nav-back-btn">
+            <i class="fas fa-arrow-left"></i>
+            <span>Back</span>
+        </a>
+
+        <div class="notif-wrap">
+            <div class="notif-bell" id="notifBell" onclick="toggleNotifPanel()">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">4</span>
+            </div>
+            <div class="notif-panel" id="notifPanel">
+                <div class="notif-header">
+                    <div class="notif-title">🔔 Notifications</div>
+                    <div class="notif-clear" onclick="clearNotifications()">Clear all</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">⭐ Creator Content Pending Review</div>
+                    <div class="notif-item-text">3 student videos awaiting HOD/teacher review for curriculum alignment.</div>
+                    <div class="notif-item-time">2 min ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">💰 Budget Threshold Alert</div>
+                    <div class="notif-item-text">Lab Equipment budget at 85% utilization. Review reallocation.</div>
+                    <div class="notif-item-time">1 hour ago</div>
+                </div>
+                <div class="notif-item creator">
+                    <div class="notif-item-title">🎬 Sponsor Interest Flagged</div>
+                    <div class="notif-item-text">A sponsor has flagged interest in creator content for your department.</div>
+                    <div class="notif-item-time">3 hours ago</div>
+                </div>
+                <div class="notif-item">
+                    <div class="notif-item-title">📊 Quarterly Report Ready</div>
+                    <div class="notif-item-text">Resource utilization report for current quarter is available.</div>
+                    <div class="notif-item-time">Yesterday</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <main class="main-content">
+
+        <!-- Welcome Header -->
+        <div class="welcome-header">
+            <h1 class="welcome-title">Resource Allocation Command</h1>
+            <p class="welcome-subtitle">Dr. Michael Rodriguez · Head of Science · Department Budget & Resource Oversight</p>
+            <p class="quantum-line">⚛️ QUANTUM-VERIFIED · CHSH S=2.8284 · SA PATENT 2026/05142</p>
+        </div>
+
+        <!-- Budget Overview -->
+        <div class="resource-section">
+            <div class="section-header">
+                <div class="section-title">Department Budget Overview</div>
+                <div class="form-control" style="width: auto; display: inline-block;">
+                    <select onchange="updateBudgetPeriod(this.value)">
+                        <option value="current">Current Quarter</option>
+                        <option value="annual">Annual Budget</option>
+                        <option value="previous">Previous Quarter</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="budget-grid">
+                <div class="budget-card">
+                    <div class="budget-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="budget-value">R 485,000</div>
+                    <div class="budget-label">Total Budget</div>
+                    <div class="budget-progress">
+                        <div class="progress-fill progress-medium" style="width: 65%"></div>
+                    </div>
+                    <div class="budget-label">65% Utilized</div>
+                </div>
+
+                <div class="budget-card">
+                    <div class="budget-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <div class="budget-value">R 128,500</div>
+                    <div class="budget-label">Lab Equipment</div>
+                    <div class="budget-progress">
+                        <div class="progress-fill progress-high" style="width: 85%"></div>
+                    </div>
+                    <div class="budget-label">85% Utilized</div>
+                </div>
+
+                <div class="budget-card">
+                    <div class="budget-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="budget-value">R 45,200</div>
+                    <div class="budget-label">Learning Materials</div>
+                    <div class="budget-progress">
+                        <div class="progress-fill progress-low" style="width: 30%"></div>
+                    </div>
+                    <div class="budget-label">30% Utilized</div>
+                </div>
+
+                <div class="budget-card">
+                    <div class="budget-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="budget-value">R 72,300</div>
+                    <div class="budget-label">Staff Development</div>
+                    <div class="budget-progress">
+                        <div class="progress-fill progress-medium" style="width: 55%"></div>
+                    </div>
+                    <div class="budget-label">55% Utilized</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Creator Content Resource Oversight -->
+        <div class="creator-oversight">
+            <div class="creator-oversight-title">🎬 Creator Content Resource Oversight</div>
+            <div class="creator-oversight-sub">Resource allocation for curriculum-gated student creator content · sponsor-backed creator initiatives</div>
+
+            <div class="creator-metrics-grid">
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-video"></i></div>
+                    <div class="creator-metric-value" id="creatorVideos">148</div>
+                    <div class="creator-metric-label">Creator Videos Funded</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-heart"></i></div>
+                    <div class="creator-metric-value" id="creatorLikes">12.4K</div>
+                    <div class="creator-metric-label">Engagement (Likes)</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-star"></i></div>
+                    <div class="creator-metric-value" id="creatorSponsorPicks">17</div>
+                    <div class="creator-metric-label">⭐ Sponsor Picks</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="creator-metric-value" id="creatorQuantumPass">94%</div>
+                    <div class="creator-metric-label">Quantum Screen Pass</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-coins"></i></div>
+                    <div class="creator-metric-value" id="creatorBudget">R 38,500</div>
+                    <div class="creator-metric-label">Creator Budget Allocated</div>
+                </div>
+                <div class="creator-metric-card">
+                    <div class="creator-metric-icon"><i class="fas fa-chess"></i></div>
+                    <div class="creator-metric-value" id="creatorChess">6</div>
+                    <div class="creator-metric-label">Chess Competitions</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resource Allocation -->
+        <div class="resource-section">
+            <div class="section-header">
+                <div class="section-title">Department Resource Allocation</div>
+                <button class="action-btn primary" onclick="openAllocationModal()">
+                    <i class="fas fa-plus"></i>
+                    New Allocation
+                </button>
+            </div>
+
+            <div class="allocation-grid" id="allocation-grid">
+                <!-- Allocation cards populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Analytics Charts -->
+        <div class="resource-section">
+            <div class="section-header">
+                <div class="section-title">Resource Utilization Analytics</div>
+                <button class="action-btn" onclick="exportResourceReport()">
+                    <i class="fas fa-download"></i>
+                    Export Report
+                </button>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Budget Distribution by Department</div>
+                        <select class="form-control" onchange="updateBudgetChart(this.value)">
+                            <option value="current">Current Quarter</option>
+                            <option value="annual">Annual View</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="budgetDistributionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Resource Utilization Trends</div>
+                        <select class="form-control" onchange="updateUtilizationChart(this.value)">
+                            <option value="quarterly">Quarterly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="utilizationTrendChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ CORPORATE AD — KD ROTATING LOGO (LOCKED) ============ -->
+        <div id="corporate-ad-center">
+            <div class="ad-content">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="kd-logo-wrap">
+                        <img src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png"
+                             alt="KD Concepts"
+                             class="kd-rotating-logo">
+                    </div>
+                    <div class="ad-text">
+                        <div class="ad-title">🚀 KDConcepts Premium — Enhanced Learning Experience</div>
+                        <div class="ad-subtitle">Premium educational resources designed specifically for African families and institutions</div>
+                    </div>
+                </div>
+                <button class="ad-button" onclick="openKDConcepts()">
+                    <i class="fas fa-rocket"></i>
+                    Explore Premium Resources
+                </button>
+            </div>
+        </div>
+
+        <!-- ============ FLOATING FOOTER (LOCKED STANDARD) ============ -->
+        <footer class="floating-footer">
+            <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                 alt="EntangleGuard"
+                 class="entangleguard-logo">
+            <div class="footer-copyright">
+                © 2026 MindFlow · Khensani AI · Powered by
+                <span class="mindtech-glitch">MindTech</span>
+                · Transforming African education
+            </div>
+            <div class="footer-patent">
+                ⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Jobs db6h46o4qg6s73c4q1n0 · db6h3eslf4us73c5c80g
+            </div>
+            <div class="footer-links">
+                <span onclick="window.location.href='hod.html'">🏠 Dashboard</span>
+                <span onclick="window.location.href='hod-staff-management.html'">👥 Staff Management</span>
+                <span onclick="window.location.href='hod-curriculum-management.html'">📚 Curriculum</span>
+                <span onclick="window.location.href='hod-performance-analytics.html'">📊 Analytics</span>
+                <span onclick="window.location.href='hod-resource-allocation.html'">💰 Resources</span>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // ============ PARTICLES — SALARYPLAN CALM CONFIG (LOCKED) ============
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55, density: { enable: true, value_area: 800 } },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 2, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#00B4D8",
+                    opacity: 0.08,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 0.8,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: false, mode: "push" }
+                }
+            }
+        });
+
+        // ============ NOTIFICATION PANEL ============
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notifPanel');
+            panel.classList.toggle('open');
+        }
+
+        function clearNotifications() {
+            const badge = document.getElementById('notifBadge');
+            badge.textContent = '0';
+            badge.style.display = 'none';
+            document.querySelectorAll('.notif-item').forEach(item => {
+                item.style.opacity = '0.4';
+            });
+        }
+
+        // Close panel on outside click
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.getElementById('notifBell');
+            if (panel && bell && !panel.contains(e.target) && !bell.contains(e.target)) {
+                panel.classList.remove('open');
+            }
+        });
+
+        // ============ RESOURCE MANAGER ============
+        class ResourceManager {
+            constructor() {
+                this.allocations = [];
+                this.charts = {};
+                this.init();
+            }
+
+            async init() {
+                try {
+                    await this.loadStaticAllocations();
+                    await this.initializeCharts();
+                    console.log('✅ Resource Manager initialized — Quantum verified');
+                } catch (error) {
+                    console.error('Error initializing Resource Manager:', error);
+                    this.loadStaticAllocations();
+                }
+            }
+
+            loadStaticAllocations() {
+                const staticAllocations = [
+                    {
+                        id: '1',
+                        title: 'Physics Lab Equipment Upgrade',
+                        department: 'physics',
+                        type: 'equipment',
+                        amount: 45000,
+                        priority: 'high',
+                        status: 'approved',
+                        date: '2024-01-15',
+                        utilization: 85,
+                        remaining: 6750,
+                        creator: false
+                    },
+                    {
+                        id: '2',
+                        title: 'Chemistry Safety Equipment',
+                        department: 'chemistry',
+                        type: 'equipment',
+                        amount: 28000,
+                        priority: 'critical',
+                        status: 'in-progress',
+                        date: '2024-01-10',
+                        utilization: 60,
+                        remaining: 11200,
+                        creator: false
+                    },
+                    {
+                        id: '3',
+                        title: 'Biology Microscopes',
+                        department: 'biology',
+                        type: 'equipment',
+                        amount: 35000,
+                        priority: 'high',
+                        status: 'pending',
+                        date: '2024-01-08',
+                        utilization: 0,
+                        remaining: 35000,
+                        creator: false
+                    },
+                    {
+                        id: '4',
+                        title: 'Computer Science Software Licenses',
+                        department: 'computer-science',
+                        type: 'software',
+                        amount: 15200,
+                        priority: 'medium',
+                        status: 'completed',
+                        date: '2024-01-05',
+                        utilization: 100,
+                        remaining: 0,
+                        creator: false
+                    },
+                    {
+                        id: '5',
+                        title: 'Creator Content Production Fund — Student Videos',
+                        department: 'general',
+                        type: 'creator',
+                        amount: 38500,
+                        priority: 'high',
+                        status: 'in-progress',
+                        date: '2024-01-12',
+                        utilization: 72,
+                        remaining: 10780,
+                        creator: true
+                    },
+                    {
+                        id: '6',
+                        title: 'Chess Competition Prize Pool — Sponsor Backed',
+                        department: 'general',
+                        type: 'creator',
+                        amount: 22000,
+                        priority: 'medium',
+                        status: 'approved',
+                        date: '2024-01-18',
+                        utilization: 45,
+                        remaining: 12100,
+                        creator: true
+                    }
+                ];
+
+                this.allocations = staticAllocations;
+                this.renderAllocationGrid();
+            }
+
+            renderAllocationGrid() {
+                const allocationGrid = document.getElementById('allocation-grid');
+                allocationGrid.innerHTML = '';
+
+                this.allocations.forEach(allocation => {
+                    const allocationCard = this.createAllocationCard(allocation);
+                    allocationGrid.appendChild(allocationCard);
+                });
+            }
+
+            createAllocationCard(allocation) {
+                const card = document.createElement('div');
+                card.className = 'allocation-card' + (allocation.creator ? ' creator-card' : '');
+
+                const statusClass = `status-${allocation.status}`;
+                const priorityClass = `priority-${allocation.priority}`;
+
+                const creatorPill = allocation.creator
+                    ? `<div class="creator-resource-pill"><i class="fas fa-star"></i> CREATOR FUNDED</div>`
+                    : '';
+
+                card.innerHTML = `
+                    <div class="allocation-header">
+                        <div style="flex: 1;">
+                            <div class="allocation-title">${allocation.title}</div>
+                            <div class="allocation-department">${this.formatDepartment(allocation.department)}</div>
+                            ${creatorPill}
+                        </div>
+                        <div class="allocation-department ${priorityClass}" style="background: ${this.getPriorityColor(allocation.priority)}">
+                            ${this.formatPriority(allocation.priority)}
+                        </div>
+                    </div>
+
+                    <div class="allocation-meta">
+                        <div>Type: ${this.formatType(allocation.type)}</div>
+                        <div>${new Date(allocation.date).toLocaleDateString()}</div>
+                    </div>
+
+                    <div class="allocation-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">R ${allocation.amount.toLocaleString()}</div>
+                            <div class="stat-label">Total Budget</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${allocation.utilization}%</div>
+                            <div class="stat-label">Utilized</div>
+                        </div>
+                    </div>
+
+                    <div class="budget-progress">
+                        <div class="progress-fill ${this.getProgressClass(allocation.utilization)}" style="width: ${allocation.utilization}%"></div>
+                    </div>
+
+                    <div class="allocation-meta">
+                        <div>Status: <span class="${statusClass}">${this.formatStatus(allocation.status)}</span></div>
+                        <div>Remaining: R ${allocation.remaining.toLocaleString()}</div>
+                    </div>
+
+                    <div class="allocation-actions">
+                        <button class="action-btn" onclick="resourceManager.viewDetails('${allocation.id}')">
+                            <i class="fas fa-eye"></i>
+                            Details
+                        </button>
+                        <button class="action-btn primary" onclick="resourceManager.manageAllocation('${allocation.id}')">
+                            <i class="fas fa-edit"></i>
+                            Manage
+                        </button>
+                    </div>
+                `;
+
+                return card;
+            }
+
+            formatDepartment(department) {
+                const deptMap = {
+                    'physics': 'Physics',
+                    'chemistry': 'Chemistry',
+                    'biology': 'Biology',
+                    'earth-science': 'Earth Science',
+                    'computer-science': 'Computer Science',
+                    'general': 'General'
+                };
+                return deptMap[department] || department;
+            }
+
+            formatType(type) {
+                const typeMap = {
+                    'equipment': 'Lab Equipment',
+                    'materials': 'Learning Materials',
+                    'software': 'Software',
+                    'training': 'Staff Training',
+                    'maintenance': 'Maintenance',
+                    'creator': 'Creator Content'
+                };
+                return typeMap[type] || type;
+            }
+
+            formatPriority(priority) {
+                const priorityMap = {
+                    'low': 'Low',
+                    'medium': 'Medium',
+                    'high': 'High',
+                    'critical': 'Critical'
+                };
+                return priorityMap[priority] || priority;
+            }
+
+            formatStatus(status) {
+                const statusMap = {
+                    'pending': 'Pending',
+                    'approved': 'Approved',
+                    'in-progress': 'In Progress',
+                    'completed': 'Completed'
+                };
+                return statusMap[status] || status;
+            }
+
+            getPriorityColor(priority) {
+                const colorMap = {
+                    'low': 'rgba(0, 168, 255, 0.2)',
+                    'medium': 'rgba(255, 215, 0, 0.2)',
+                    'high': 'rgba(255, 170, 0, 0.2)',
+                    'critical': 'rgba(255, 51, 102, 0.2)'
+                };
+                return colorMap[priority] || 'rgba(106, 13, 173, 0.2)';
+            }
+
+            getProgressClass(utilization) {
+                if (utilization >= 80) return 'progress-high';
+                if (utilization >= 50) return 'progress-medium';
+                return 'progress-low';
+            }
+
+            initializeCharts() {
+                // Budget Distribution Chart
+                const budgetCtx = document.getElementById('budgetDistributionChart').getContext('2d');
+                this.charts.budgetDistribution = new Chart(budgetCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Physics', 'Chemistry', 'Biology', 'Earth Science', 'Computer Science', 'General'],
+                        datasets: [{
+                            data: [45000, 28000, 35000, 12000, 15200, 60500],
+                            backgroundColor: [
+                                'rgba(106, 13, 173, 0.8)',
+                                'rgba(255, 215, 0, 0.8)',
+                                'rgba(0, 255, 170, 0.8)',
+                                'rgba(255, 140, 66, 0.8)',
+                                'rgba(0, 102, 255, 0.8)',
+                                'rgba(255, 105, 180, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(106, 13, 173, 1)',
+                                'rgba(255, 215, 0, 1)',
+                                'rgba(0, 255, 170, 1)',
+                                'rgba(255, 140, 66, 1)',
+                                'rgba(0, 102, 255, 1)',
+                                'rgba(255, 105, 180, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: '#e0e0ff',
+                                    font: { family: "'Exo 2', sans-serif" }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `R ${context.raw.toLocaleString()}`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Utilization Trend Chart
+                const utilizationCtx = document.getElementById('utilizationTrendChart').getContext('2d');
+                this.charts.utilizationTrend = new Chart(utilizationCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [
+                            {
+                                label: 'Lab Equipment',
+                                data: [65, 72, 78, 85, 82, 88],
+                                borderColor: 'rgba(106, 13, 173, 1)',
+                                backgroundColor: 'rgba(106, 13, 173, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Learning Materials',
+                                data: [45, 52, 48, 55, 60, 65],
+                                borderColor: 'rgba(255, 215, 0, 1)',
+                                backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Staff Development',
+                                data: [30, 35, 42, 48, 52, 55],
+                                borderColor: 'rgba(0, 255, 170, 1)',
+                                backgroundColor: 'rgba(0, 255, 170, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Creator Content',
+                                data: [20, 32, 48, 60, 68, 72],
+                                borderColor: 'rgba(255, 105, 180, 1)',
+                                backgroundColor: 'rgba(255, 105, 180, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#e0e0ff',
+                                    font: { family: "'Exo 2', sans-serif" }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    color: '#a0a0cc',
+                                    callback: function(value) { return value + '%'; }
+                                },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            },
+                            x: {
+                                ticks: { color: '#a0a0cc' },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            viewDetails(allocationId) {
+                const allocation = this.allocations.find(a => a.id === allocationId);
+                if (allocation) {
+                    alert(`📊 Allocation Details\n\nTitle: ${allocation.title}\nDepartment: ${this.formatDepartment(allocation.department)}\nAmount: R ${allocation.amount.toLocaleString()}\nStatus: ${this.formatStatus(allocation.status)}\nUtilization: ${allocation.utilization}%\nRemaining: R ${allocation.remaining.toLocaleString()}${allocation.creator ? '\n\n⭐ CREATOR FUNDED ALLOCATION' : ''}`);
+                }
+            }
+
+            manageAllocation(allocationId) {
+                const allocation = this.allocations.find(a => a.id === allocationId);
+                if (allocation) {
+                    alert(`⚙️ Managing Allocation\n\n${allocation.title}\n\nThis would open the detailed management interface.\nQuantum-verified · CHSH S=2.8284`);
+                }
+            }
+        }
+
+        // ============ GLOBAL FUNCTIONS ============
+        function updateBudgetPeriod(period) {
+            console.log('Updating budget period to:', period);
+        }
+
+        function updateBudgetChart(view) {
+            console.log('Updating budget chart view to:', view);
+        }
+
+        function updateUtilizationChart(granularity) {
+            console.log('Updating utilization chart granularity to:', granularity);
+        }
+
+        function openAllocationModal() {
+            alert('➕ New Resource Allocation\n\nThis would open the allocation creation modal.\n\nQuantum-verified · CHSH S=2.8284 · SA Patent 2026/05142');
+        }
+
+        function exportResourceReport() {
+            alert('📥 Exporting Resource Utilization Report\n\nGenerating comprehensive PDF report...\nIncludes creator content funding breakdown.\n\n⚛️ CHSH S=2.8284 verified');
+        }
+
+        function openKDConcepts() {
+            alert('🚀 KDConcepts Premium Resources\n\nOpening KDConcepts platform...\n\nPremium African education resources.\nQuantum-verified partnership.');
+        }
+
+        // ============ INIT ============
+        let resourceManager;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            resourceManager = new ResourceManager();
+
+            // Animate creator metrics
+            animateCreatorMetrics();
+        });
+
+        function animateCreatorMetrics() {
+            const metrics = [
+                { id: 'creatorVideos', target: 148, suffix: '' },
+                { id: 'creatorLikes', target: 12.4, suffix: 'K', decimals: 1 },
+                { id: 'creatorSponsorPicks', target: 17, suffix: '' },
+                { id: 'creatorQuantumPass', target: 94, suffix: '%' },
+                { id: 'creatorChess', target: 6, suffix: '' }
+            ];
+
+            metrics.forEach(m => {
+                const el = document.getElementById(m.id);
+                if (!el) return;
+                let current = 0;
+                const step = m.target / 40;
+                const interval = setInterval(() => {
+                    current += step;
+                    if (current >= m.target) {
+                        current = m.target;
+                        clearInterval(interval);
+                    }
+                    if (m.decimals) {
+                        el.textContent = current.toFixed(m.decimals) + m.suffix;
+                    } else {
+                        el.textContent = Math.floor(current) + m.suffix;
+                    }
+                }, 30);
+            });
+        }
+    </script>
+</body>
+</html>

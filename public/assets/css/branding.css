@@ -1,0 +1,314 @@
+﻿/* ============================================================
+   KHENSANI AI — BRANDING STYLESHEET
+   Patent: SA 2026/05142 · CHSH S=2.76 (Aer: 2.8284)
+   Includes: logos, quantum badge, chat widget, superposition rotation
+   ============================================================ */
+
+/* 1. ROOT VARIABLES */
+:root {
+  --khensani-forest:   #1B4D3D;
+  --khensani-emerald:  #2A7A5E;
+  --khensani-gold:     #C8A450;
+  --khensani-gold-lt:  #d9b565;
+  --khensani-cream:    #E8D5A3;
+  --khensani-dark:     #0a1f18;
+  --khensani-standby:  #a8a8a8;
+  --khensani-danger:   #EF476F;
+  --khensani-success:  #2A7A5E;
+}
+
+/* 2. LOGO ASSETS */
+.khensani-logo {
+  height: 60px;
+  width: auto;
+  filter: drop-shadow(0 0 20px rgba(200, 164, 80, 0.3));
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+.khensani-logo:hover {
+  filter: drop-shadow(0 0 40px rgba(200, 164, 80, 0.6));
+  transform: scale(1.02);
+}
+.khensani-footer-logo {
+  height: 40px;
+  width: auto;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+.khensani-footer-logo:hover { opacity: 1; }
+
+.khensani-rotating-logo {
+  width: 56px;
+  height: 56px;
+  animation: superposition-rotation 4s linear infinite;
+  will-change: transform, filter;
+}
+
+/* 3. SUPERPOSITION ROTATION ANIMATION */
+@keyframes superposition-rotation {
+  0%   { transform: rotate(0deg) scale(1);     filter: drop-shadow(0 0 8px  rgba(138, 43, 226, 0.6)); }
+  25%  { transform: rotate(90deg) scale(1.05); filter: drop-shadow(0 0 16px rgba(138, 43, 226, 0.9)); }
+  50%  { transform: rotate(180deg) scale(1);    filter: drop-shadow(0 0 8px  rgba(138, 43, 226, 0.6)); }
+  75%  { transform: rotate(270deg) scale(1.05); filter: drop-shadow(0 0 16px rgba(138, 43, 226, 0.9)); }
+  100% { transform: rotate(360deg) scale(1);    filter: drop-shadow(0 0 8px  rgba(138, 43, 226, 0.6)); }
+}
+
+/* 4. QUANTUM BADGE */
+.quantum-badge-container {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 16px;
+}
+.quantum-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+.quantum-badge.standby {
+  background: rgba(168, 168, 168, 0.15);
+  color: var(--khensani-standby);
+  border: 1px solid rgba(168, 168, 168, 0.3);
+}
+.quantum-badge.live {
+  background: rgba(42, 122, 94, 0.2);
+  color: var(--khensani-emerald);
+  border: 1px solid rgba(42, 122, 94, 0.5);
+}
+.quantum-badge.hardware {
+  background: rgba(200, 164, 80, 0.2);
+  color: var(--khensani-gold);
+  border: 1px solid rgba(200, 164, 80, 0.5);
+  box-shadow: 0 0 12px rgba(200, 164, 80, 0.35);
+}
+.quantum-badge.cached {
+  background: rgba(200, 164, 80, 0.1);
+  color: var(--khensani-gold);
+  border: 1px dashed rgba(200, 164, 80, 0.4);
+  opacity: 0.75;
+}
+.quantum-badge.unavailable {
+  background: rgba(239, 71, 111, 0.15);
+  color: var(--khensani-danger);
+  border: 1px solid rgba(239, 71, 111, 0.4);
+}
+
+/* 5. CHAT WIDGET — FLOATING TOGGLE */
+.khensani-chat-toggle {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--khensani-forest), var(--khensani-emerald));
+  border: 2px solid rgba(200, 164, 80, 0.5);
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.khensani-chat-toggle:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 32px rgba(200, 164, 80, 0.5);
+}
+.khensani-chat-toggle img {
+  width: 32px;
+  height: 32px;
+  animation: superposition-rotation 4s linear infinite;
+}
+
+/* 6. CHAT WIDGET — PANEL */
+.khensani-chat-panel {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  height: 560px;
+  max-height: calc(100vh - 48px);
+  background: var(--khensani-dark);
+  border: 1px solid rgba(200, 164, 80, 0.3);
+  border-radius: 16px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+  transform: translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.khensani-chat-panel.open {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* 7. CHAT WIDGET — HEADER */
+.khensani-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(200, 164, 80, 0.2);
+}
+.chat-brand { height: 28px; width: auto; }
+.chat-intelligence {
+  color: var(--khensani-gold);
+  font-family: 'JetBrains Mono', 'Space Mono', monospace;
+  font-size: 0.75rem;
+  margin-left: auto;
+}
+.chat-close {
+  background: none;
+  border: none;
+  color: var(--khensani-cream);
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.2s ease;
+}
+.chat-close:hover { color: var(--khensani-gold); }
+
+/* 8. CHAT WIDGET — BODY */
+.khensani-chat-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+.khensani-chat-body::-webkit-scrollbar { width: 6px; }
+.khensani-chat-body::-webkit-scrollbar-track { background: transparent; }
+.khensani-chat-body::-webkit-scrollbar-thumb {
+  background: rgba(200, 164, 80, 0.3);
+  border-radius: 3px;
+}
+.chat-msg {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  max-width: 80%;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+.chat-msg-user {
+  background: var(--khensani-emerald);
+  color: #ffffff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+.chat-msg-ai {
+  background: rgba(200, 164, 80, 0.15);
+  color: var(--khensani-cream);
+  align-self: flex-start;
+  border-left: 2px solid var(--khensani-gold);
+  border-bottom-left-radius: 4px;
+}
+.chat-msg-ai strong { color: var(--khensani-gold); }
+
+/* 9. CHAT WIDGET — FORM */
+.khensani-chat-form {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(200, 164, 80, 0.2);
+}
+.khensani-chat-form input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(200, 164, 80, 0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--khensani-cream);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+.khensani-chat-form input:focus {
+  outline: none;
+  border-color: var(--khensani-gold);
+  box-shadow: 0 0 8px rgba(200, 164, 80, 0.2);
+}
+.khensani-chat-form input::placeholder { color: rgba(232, 213, 163, 0.4); }
+.khensani-chat-form button {
+  background: var(--khensani-gold);
+  color: var(--khensani-dark);
+  border: none;
+  border-radius: 8px;
+  padding: 0 18px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.khensani-chat-form button:hover { background: var(--khensani-gold-lt); }
+.khensani-chat-form button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* 10. SENTINEL PROMPT */
+.sentinel-prompt {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, var(--khensani-forest) 0%, var(--khensani-emerald) 100%);
+  color: var(--khensani-cream);
+  padding: 14px 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  max-width: 90vw;
+  z-index: 10000;
+  border: 1px solid rgba(200, 164, 80, 0.3);
+  animation: sentinel-slide-up 0.4s ease-out;
+}
+@keyframes sentinel-slide-up {
+  from { transform: translate(-50%, 20px); opacity: 0; }
+  to   { transform: translate(-50%, 0);    opacity: 1; }
+}
+
+/* 11. RESPONSIVE */
+@media (max-width: 480px) {
+  .khensani-chat-panel {
+    width: calc(100vw - 24px);
+    height: calc(100vh - 48px);
+    bottom: 12px;
+    right: 12px;
+  }
+  .khensani-chat-toggle {
+    bottom: 80px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+  .quantum-badge { font-size: 0.7rem; padding: 5px 10px; }
+}
+@media (max-width: 360px) {
+  .quantum-badge { font-size: 0.65rem; padding: 4px 8px; letter-spacing: 0.02em; }
+  .khensani-chat-panel { width: 100vw; height: 100vh; bottom: 0; right: 0; border-radius: 0; }
+}
+
+/* 12. REDUCED MOTION */
+@media (prefers-reduced-motion: reduce) {
+  .khensani-rotating-logo,
+  .khensani-chat-toggle img,
+  .sentinel-prompt { animation: none; }
+  .khensani-chat-panel { transition: none; }
+}

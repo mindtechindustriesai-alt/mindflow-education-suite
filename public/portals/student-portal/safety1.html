@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safety & Location - Khensani AI · MindFlow Student Portal</title>
+
+    <!-- Required Libraries -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        :root {
+            /* Khensani Canonical */
+            --khensani-gold: #C8A450;
+            --khensani-cream: #E8D5A3;
+            --creator-pink: #FF69B4;
+            --communication-blue: #00A8FF;
+
+            /* Student Theme */
+            --quantum-blue: #0066FF;
+            --student-blue: #00A8FF;
+            --learning-green: #00FFAA;
+            --ai-gold: #FFD700;
+
+            /* Safety Theme */
+            --safety-orange: #FF8C42;
+            --safety-light: #FFA726;
+            --safety-dark: #EF6C00;
+            --emergency-red: #FF6B6B;
+
+            /* Zones */
+            --tech-black: #0A0A0A;
+            --dark-space: #0f0f1a;
+            --safe-zone: #00FFAA;
+            --warning-zone: #FFD700;
+            --danger-zone: #FF6B6B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        html { background: var(--dark-space); }
+
+        body {
+            background: transparent;
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            isolation: isolate;
+        }
+
+        /* ============ QUANTUM PARTICLES ============ */
+        #particles-js {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .content-layer { position: relative; z-index: 1; }
+
+        /* ============ TECH NAVBAR (CANONICAL) ============ */
+        .tech-navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(10, 10, 16, 0.48);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--safety-orange);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(255, 140, 66, 0.15);
+        }
+
+        .nav-logo-block {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .khensani-nav-logo {
+            height: 90px;
+            width: auto;
+            object-fit: contain;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 12px rgba(255, 140, 66, 0.5));
+        }
+
+        .khensani-nav-logo:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 22px rgba(255, 140, 66, 0.9));
+        }
+
+        .brand-block { display: flex; align-items: center; gap: 0.6rem; }
+
+        .brand-icon-wrap {
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--student-blue), var(--ai-gold));
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 18px rgba(0, 168, 255, 0.6);
+        }
+
+        .brand-icon-wrap i { color: #0a0a16; font-size: 1.2rem; }
+
+        .brand-text {
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--student-blue), var(--ai-gold));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            white-space: nowrap;
+        }
+
+        .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+        /* Notification Bell */
+        .notif-bell {
+            position: relative;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 140, 66, 0.12);
+            border: 2px solid var(--safety-orange);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notif-bell:hover {
+            background: rgba(255, 140, 66, 0.28);
+            transform: scale(1.08);
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.6);
+        }
+
+        .notif-bell i { color: var(--safety-orange); font-size: 1.05rem; }
+
+        .notif-badge {
+            position: absolute;
+            top: -4px; right: -4px;
+            background: var(--emergency-red);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 700;
+            min-width: 20px; height: 20px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 0 5px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 12px rgba(255, 107, 107, 0.8);
+        }
+
+        /* Notification Panel */
+        .notif-panel {
+            position: fixed;
+            top: 0; right: -420px;
+            width: 400px;
+            max-width: 92vw;
+            height: 100vh;
+            background: rgba(10, 10, 26, 0.98);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-left: 2px solid var(--safety-orange);
+            z-index: 1200;
+            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding: 1.5rem;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.6);
+        }
+
+        .notif-panel.open { right: 0; }
+
+        .notif-panel-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 140, 66, 0.35);
+        }
+
+        .notif-panel-head h3 {
+            font-family: 'Space Mono', monospace;
+            color: var(--safety-orange);
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+        }
+
+        .notif-close {
+            background: transparent;
+            border: 1px solid var(--safety-orange);
+            color: var(--safety-orange);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notif-close:hover {
+            background: var(--safety-orange);
+            color: #0a0a16;
+            transform: rotate(90deg);
+        }
+
+        .notif-item {
+            background: rgba(255, 140, 66, 0.06);
+            border-left: 4px solid var(--safety-orange);
+            border-radius: 8px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .notif-item:hover { transform: translateX(-5px); background: rgba(255, 140, 66, 0.14); }
+        .notif-item.critical { border-left-color: var(--emergency-red); background: rgba(255, 107, 107, 0.1); }
+        .notif-item.critical .notif-title { color: var(--emergency-red); }
+        .notif-item.warning { border-left-color: var(--warning-zone); background: rgba(255, 215, 0, 0.1); }
+        .notif-item.warning .notif-title { color: var(--warning-zone); }
+
+        .notif-title { font-weight: 600; color: var(--safety-orange); font-size: 0.95rem; margin-bottom: 0.35rem; }
+        .notif-text { font-size: 0.85rem; color: #a0a0cc; line-height: 1.4; }
+        .notif-time { font-size: 0.72rem; color: #a0a0cc; margin-top: 0.5rem; font-family: 'Space Mono', monospace; opacity: 0.75; }
+
+        /* Back Button Pill */
+        .back-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: 2px solid var(--safety-orange);
+            color: var(--safety-orange);
+            padding: 0.55rem 1.15rem;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .back-pill:hover {
+            background: var(--safety-orange);
+            color: #0a0a16;
+            box-shadow: 0 0 22px rgba(255, 140, 66, 0.75);
+            transform: translateY(-2px);
+        }
+
+        /* ============ PORTAL HEADER ============ */
+        .portal-header {
+            margin-top: 105px;
+            background: rgba(10, 10, 10, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--safety-orange);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 900;
+            box-shadow: 0 0 30px rgba(255, 140, 66, 0.3);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-container { display: flex; align-items: center; gap: 1rem; }
+
+        .logo {
+            font-size: 2rem;
+            color: var(--safety-orange);
+            animation: pulse 2s infinite;
+        }
+
+        .portal-title { font-size: 1.5rem; font-weight: 600; color: white; }
+        .portal-subtitle {
+            font-size: 0.85rem;
+            color: #a0a0cc;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+        }
+
+        .quantum-line {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--khensani-gold);
+            letter-spacing: 3px;
+            font-family: 'Space Mono', monospace;
+            padding: 0.6rem 1rem;
+            background: rgba(200, 164, 80, 0.05);
+            border-top: 1px solid rgba(200, 164, 80, 0.2);
+            border-bottom: 1px solid rgba(200, 164, 80, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ============ MAIN CONTENT ============ */
+        .safety-content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Emergency Alert */
+        .emergency-alert {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 140, 66, 0.2));
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid var(--emergency-red);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            animation: alertPulse 2s infinite;
+        }
+
+        .emergency-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--emergency-red);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .panic-button {
+            background: linear-gradient(45deg, var(--emergency-red), var(--safety-orange));
+            border: none;
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+            margin: 1rem 0;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .panic-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
+        }
+
+        .emergency-contacts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .contact-card {
+            background: rgba(255, 140, 66, 0.1);
+            border: 1px solid rgba(255, 140, 66, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            border-color: var(--safety-orange);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 140, 66, 0.3);
+        }
+
+        .contact-icon { font-size: 2rem; color: var(--safety-orange); margin-bottom: 1rem; }
+        .contact-name { font-weight: 600; margin-bottom: 0.35rem; }
+        .contact-number { font-size: 0.85rem; color: #a0a0cc; font-family: 'Space Mono', monospace; }
+
+        /* Safety Dashboard */
+        .safety-dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .map-container {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-header {
+            color: var(--safety-orange);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        #safetyMap {
+            flex: 1;
+            width: 100%;
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaflet-container {
+            background: rgba(15, 15, 26, 0.9) !important;
+            border-radius: 10px;
+            height: 100% !important;
+            width: 100% !important;
+        }
+
+        .leaflet-control-attribution {
+            background: rgba(0, 0, 0, 0.7) !important;
+            color: #ccc !important;
+            font-size: 11px !important;
+            padding: 2px 8px !important;
+            border-radius: 4px !important;
+        }
+
+        .safety-status {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .status-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--safety-orange);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-indicators { display: flex; flex-direction: column; gap: 1rem; }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: rgba(255, 140, 66, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+        }
+
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+        .dot-safe { background: var(--safe-zone); box-shadow: 0 0 10px var(--safe-zone); }
+        .dot-warning { background: var(--warning-zone); box-shadow: 0 0 10px var(--warning-zone); }
+        .dot-danger { background: var(--danger-zone); box-shadow: 0 0 10px var(--danger-zone); }
+
+        .status-label { font-weight: 600; font-size: 0.9rem; }
+        .status-value { font-size: 0.8rem; color: #a0a0cc; }
+
+        /* Protocol Cards */
+        .protocols-section { margin-bottom: 2rem; }
+
+        .section-title {
+            color: var(--safety-orange);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.4rem;
+        }
+
+        .protocols-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .protocol-card {
+            background: rgba(15, 20, 35, 0.48);
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid rgba(255, 140, 66, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .protocol-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--safety-orange);
+            box-shadow: 0 10px 30px rgba(255, 140, 66, 0.2);
+        }
+
+        .protocol-icon {
+            font-size: 2rem;
+            color: var(--safety-orange);
+            margin-bottom: 1rem;
+        }
+
+        .protocol-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--safety-orange);
+            margin-bottom: 0.5rem;
+        }
+
+        .protocol-description { font-size: 0.9rem; color: #a0a0cc; line-height: 1.6; }
+
+        /* Khensani Safety AI */
+        .khensani-safety {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 140, 66, 0.1));
+            backdrop-filter: blur(3px);
+            -webkit-backdrop-filter: blur(3px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .khensani-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .khensani-icon { font-size: 2rem; color: var(--ai-gold); }
+        .khensani-title { font-size: 1.5rem; font-weight: 600; color: var(--ai-gold); }
+
+        .safety-tips {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .tip-card {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .tip-card strong { color: var(--ai-gold); display: block; margin-bottom: 0.5rem; }
+        .tip-card p { color: #a0a0cc; font-size: 0.85rem; }
+
+        /* CANONICAL KD AD */
+        .corporate-ad-center {
+            background: linear-gradient(135deg, rgba(70,25,115,0.22), rgba(110,80,20,0.18));
+            border: 2px solid rgba(200,164,80,0.4);
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin: 2rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+
+        .corporate-ad-center::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(200,164,80,0.08), transparent);
+            animation: kd-shine 4s infinite;
+        }
+
+        @keyframes kd-shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .corporate-ad-center:hover {
+            border-color: var(--khensani-gold);
+            box-shadow: 0 0 40px rgba(200,164,80,0.3);
+            transform: translateY(-3px);
+        }
+
+        .corporate-ad-text {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.95rem;
+            color: var(--khensani-cream);
+            letter-spacing: 1px;
+        }
+
+        .corporate-ad-text strong { color: var(--khensani-gold); font-size: 1.15rem; display: block; margin-bottom: 4px; }
+
+        .kd-rotating-logo {
+            height: 65px;
+            width: 65px;
+            object-fit: contain;
+            background: transparent;
+            flex-shrink: 0;
+            opacity: 1 !important;
+            filter: brightness(0.78) contrast(1.28) drop-shadow(0 0 7px rgba(80,20,135,0.98)) drop-shadow(0 0 16px rgba(138,43,226,0.95)) drop-shadow(0 0 25px rgba(200,164,80,0.72)) !important;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            animation: kd-superposition-visible 6s ease-in-out infinite !important;
+        }
+
+        @keyframes kd-superposition-visible {
+            0%,100% { transform: perspective(600px) rotateY(0deg) rotateZ(0deg) scale(1); }
+            25% { transform: perspective(600px) rotateY(90deg) rotateZ(4deg) scale(1.08); }
+            50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); }
+            75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); }
+        }
+
+        /* FLOATING FOOTER */
+        .floating-footer {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 2.5rem 1rem 1.5rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            margin-top: 2rem;
+        }
+
+        .footer-logo-row { display: flex; justify-content: center; margin-bottom: 1rem; }
+
+        .footer-logo {
+            height: 55px;
+            width: auto;
+            object-fit: contain;
+            opacity: 0.85;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 0 12px rgba(0, 168, 255, 0.4));
+        }
+
+        .footer-logo:hover {
+            opacity: 1;
+            transform: scale(1.05);
+            filter: drop-shadow(0 0 30px rgba(0, 168, 255, 0.9));
+        }
+
+        .floating-footer .copyright {
+            color: #a0a0cc;
+            font-size: 0.85rem;
+            font-family: 'Space Mono', monospace;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .floating-footer .copyright a { color: inherit; text-decoration: none; }
+
+        .mindtech-glitch {
+            color: var(--student-blue);
+            font-weight: bold;
+            font-size: 0.9rem;
+            position: relative;
+            display: inline-block;
+            animation: mindtechGlitch 2s infinite;
+        }
+
+        .footer-bottom {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.72rem;
+            color: var(--khensani-gold);
+            letter-spacing: 1.5px;
+            margin-top: 0.75rem;
+            opacity: 0.85;
+        }
+
+        /* ANIMATIONS */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        @keyframes alertPulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 107, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(255, 107, 107, 0.8); }
+        }
+
+        @keyframes mindtechGlitch {
+            0% { text-shadow: 0 0 10px var(--student-blue), 0 0 20px #0066FF; }
+            50% { text-shadow: 0 0 15px var(--student-blue), 0 0 30px #0066FF, 0 0 40px #8A2BE2; }
+            100% { text-shadow: 0 0 10px var(--student-blue), 0 0 20px #0066FF; }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .khensani-nav-logo { height: 60px; }
+            .brand-text { font-size: 0.9rem; }
+        }
+
+        @media (max-width: 768px) {
+            .tech-navbar { padding: 0.5rem 0.75rem; }
+            .khensani-nav-logo { height: 50px; }
+            .portal-header { padding: 1rem; flex-direction: column; align-items: flex-start; margin-top: 80px; }
+            .safety-content { padding: 1rem; }
+            .safety-dashboard { grid-template-columns: 1fr; }
+            .map-container { height: 400px; }
+            .protocols-grid { grid-template-columns: 1fr; }
+            .notif-panel { width: 100%; right: -100%; }
+            .back-pill { padding: 0.45rem 0.85rem; font-size: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+            .map-container { height: 350px; padding: 1rem; }
+            .leaflet-control-attribution { font-size: 9px !important; padding: 1px 4px !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- QUANTUM PARTICLES -->
+    <div id="particles-js"></div>
+
+    <div class="content-layer">
+
+    <!-- ============ CANONICAL TECH NAVBAR ============ -->
+    <header class="tech-navbar">
+        <div class="nav-logo-block">
+            <a href="mindflow-portal.html">
+                <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png"
+                     alt="Khensani AI"
+                     class="khensani-nav-logo"
+                     onerror="this.style.display='none'">
+            </a>
+            <div class="brand-block">
+                <div class="brand-icon-wrap"><i class="fas fa-shield-alt"></i></div>
+                <div class="brand-text">STUDENT SAFETY</div>
+            </div>
+        </div>
+
+        <div class="nav-actions">
+            <div class="notif-bell" onclick="toggleNotifPanel()">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge">3</span>
+            </div>
+            <a href="mindflow-portal.html" class="back-pill">
+                <i class="fas fa-arrow-left"></i> Back to Portal
+            </a>
+        </div>
+    </header>
+
+    <!-- NOTIFICATION PANEL -->
+    <aside class="notif-panel" id="notifPanel">
+        <div class="notif-panel-head">
+            <h3><i class="fas fa-shield-alt"></i> SAFETY ALERTS</h3>
+            <button class="notif-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="notif-item warning">
+            <div class="notif-title"><i class="fas fa-cloud-rain"></i> Weather Warning</div>
+            <div class="notif-text">Heavy rain expected after school. Use covered walkways.</div>
+            <div class="notif-time">30 min ago · PRIORITY MEDIUM</div>
+        </div>
+
+        <div class="notif-item">
+            <div class="notif-title"><i class="fas fa-users"></i> Buddy System Update</div>
+            <div class="notif-text">You're paired with Kagiso Mbeki for after-school activities.</div>
+            <div class="notif-time">2 hours ago · PRIORITY LOW</div>
+        </div>
+
+        <div class="notif-item">
+            <div class="notif-title"><i class="fas fa-check-circle"></i> All Safety Systems Active</div>
+            <div class="notif-text">Emergency protocols verified. Location tracking enabled.</div>
+            <div class="notif-time">4 hours ago · PRIORITY LOW</div>
+        </div>
+    </aside>
+
+    <!-- PORTAL HEADER -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo"><i class="fas fa-shield-alt"></i></div>
+            <div>
+                <div class="portal-title">Student Safety Portal</div>
+                <div class="portal-subtitle">Lerato Dube · Grade 10A · Status: Safe</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="quantum-line">⚛️ QUANTUM-VERIFIED · CHSH S=2.8284 · SA PATENT 2026/05142</div>
+
+    <!-- ============ MAIN ============ -->
+    <main class="safety-content">
+
+        <!-- Emergency Alert System -->
+        <section class="emergency-alert">
+            <h2 class="emergency-title">
+                <i class="fas fa-exclamation-triangle"></i>
+                Emergency Response System
+            </h2>
+            <p style="margin-bottom:1.5rem; opacity:0.9;">
+                Your safety is our priority. In case of emergency, press the panic button below.
+            </p>
+            <button class="panic-button" onclick="SafetySystem.triggerEmergency()">
+                <i class="fas fa-bell"></i> EMERGENCY PANIC BUTTON
+            </button>
+            <div class="emergency-contacts">
+                <div class="contact-card" onclick="SafetySystem.contactSecurity()">
+                    <div class="contact-icon"><i class="fas fa-walkie-talkie"></i></div>
+                    <div class="contact-name">Campus Security</div>
+                    <div class="contact-number">Ext. 911</div>
+                </div>
+                <div class="contact-card" onclick="SafetySystem.contactTeacher()">
+                    <div class="contact-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <div class="contact-name">Class Teacher</div>
+                    <div class="contact-number">Mr. Smith</div>
+                </div>
+                <div class="contact-card" onclick="SafetySystem.contactParent()">
+                    <div class="contact-icon"><i class="fas fa-user-friends"></i></div>
+                    <div class="contact-name">Parent/Guardian</div>
+                    <div class="contact-number">Mom - Mobile</div>
+                </div>
+                <div class="contact-card" onclick="SafetySystem.contactMedical()">
+                    <div class="contact-icon"><i class="fas fa-ambulance"></i></div>
+                    <div class="contact-name">Medical Emergency</div>
+                    <div class="contact-number">Ext. 112</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Dashboard -->
+        <section class="safety-dashboard">
+            <div class="map-container">
+                <h3 class="map-header"><i class="fas fa-map-marked-alt"></i> Live Campus Map</h3>
+                <div id="safetyMap"></div>
+            </div>
+
+            <div class="safety-status">
+                <h3 class="status-title"><i class="fas fa-heartbeat"></i> Safety Status</h3>
+                <div class="status-indicators">
+                    <div class="status-item">
+                        <div class="status-dot dot-safe"></div>
+                        <div>
+                            <div class="status-label">Location Status</div>
+                            <div class="status-value">Safe - In Classroom</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot dot-safe"></div>
+                        <div>
+                            <div class="status-label">Network Connection</div>
+                            <div class="status-value">Strong Signal</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot dot-safe"></div>
+                        <div>
+                            <div class="status-label">Emergency Ready</div>
+                            <div class="status-value">Systems Active</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot dot-warning"></div>
+                        <div>
+                            <div class="status-label">Weather Alert</div>
+                            <div class="status-value">Rain Expected</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:2rem;">
+                    <h4 style="color: var(--safety-orange); margin-bottom:1rem;">
+                        <i class="fas fa-bell"></i> Active Alerts
+                    </h4>
+                    <div style="background:rgba(255,215,0,0.1); padding:1rem; border-radius:8px; border:1px solid rgba(255,215,0,0.3);">
+                        <div style="font-weight:600; color: var(--warning-zone);">Weather Warning</div>
+                        <div style="font-size:0.9rem; opacity:0.8;">Heavy rain expected after school - Use covered walkways</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Safety Protocols -->
+        <section class="protocols-section">
+            <h2 class="section-title">
+                <i class="fas fa-book-medical"></i>
+                Safety Protocols & Guidelines
+            </h2>
+            <div class="protocols-grid">
+                <div class="protocol-card">
+                    <div class="protocol-icon"><i class="fas fa-fire-extinguisher"></i></div>
+                    <h3 class="protocol-title">Fire Emergency</h3>
+                    <p class="protocol-description">Know your nearest exit routes and assembly points. Stay calm and follow teacher instructions.</p>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-icon"><i class="fas fa-first-aid"></i></div>
+                    <h3 class="protocol-title">Medical Emergency</h3>
+                    <p class="protocol-description">Alert any teacher immediately. Campus medical team will respond within 2 minutes.</p>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-icon"><i class="fas fa-user-shield"></i></div>
+                    <h3 class="protocol-title">Personal Safety</h3>
+                    <p class="protocol-description">Always travel in groups after dark. Report any suspicious activity to security.</p>
+                </div>
+                <div class="protocol-card">
+                    <div class="protocol-icon"><i class="fas fa-network-wired"></i></div>
+                    <h3 class="protocol-title">Digital Safety</h3>
+                    <p class="protocol-description">Keep login credentials secure. Report any cyber bullying immediately.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Khensani Safety AI -->
+        <section class="khensani-safety">
+            <div class="khensani-header">
+                <i class="fas fa-robot khensani-icon"></i>
+                <h2 class="khensani-title">Khensani Safety Assistant</h2>
+            </div>
+            <div class="safety-tips">
+                <div class="tip-card">
+                    <strong>🏃 Emergency Evacuation</strong>
+                    <p>Remember the nearest exit from your current location: Main Staircase B</p>
+                </div>
+                <div class="tip-card">
+                    <strong>📞 Quick Contacts</strong>
+                    <p>Security: Ext. 911 | Medical: Ext. 112 | Counselor: Ext. 123</p>
+                </div>
+                <div class="tip-card">
+                    <strong>🌧️ Weather Alert</strong>
+                    <p>Carry an umbrella - heavy rainfall expected during dismissal</p>
+                </div>
+                <div class="tip-card">
+                    <strong>👥 Buddy System</strong>
+                    <p>You're paired with Kagiso Mbeki for after-school activities</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CANONICAL KD AD -->
+        <a href="https://kdconcepts.com" target="_blank" rel="noopener" id="corporate-ad-center" class="corporate-ad-center">
+            <img id="corporate-ad-logo" src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png" class="kd-rotating-logo" onerror="this.style.display='none'">
+            <div class="corporate-ad-text">
+                <strong id="corporate-ad-title">Student Safety Sponsored by KD Concepts</strong>
+                <span id="corporate-ad-tagline">Advertising · Platform Exposure · Circular Economy Partner</span>
+            </div>
+            <i class="fas fa-external-link-alt" style="color: var(--khensani-gold); font-size: 1.2rem;"></i>
+        </a>
+
+        <!-- FLOATING FOOTER -->
+        <footer class="floating-footer">
+            <div class="footer-logo-row">
+                <a href="https://mindtech.africa" target="_blank">
+                    <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                         class="footer-logo"
+                         alt="EntangleGuard"
+                         onerror="this.style.display='none'">
+                </a>
+            </div>
+            <p class="copyright">© 2026 MindFlow · Khensani AI · Powered by <a href="https://mindtech.africa"><span class="mindtech-glitch">MindTech</span></a> · Transforming African education</p>
+            <div class="footer-bottom">⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Jobs db6h46o4qg6s73c4q1n0 · db6h3eslf4us73c5c80g</div>
+        </footer>
+
+    </main>
+
+    </div><!-- /content-layer -->
+
+    <!-- ============ FIREBASE 10.8.0 MODULAR ============ -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, collection, query, where, orderBy, getDocs, addDoc, updateDoc, doc, increment, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.__khensaniFirebase = { app, auth, db };
+        window.__khensaniFirestore = { collection, query, where, orderBy, getDocs, addDoc, updateDoc, doc, increment, serverTimestamp };
+
+        window.loadCorporateAds = async function() {
+            try {
+                const adsRef = collection(db, 'corporate_ads');
+                const q = query(adsRef, where('approved', '==', true), orderBy('tier', 'desc'));
+                const snap = await getDocs(q);
+                const now = new Date();
+
+                for (const docSnap of snap.docs) {
+                    const ad = docSnap.data();
+                    if (ad.endDate && new Date(ad.endDate.toDate ? ad.endDate.toDate() : ad.endDate) < now) continue;
+
+                    const logoEl = document.getElementById('corporate-ad-logo');
+                    const titleEl = document.getElementById('corporate-ad-title');
+                    const taglineEl = document.getElementById('corporate-ad-tagline');
+                    const linkEl = document.getElementById('corporate-ad-center');
+
+                    if (ad.logoUrl && logoEl) logoEl.src = ad.logoUrl;
+                    if (ad.title && titleEl) titleEl.textContent = ad.title;
+                    if (ad.tagline && taglineEl) taglineEl.textContent = ad.tagline;
+                    if (ad.linkUrl && linkEl) linkEl.href = ad.linkUrl;
+
+                    try { await updateDoc(doc(db, 'corporate_ads', docSnap.id), { impressions: increment(1) }); } catch (e) {}
+                    break;
+                }
+            } catch (e) { console.warn('Corporate ads loader (canonical fallback):', e.message); }
+        };
+
+        window.openKDConcepts = function() { window.open('https://kdconcepts.com', '_blank'); };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => window.loadCorporateAds());
+        } else {
+            window.loadCorporateAds();
+        }
+    </script>
+
+    <!-- ============ PARTICLES (CANONICAL CALM) ============ -->
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55, density: { enable: true, value_area: 800 } },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#00B4D8", opacity: 0.08, width: 1 },
+                move: { enable: true, speed: 0.8, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: false }
+                }
+            }
+        });
+    </script>
+
+    <!-- ============ SAFETY SYSTEM + MAP ============ -->
+    <script>
+        function toggleNotifPanel() {
+            document.getElementById('notifPanel').classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.querySelector('.notif-bell');
+            if (panel && bell && panel.classList.contains('open')) {
+                if (!panel.contains(e.target) && !bell.contains(e.target)) {
+                    panel.classList.remove('open');
+                }
+            }
+        });
+
+        const SafetySystem = {
+            logToFirestore: function(collectionName, data) {
+                try {
+                    const fb = window.__khensaniFirebase;
+                    const fs = window.__khensaniFirestore;
+                    if (fb && fs) {
+                        fs.addDoc(fs.collection(fb.db, collectionName), {
+                            ...data,
+                            timestamp: fs.serverTimestamp()
+                        });
+                    }
+                } catch (e) { /* silent */ }
+            },
+
+            triggerEmergency: function() {
+                if (confirm('🚨 EMERGENCY ALERT!\n\nThis will notify campus security, your teachers, and parents immediately.\n\nAre you in immediate danger?')) {
+                    alert('🆘 EMERGENCY SIGNAL SENT!\n\nHelp is on the way. Security has been alerted with your location.\n\nStay calm and follow safety protocols.');
+                    this.logToFirestore('emergencies', {
+                        userId: 'student_lerato_dube',
+                        userName: 'Lerato Dube',
+                        location: 'Main Building - Classroom 10A',
+                        status: 'active',
+                        type: 'panic_button'
+                    });
+                }
+            },
+
+            contactSecurity: function() {
+                alert('📞 Contacting Campus Security...\n\nSecurity Team: Activated\nResponse Time: < 2 minutes\nYour location has been shared.');
+                this.logToFirestore('security_contacts', { userId: 'student_lerato_dube', contactType: 'security' });
+            },
+
+            contactTeacher: function() {
+                alert('👨‍🏫 Contacting Mr. Smith...\n\nYour class teacher has been notified.\nThey will check on you shortly.');
+                this.logToFirestore('teacher_contacts', { userId: 'student_lerato_dube', teacher: 'Mr. Smith' });
+            },
+
+            contactParent: function() {
+                alert('👪 Contacting Parent/Guardian...\n\nYour emergency contact has been notified.\nThey will call you back immediately.');
+                this.logToFirestore('parent_contacts', { userId: 'student_lerato_dube' });
+            },
+
+            contactMedical: function() {
+                alert('🏥 Contacting Medical Emergency...\n\nCampus medical team alerted.\nResponse Time: < 3 minutes\nStay where you are.');
+                this.logToFirestore('medical_contacts', { userId: 'student_lerato_dube' });
+            }
+        };
+        window.SafetySystem = SafetySystem;
+
+        // Leaflet Map Init
+        let safetyMap;
+        function initializeSafetyMap() {
+            safetyMap = L.map('safetyMap', { zoomControl: true, attributionControl: true }).setView([-26.107, 28.057], 16);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 18,
+                minZoom: 14
+            }).addTo(safetyMap);
+
+            L.circle([-26.107, 28.057], {
+                color: '#00FFAA',
+                fillColor: '#00FFAA',
+                fillOpacity: 0.1,
+                radius: 200
+            }).addTo(safetyMap).bindPopup('Main Campus - Safe Zone');
+
+            L.marker([-26.107, 28.057]).addTo(safetyMap)
+                .bindPopup('<b>Lerato Dube</b><br>Grade 10A Classroom<br>Status: Safe')
+                .openPopup();
+
+            const emergencyPoints = [
+                { lat: -26.108, lng: 28.058, name: 'Security Office' },
+                { lat: -26.106, lng: 28.056, name: 'Medical Center' },
+                { lat: -26.107, lng: 28.059, name: 'Principal Office' }
+            ];
+
+            emergencyPoints.forEach(point => {
+                L.marker([point.lat, point.lng])
+                    .addTo(safetyMap)
+                    .bindPopup(`<b>${point.name}</b><br>Emergency Contact Point`);
+            });
+
+            setTimeout(() => safetyMap.invalidateSize(), 150);
+        }
+
+        window.addEventListener('load', function() {
+            initializeSafetyMap();
+            try {
+                const fb = window.__khensaniFirebase;
+                const fs = window.__khensaniFirestore;
+                if (fb && fs) {
+                    fs.addDoc(fs.collection(fb.db, 'navigation_logs'), {
+                        page: 'safety1',
+                        timestamp: fs.serverTimestamp(),
+                        user: 'Lerato Dube',
+                        role: 'student',
+                        action: 'page_view'
+                    });
+                }
+            } catch (e) { /* silent */ }
+        });
+
+        window.addEventListener('resize', function() {
+            if (safetyMap) setTimeout(() => safetyMap.invalidateSize(), 200);
+        });
+
+        // ESC keyboard shortcut → mindflow-portal.html
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                window.location.href = 'mindflow-portal.html';
+            }
+        });
+    </script>
+</body>
+</html>
