@@ -41,3 +41,4 @@ portal-inventory.txt
 # Firebase hosting build folder
 public/
 !public/index.html
+firebase.json.backup
