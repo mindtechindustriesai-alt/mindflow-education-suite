@@ -37,3 +37,7 @@ functions/.env
 *.pem
 serviceAccountKey.json
 portal-inventory.txt
+
+# Firebase hosting build folder
+public/
+!public/index.html

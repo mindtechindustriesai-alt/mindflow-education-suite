@@ -6,6 +6,9 @@
   "engines": {
     "node": "22"
   },
+  "overrides": {
+    "jwks-rsa": "3.2.2"
+  },
   "scripts": {
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
