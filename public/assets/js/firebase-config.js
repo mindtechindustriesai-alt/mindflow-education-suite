@@ -1,4 +1,5 @@
 // ⚡ FIREBASE CONFIGURATION - MindFlow Education Suite
+// Region: africa-south1 (Johannesburg) · Khensani AI
 console.log('🚀 Initializing MindFlow Firebase Configuration...');
 
 // Firebase Configuration
@@ -12,17 +13,20 @@ const firebaseConfig = {
     measurementId: "G-XXXXXXXXXX"
 };
 
+// Khensani region — all Cloud Functions are in africa-south1
+const KHENSANI_REGION = 'africa-south1';
+
 // Initialize Firebase
 try {
     if (typeof firebase !== 'undefined') {
         firebase.initializeApp(firebaseConfig);
         console.log('✅ Firebase initialized successfully');
-        
+
         // Initialize services
         window.auth = firebase.auth();
         window.db = firebase.firestore();
         window.storage = firebase.storage();
-        
+
         // Enable offline persistence
         window.db.enablePersistence()
             .then(() => console.log('✅ Firestore offline persistence enabled'))
@@ -33,7 +37,6 @@ try {
                     console.warn('⚠️ The current browser does not support persistence');
                 }
             });
-            
     } else {
         console.error('❌ Firebase SDK not loaded');
     }
@@ -47,28 +50,25 @@ window.MindFlowFirebase = {
     auth: window.auth,
     db: window.db,
     storage: window.storage,
-    
-    // Utility Methods
+    region: KHENSANI_REGION,
+
     getCurrentUser: () => window.auth?.currentUser,
     isAuthenticated: () => !!window.auth?.currentUser,
     getUserId: () => window.auth?.currentUser?.uid,
-    
-    // Security Logging
+
     logSecurityEvent: async (eventType, details) => {
         try {
             const logEntry = {
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 eventType,
-                userId: window.MindFlowFirebase.getUserId(),
-                ...details,
-                userAgent: navigator.userAgent,
-                url: window.location.href
+                details,
+                userId: window.auth?.currentUser?.uid || 'anonymous'
             };
-            
             await window.db.collection('security_logs').add(logEntry);
-            console.log('🔒 Security event logged:', eventType);
-        } catch (error) {
-            console.error('❌ Security logging failed:', error);
+        } catch (err) {
+            console.warn('Security log failed:', err.message);
         }
     }
 };
+
+console.log('✅ MindFlow Firebase ready · region:', KHENSANI_REGION);

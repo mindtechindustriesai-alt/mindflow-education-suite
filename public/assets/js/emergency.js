@@ -31,7 +31,7 @@
 
       // Notify via Cloud Function
       if (window.firebase?.functions) {
-        window.firebase.functions().httpsCallable('panicAlert')(payload);
+        window.firebase.app().functions('africa-south1').httpsCallable('panicAlert')(payload);
       }
 
       console.log('[Emergency] PANIC dispatched', payload);
@@ -65,7 +65,7 @@
       }
 
       if (window.firebase?.functions) {
-        window.firebase.functions().httpsCallable('securityCommand')(payload);
+        window.firebase.app().functions('africa-south1').httpsCallable('securityCommand')(payload);
       }
 
       console.log('[Emergency] Command dispatched:', type);

@@ -2,403 +2,102 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // =========================================================
-    // HELPERS
-    // =========================================================
+    // ==== Helper functions ====
     function isSignedIn() {
       return request.auth != null;
     }
-
-    function uid() {
-      return request.auth.uid;
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
     }
 
-    function userDoc() {
-      return get(/databases/$(database)/documents/users/$(uid())).data;
+    // ==== Corporate ads — public read of approved ====
+    match /corporate_ads/{adId} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.token.role == 'admin';
     }
 
-    function role() {
-      return userDoc().role;
+    // ==== Teacher videos — public read of approved ====
+    match /teacher_videos/{videoId} {
+      // Public read — approved only enforced at query level
+      allow read: if true;
+      allow create: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+      allow update, delete: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
     }
 
-    function schoolId() {
-      return userDoc().schoolId;
-    }
-
-    function isRole(r) {
-      return isSignedIn() && role() == r;
-    }
-
-    function isAdmin() {
-      return isSignedIn() && (role() == 'principal' || role() == 'hod');
-    }
-
-    function isStaff() {
-      return isSignedIn() && (role() == 'teacher' || role() == 'hod' || role() == 'principal');
-    }
-
-    function sameSchool(resource) {
-      return isSignedIn() && resource.data.schoolId == schoolId();
-    }
-
-    function isOwner(resource) {
-      return isSignedIn() && resource.data.uid == uid();
-    }
-
-    function isParentOf(childUid) {
-      return isSignedIn() && exists(/databases/$(database)/documents/family_connections/$(uid() + '_' + childUid));
-    }
-
-    function validTimestamp() {
-      return request.time == request.resource.data.timestamp;
-    }
-
-    // =========================================================
-    // USERS (Profile + Role)
-    // =========================================================
-    match /users/{userId} {
-      allow read: if isSignedIn() && (userId == uid() || isAdmin() || isStaff());
-      allow create: if isSignedIn() && userId == uid();
-      allow update: if isSignedIn() && (
-        userId == uid() ||
-        isAdmin()
-      );
-      allow delete: if false; // Never delete users
-    }
-
-    // =========================================================
-    // STUDENT PORTAL COLLECTIONS
-    // =========================================================
-    match /student_profiles/{studentId} {
-      allow read: if isSignedIn() && (
-        studentId == uid() ||
-        isStaff() ||
-        isParentOf(studentId) ||
-        isRole('security')
-      );
-      allow write: if isSignedIn() && (studentId == uid() || isAdmin());
-    }
-
-    match /student_skills/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isStaff() ||
-        isParentOf(resource.data.studentId)
-      );
-      allow write: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isStaff()
-      );
-    }
-
-    match /ai_conversations/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.uid == uid() ||
-        isStaff()
-      );
-      allow create: if isSignedIn() && request.resource.data.uid == uid();
-      allow update, delete: if false; // Conversations immutable
-    }
-
-    match /student_assignments/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isStaff() ||
-        isParentOf(resource.data.studentId)
-      );
-      allow write: if isSignedIn() && isStaff();
-    }
-
-    match /assignment_submissions/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        resource.data.teacherId == uid() ||
-        isAdmin() ||
-        isParentOf(resource.data.studentId)
-      );
-      allow create: if isSignedIn() && request.resource.data.studentId == uid();
-      allow update: if isSignedIn() && (
-        resource.data.teacherId == uid() ||
-        isAdmin()
-      );
-    }
-
-    match /timetables/{docId} {
-      allow read: if isSignedIn() && sameSchool(resource);
-      allow write: if isAdmin();
-    }
-
-    match /daily_schedule/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isStaff() ||
-        isParentOf(resource.data.studentId)
-      );
-      allow write: if false; // Written by Cloud Function only
-    }
-
-    // =========================================================
-    // SAFETY + SENTINEL AI (Patent-Critical)
-    // =========================================================
-    match /privacy_states/{studentId} {
-      allow read: if isSignedIn() && (
-        studentId == uid() ||
-        isParentOf(studentId) ||
-        isStaff()
-      );
-      allow write: if isSignedIn() && studentId == uid();
-    }
-
-    match /locations_tracking/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isParentOf(resource.data.studentId) ||
-        isRole('security') ||
-        isAdmin()
-      );
-      allow create: if isSignedIn() && request.resource.data.studentId == uid();
-      allow update, delete: if false;
-    }
-
-    match /campus_zones/{docId} {
-      allow read: if isSignedIn();
-      allow write: if isRole('security') || isRole('principal');
-    }
-
-    match /parent_notifications/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.parentUid == uid() ||
-        isAdmin()
-      );
-      allow write: if false; // Cloud Function only
-    }
-
-    match /family_connections/{docId} {
-      allow read: if isSignedIn() && (
-        docId.matches(uid() + '_.*') ||
-        resource.data.parentUid == uid() ||
-        isAdmin()
-      );
-      allow write: if isAdmin();
-    }
-
-    match /sentinel_alerts/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isStaff() ||
-        isParentOf(resource.data.studentId) ||
-        isRole('security')
-      );
-      allow write: if false; // Sentinel AI writes via Cloud Function
-    }
-
-    match /panic_events/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isStaff() ||
-        isParentOf(resource.data.studentId) ||
-        isRole('security')
-      );
-      allow create: if isSignedIn() && request.resource.data.studentId == uid();
-      allow update, delete: if false;
-    }
-
-    match /anonymous_reports/{docId} {
-      allow read: if isStaff() || isRole('security');
+    // ==== Student videos — public read of approved ====
+    match /student_videos/{videoId} {
+      allow read: if resource.data.approved == true || isSignedIn();
       allow create: if isSignedIn();
-      allow update, delete: if false;
-    }
-
-    // =========================================================
-    // ACADEMIC + SCHOOL
-    // =========================================================
-    match /classes/{docId} {
-      allow read: if isSignedIn() && sameSchool(resource);
-      allow write: if isAdmin();
-    }
-
-    match /attendance_records/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isStaff() ||
-        isParentOf(resource.data.studentId)
+      allow update, delete: if isSignedIn() && (
+        resource.data.studentUid == request.auth.uid ||
+        request.auth.token.role in ['teacher', 'admin']
       );
-      allow write: if isStaff();
     }
 
-    match /learning_analytics/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.studentId == uid() ||
-        isStaff() ||
-        isParentOf(resource.data.studentId)
-      );
-      allow write: if false; // System only
+    // ==== Video likes ====
+    match /video_likes/{likeId} {
+      allow read: if true;
+      allow create, delete: if isSignedIn();
     }
 
-    match /curriculum_plans/{docId} {
-      allow read: if isSignedIn() && sameSchool(resource);
-      allow write: if isRole('hod') || isRole('principal');
-    }
-
-    match /hod_profiles/{userId} {
-      allow read: if isSignedIn() && (userId == uid() || isRole('principal'));
-      allow write: if isSignedIn() && userId == uid();
-    }
-
-    match /teacher_profiles/{userId} {
-      allow read: if isSignedIn() && (userId == uid() || isAdmin());
-      allow write: if isSignedIn() && (userId == uid() || isAdmin());
-    }
-
-    match /activity_log/{docId} {
-      allow read: if isSignedIn() && sameSchool(resource);
-      allow write: if false; // Cloud Function only
-    }
-
-    // =========================================================
-    // SECURITY PORTAL
-    // =========================================================
-    match /security_profiles/{userId} {
-      allow read: if isSignedIn() && (userId == uid() || isRole('principal'));
-      allow write: if isSignedIn() && (userId == uid() || isRole('principal'));
-    }
-
-    match /security_incidents/{docId} {
-      allow read: if isRole('security') || isAdmin();
-      allow create: if isRole('security');
-      allow update: if isRole('security');
-      allow delete: if false;
-    }
-
-    match /security_alerts/{docId} {
-      allow read: if isRole('security') || isAdmin() || isStaff();
-      allow write: if isRole('security');
-    }
-
-    match /security_cameras/{docId} {
-      allow read: if isRole('security') || isRole('principal');
-      allow write: if isRole('security');
-    }
-
-    match /access_control/{docId} {
-      allow read: if isRole('security') || isAdmin();
-      allow write: if isRole('security');
-    }
-
-    match /officer_locations/{docId} {
-      allow read: if isRole('security') || isRole('principal');
-      allow write: if isSignedIn() && docId == uid();
-    }
-
-    match /security_commands/{docId} {
-      allow read: if isRole('security') || isAdmin();
-      allow create: if isRole('security') || isRole('principal');
-      allow update, delete: if false;
-    }
-
-    match /priority_alerts/{docId} {
-      allow read: if isAdmin() || isRole('security');
-      allow write: if false; // Cloud Function only
-    }
-
-    // =========================================================
-    // PARENT PORTAL
-    // =========================================================
-    match /parent_profiles/{userId} {
-      allow read: if isSignedIn() && (userId == uid() || isAdmin());
-      allow write: if isSignedIn() && userId == uid();
-    }
-
-    match /parent_insights/{docId} {
-      allow read: if isSignedIn() && (
-        resource.data.parentUid == uid() ||
-        isAdmin()
-      );
-      allow write: if false; // Cloud Function only
-    }
-
-    // =========================================================
-    // CORPORATE PORTAL
-    // =========================================================
-    match /corporate_profiles/{userId} {
-      allow read: if isSignedIn() && userId == uid();
-      allow write: if isSignedIn() && userId == uid();
-    }
-
-    match /corporate_insights/{docId} {
-      allow read: if isRole('corporate');
-      allow write: if false; // Cloud Function only
-    }
-
-    match /corporate_activity_log/{docId} {
-      allow read: if isRole('corporate');
-      allow write: if false;
-    }
-
-    match /corporate_billing/{docId} {
-      allow read: if isRole('corporate') || isRole('principal');
-      allow write: if isRole('corporate');
-    }
-
-    match /sponsorship_records/{docId} {
-      allow read: if isRole('corporate');
-      allow create: if isSignedIn(); // impression logging
-      allow update, delete: if isRole('corporate');
-    }
-
-    // =========================================================
-    // PLATFORM + BRANDING
-    // =========================================================
-    match /platform_branding/{docId} {
-      allow read: if true; // Public — logos, footer
-      allow write: if isRole('corporate') || isRole('principal');
-    }
-
-    // =========================================================
-    // AI MODELS + KNOWLEDGE BASE
-    // =========================================================
-    match /ai_models/{docId} {
-      allow read: if isSignedIn();
-      allow write: if false; // Admin SDK only
-    }
-
-    match /knowledge_base/{docId} {
-      allow read: if isSignedIn();
-      allow write: if isRole('teacher') || isAdmin();
-    }
-
-    // =========================================================
-    // QUANTUM VERIFICATION
-    // =========================================================
-    match /quantum_verifications/{docId} {
-      allow read: if true; // Public badge — CHSH S value
-      allow write: if false; // Cloud Function only
-    }
-
-    // =========================================================
-    // AUTH TOKENS (QR Backup)
-    // =========================================================
-    match /auth_tokens/{token} {
-      allow read: if true; // validated by token match
-      allow create: if isAdmin();
-      allow update: if true; // mark as used
-      allow delete: if isAdmin();
-    }
-
-    // =========================================================
-    // SECURITY LOGS (Audit — Immutable)
-    // =========================================================
-    match /security_logs/{docId} {
-      allow read: if isAdmin() || isRole('security');
+    // ==== Video comments ====
+    match /video_comments/{commentId} {
+      allow read: if true;
       allow create: if isSignedIn();
-      allow update, delete: if false; // Immutable
+      allow update, delete: if isSignedIn() && resource.data.commenterUid == request.auth.uid;
     }
 
-    // =========================================================
-    // CATCH-ALL — DENY EVERYTHING ELSE
-    // =========================================================
-    match /{document=**} {
-      allow read, write: if false;
+    // ==== Chess competitions ====
+    match /chess_competitions/{compId} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+    }
+
+    // ==== Chess matches ====
+    match /chess_matches/{matchId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+    }
+
+    // ==== Sponsor interest ====
+    match /sponsor_interest/{interestId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+    }
+
+    // ==== Quantum screenings audit ====
+    match /quantum_screenings/{screenId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+    }
+
+    // ==== Emergency logs (existing collections) ====
+    match /emergencies/{emergencyId} {
+      allow read, write: if isSignedIn();
+    }
+    match /security_contacts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+    match /teacher_contacts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+    match /parent_contacts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+    match /medical_contacts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // ==== Navigation logs ====
+    match /navigation_logs/{logId} {
+      allow read: if isSignedIn() && request.auth.token.role in ['admin', 'security'];
+      allow create: if true;
+    }
+
+    // ==== Incident actions ====
+    match /incident_actions/{actionId} {
+      allow read: if isSignedIn() && request.auth.token.role in ['security', 'admin'];
+      allow create: if isSignedIn();
     }
   }
 }

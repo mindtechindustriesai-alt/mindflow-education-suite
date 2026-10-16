@@ -29,7 +29,7 @@
 
       this._inFlight = true;
       try {
-        const call = window.firebase.functions().httpsCallable('mqosChsh');
+        const call = window.firebase.app().functions('africa-south1').httpsCallable('mqosChsh');
         const res = await call({ fresh: forceFresh });
         const d = res.data || {};
 

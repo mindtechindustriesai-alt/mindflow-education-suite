@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script>
+// SW Kill Switch v2 — unregisters stale SW + clears caches
+(function(){
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(reg => {
+        console.log('🧹 Unregistering stale SW:', reg.scope);
+        reg.unregister();
+      });
+    });
+  }
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => {
+        console.log('🧹 Deleting cache:', name);
+        caches.delete(name);
+      });
+    });
+  }
+})();
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindFlow Portal - Student Dashboard · Khensani Quantum AI</title>
@@ -800,7 +820,7 @@
                     <div class="user-role">Grade 10A • Mathematics Focus</div>
                 </div>
             </div>
-            <a href="student.html" class="profile-btn">
+            <a href="student1.html" class="profile-btn">
                 <i class="fas fa-user-circle"></i>
                 Profile
             </a>
@@ -832,22 +852,22 @@
                 </a>
             </li>
             <li class="nav-tab">
-                <a href="safety.html" style="color: inherit; text-decoration: none;">
+                <a href="safety1.html" style="color: inherit; text-decoration: none;">
                     <i class="fas fa-shield-alt"></i> Safety
                 </a>
             </li>
             <li class="nav-tab">
-                <a href="anonymous-reporting.html" style="color: inherit; text-decoration: none;">
+                <a href="anomynous1.html" style="color: inherit; text-decoration: none;">
                     <i class="fas fa-comment-medical"></i> Reporting
                 </a>
             </li>
             <li class="nav-tab">
-                <a href="chess-quiz.html" style="color: inherit; text-decoration: none;">
+                <a href="chess1.html" style="color: inherit; text-decoration: none;">
                     <i class="fas fa-chess"></i> Chess Quiz
                 </a>
             </li>
             <li class="nav-tab">
-                <a href="student.html" style="color: inherit; text-decoration: none;">
+                <a href="student1.html" style="color: inherit; text-decoration: none;">
                     <i class="fas fa-user-graduate"></i> Profile
                 </a>
             </li>
@@ -1215,8 +1235,8 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script src="../../assets/js/quantum-verify.js"></script>
-    <script src="../../assets/js/components/chat.js"></script>
+    <script src="../../assets/js/quantum-verify.js?v=1792153740232"></script>
+    <script src="../../assets/js/components/chat.js?v=1792153740232"></script>
 
     <script>
         // ============================================================
@@ -1253,7 +1273,7 @@
             }
             db = firebase.firestore();
             auth = firebase.auth();
-            functions = firebase.functions();
+            functions = firebase.app().functions('africa-south1');
         } catch(e) { console.warn('[Firebase] Init error:', e.message); }
 
         // ============================================================

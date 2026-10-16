@@ -858,7 +858,7 @@
             }
             db = firebase.firestore();
             auth = firebase.auth();
-            functions = firebase.functions();
+            functions = firebase.app().functions('africa-south1');
             storage = firebase.storage();
         } catch(e) { console.warn('[Firebase] Init error:', e.message); }
 

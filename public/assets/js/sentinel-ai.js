@@ -340,14 +340,14 @@
       }
       // Alert via Cloud Function (never write directly)
       if (window.firebase?.functions) {
-        window.firebase.functions().httpsCallable('sentinelAlert')(payload);
+        window.firebase.app().functions('africa-south1').httpsCallable('sentinelAlert')(payload);
       }
       document.dispatchEvent(new CustomEvent('sentinel:tier3', { detail: payload }));
     }
 
     tier4HumanHandoff(payload) {
       if (window.firebase?.functions) {
-        window.firebase.functions().httpsCallable('sentinelAlert')({
+        window.firebase.app().functions('africa-south1').httpsCallable('sentinelAlert')({
           ...payload,
           severity: 'critical',
           notifyParent: true
@@ -378,7 +378,7 @@
         location: await this.getLocation()
       };
       if (window.firebase?.functions) {
-        window.firebase.functions().httpsCallable('panicAlert')(payload);
+        window.firebase.app().functions('africa-south1').httpsCallable('panicAlert')(payload);
       }
       this.showPrompt('Help is on the way. Stay where you are.');
     }

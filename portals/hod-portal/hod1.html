@@ -607,11 +607,11 @@
     <!-- PORTAL NAV -->
     <nav class="portal-nav">
         <ul class="nav-tabs">
-            <li><a href="hod.html" class="nav-tab active">Department Dashboard</a></li>
-            <li><a href="hod-staff-management.html" class="nav-tab">Staff Management</a></li>
-            <li><a href="hod-curriculum-management.html" class="nav-tab">Curriculum Planning</a></li>
-            <li><a href="hod-performance-analytics.html" class="nav-tab">Performance Analytics</a></li>
-            <li><a href="hod-resource-allocation.html" class="nav-tab">Resource Allocation</a></li>
+            <li><a href="../hod-portal/hod1.html" class="nav-tab active">Department Dashboard</a></li>
+            <li><a href="../hod-portal/hod-staff-management1.html" class="nav-tab">Staff Management</a></li>
+            <li><a href="../hod-portal/hod-curriculum-management1.html" class="nav-tab">Curriculum Planning</a></li>
+            <li><a href="../hod-portal/hod-performance-analytics1.html" class="nav-tab">Performance Analytics</a></li>
+            <li><a href="../hod-portal/hod-resource-allocation1.html" class="nav-tab">Resource Allocation</a></li>
         </ul>
     </nav>
 
@@ -675,19 +675,19 @@
             </div>
 
             <div class="quick-actions">
-                <a href="hod-staff-management.html" class="action-btn">
+                <a href="../hod-portal/hod-staff-management1.html" class="action-btn">
                     <i class="fas fa-user-tie action-icon"></i>
                     <div class="action-text">Staff Management</div>
                 </a>
-                <a href="hod-curriculum-management.html" class="action-btn">
+                <a href="../hod-portal/hod-curriculum-management1.html" class="action-btn">
                     <i class="fas fa-book action-icon"></i>
                     <div class="action-text">Curriculum Planning</div>
                 </a>
-                <a href="hod-resource-allocation.html" class="action-btn">
+                <a href="../hod-portal/hod-resource-allocation1.html" class="action-btn">
                     <i class="fas fa-money-bill-wave action-icon"></i>
                     <div class="action-text">Budget Allocation</div>
                 </a>
-                <a href="hod-performance-analytics.html" class="action-btn">
+                <a href="../hod-portal/hod-performance-analytics1.html" class="action-btn">
                     <i class="fas fa-chart-bar action-icon"></i>
                     <div class="action-text">Department Report</div>
                 </a>
@@ -723,7 +723,7 @@
         <div class="staff-performance">
             <div class="performance-header">
                 <div class="chart-title">Staff Performance Overview</div>
-                <a href="hod-staff-management.html" class="form-control" style="text-decoration: none; display: inline-block; text-align: center; cursor: pointer;">View All Staff</a>
+                <a href="../hod-portal/hod-staff-management1.html" class="form-control" style="text-decoration: none; display: inline-block; text-align: center; cursor: pointer;">View All Staff</a>
             </div>
             <div class="staff-grid">
                 <div class="staff-card">
@@ -768,7 +768,7 @@
                 <div class="chart-title">
                     <i class="fas fa-video"></i> Creator Content Oversight
                 </div>
-                <a href="hod-performance-analytics.html" class="form-control" style="text-decoration: none; display: inline-block; text-align: center; cursor: pointer;">View Full Analytics</a>
+                <a href="../hod-portal/hod-performance-analytics1.html" class="form-control" style="text-decoration: none; display: inline-block; text-align: center; cursor: pointer;">View Full Analytics</a>
             </div>
             <p style="opacity: 0.85; font-size: 0.9rem; margin-bottom: 1.2rem;">
                 Student creative curriculum content across the department — dance, song, rap, robotics, animation, and more. Quantum-screened for curriculum alignment and safety.
@@ -805,7 +805,7 @@
         <div class="curriculum-section">
             <div class="curriculum-header">
                 <div class="chart-title">Curriculum Development Status</div>
-                <a href="hod-curriculum-management.html" class="form-control" style="text-decoration: none; display: inline-block; text-align: center; cursor: pointer;">Manage Curriculum</a>
+                <a href="../hod-portal/hod-curriculum-management1.html" class="form-control" style="text-decoration: none; display: inline-block; text-align: center; cursor: pointer;">Manage Curriculum</a>
             </div>
             <div class="curriculum-grid">
                 <div class="curriculum-card">
@@ -886,7 +886,7 @@
         }
         db = firebase.firestore();
         auth = firebase.auth();
-        functions = firebase.functions ? firebase.functions() : null;
+        functions = firebase.functions ? firebase.app().functions('africa-south1') : null;
     } catch(e) { console.warn('[Firebase] Init error:', e.message); }
 
     // ============================================================

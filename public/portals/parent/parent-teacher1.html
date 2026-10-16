@@ -755,11 +755,11 @@
     <!-- PORTAL NAV -->
     <nav class="portal-nav">
         <ul class="nav-tabs">
-            <li><a href="parent-dashboard.html" class="nav-tab">Dashboard</a></li>
-            <li><a href="communications.html" class="nav-tab">Communications</a></li>
-            <li><a href="parent-analytics.html" class="nav-tab">Progress Analytics</a></li>
-            <li><a href="parent-children.html" class="nav-tab">Children Profiles</a></li>
-            <li><a href="parent-teacher.html" class="nav-tab active">Teacher Connect</a></li>
+            <li><a href="../parent/parent-dashboard1.html" class="nav-tab">Dashboard</a></li>
+            <li><a href="../parent/communications1.html" class="nav-tab">Communications</a></li>
+            <li><a href="../parent/parent-analytics1.html" class="nav-tab">Progress Analytics</a></li>
+            <li><a href="../parent/parent-children1.html" class="nav-tab">Children Profiles</a></li>
+            <li><a href="../parent/parent-teacher1.html" class="nav-tab active">Teacher Connect</a></li>
         </ul>
     </nav>
 
@@ -1025,7 +1025,7 @@
             }
             db = firebase.firestore();
             auth = firebase.auth();
-            functions = firebase.functions ? firebase.functions() : null;
+            functions = firebase.functions ? firebase.app().functions('africa-south1') : null;
         } catch(e) { console.warn('[Firebase] Init error:', e.message); }
 
         // ============================================================

@@ -28,6 +28,19 @@ setGlobalOptions({
   maxInstances: 10,
 });
 
+// CORS configuration for callable functions
+const corsOptions = {
+  cors: [
+    'https://mindflow-ai-education.web.app',
+    'https://mindflow-ai-education.firebaseapp.com',
+    'https://mindflow-ai-education.app',
+    'http://localhost:5000',
+    'http://localhost:3000',
+    'http://127.0.0.1:5000'
+  ]
+};
+
+
 // Declare secrets (read from Firebase Secret Manager at runtime)
 const MQOS_URL = defineSecret('MQOS_URL');
 const MQOS_SHARED_SECRET = defineSecret('MQOS_SHARED_SECRET');
@@ -41,6 +54,7 @@ const LUVUNO_SHARED_SECRET = defineSecret('LUVUNO_SHARED_SECRET');
 
 exports.mqosChsh = onCall(
   {
+    ...corsOptions,
     secrets: [MQOS_URL, MQOS_SHARED_SECRET],
     timeoutSeconds: 120,
     memory: '256MiB',
@@ -48,7 +62,7 @@ exports.mqosChsh = onCall(
   async (request) => {
     const fresh = request.data && request.data.fresh === true;
     const mqosUrl = MQOS_URL.value();
-    const mqosKey = MQOS_SHARED_SECRET.value();
+    const mqosKey = (MQOS_SHARED_SECRET.value() || '').replace(/^\uFEFF/, '').trim(); // Sanitize secret
 
     if (!mqosUrl) {
       throw new HttpsError('failed-precondition', 'MQOS_URL not configured');
@@ -106,6 +120,7 @@ exports.mqosChsh = onCall(
 
 exports.luvunoChat = onCall(
   {
+    ...corsOptions,
     secrets: [LUVUNO_URL, LUVUNO_SHARED_SECRET],
     timeoutSeconds: 60,
     memory: '256MiB',
@@ -116,7 +131,7 @@ exports.luvunoChat = onCall(
     }
 
     const luvunoUrl = LUVUNO_URL.value();
-    const luvunoKey = LUVUNO_SHARED_SECRET.value();
+    const luvunoKey = (LUVUNO_SHARED_SECRET.value() || '').replace(/^\uFEFF/, '').trim(); // Sanitize secret
 
     if (!luvunoUrl) {
       throw new HttpsError('failed-precondition', 'LUVUNO_URL not configured');

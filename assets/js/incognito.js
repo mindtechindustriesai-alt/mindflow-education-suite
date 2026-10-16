@@ -86,7 +86,7 @@
         timestamp: new Date().toISOString()
       };
       if (window.firebase?.functions) {
-        window.firebase.functions().httpsCallable('forceLocate')(payload);
+        window.firebase.app().functions('africa-south1').httpsCallable('forceLocate')(payload);
       }
     }
   }

@@ -102,7 +102,7 @@
       // Try Cloud Function first (has auth + logging + quantum context)
       if (window.firebase && window.firebase.functions) {
         try {
-          const call = window.firebase.functions().httpsCallable('luvunoChat');
+          const call = window.firebase.app().functions('africa-south1').httpsCallable('luvunoChat');
           const res = await call({
             message: text,
             portal: 'khensani',
