@@ -163,13 +163,15 @@ exports.luvunoChat = onCall(
       });
     } catch (err) {
       console.error('[luvunoChat] fetch failed:', err);
-      throw new HttpsError('internal', `Luvuno fetch failed: ${err.message}`);
+      await db.collection("student_videos").doc(videoId).update({ quantum_screen: "review", quantum_score: 50, quantum_reason: "Luvuno network error. Queued for manual review." });
+      return { status: "review", score: 50, reason: "Luvuno network error" };
     }
 
     if (!res.ok) {
       const body = await res.text().catch(() => '');
       console.error(`[luvunoChat] ${res.status} body:`, body.slice(0, 200));
-      throw new HttpsError('internal', `Luvuno ${res.status}`);
+      await db.collection("student_videos").doc(videoId).update({ quantum_screen: "review", quantum_score: 50, quantum_reason: "Luvuno offline. Queued for manual review." });
+      return { status: "review", score: 50, reason: "Luvuno offline" };
     }
 
     const json = await res.json();
@@ -254,10 +256,18 @@ Do not include any other text outside the JSON.`;
         }),
       });
     } catch (err) {
-      throw new HttpsError('internal', `Luvuno fetch failed: ${err.message}`);
+      await db.collection("student_videos").doc(videoId).update({ quantum_screen: "review", quantum_score: 50, quantum_reason: "Luvuno network error. Queued for manual review." });
+      return { status: "review", score: 50, reason: "Luvuno network error" };
     }
 
-    if (!res.ok) throw new HttpsError('internal', `Luvuno returned ${res.status}`);
+    if (!res.ok) 
+      // Fallback: Route to manual review if Luvuno fails
+      await db.collection('student_videos').doc(videoId).update({ 
+        quantum_screen: 'review', 
+        quantum_score: 50, 
+        quantum_reason: 'Luvuno AI unavailable. Queued for manual review.' 
+      });
+      return { status: 'review', score: 50, reason: 'Luvuno error' };
     
     const json = await res.json();
     let screenResult = { pass: false, score: 0, reason: "Parse error", flags: ["system"] };
