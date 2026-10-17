@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sponsor Dashboard - Khensani AI · MindFlow Corporate</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+    <style>
+        :root {
+            --khensani-gold: #C8A450;
+            --khensani-cream: #E8D5A3;
+            --creator-pink: #FF69B4;
+            --communication-blue: #00A8FF;
+            --primary: #0a0a2a;
+            --secondary: #1a1a4a;
+            --accent: #FFD700;
+            --text: #e0e0ff;
+            --text-dim: #a0a0cc;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3366;
+            --ai-gold: #FFD700;
+            --corporate-primary: #FFD700;
+            --corporate-secondary: #C8A450;
+            --dark-space: #0f0f1a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Exo 2', sans-serif; }
+        html { background: var(--dark-space); }
+        body { background: transparent; color: var(--text); min-height: 100vh; overflow-x: hidden; isolation: isolate; }
+
+        #particles-js { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .content-layer { position: relative; z-index: 1; }
+
+        /* TECH NAVBAR */
+        .tech-navbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: rgba(10, 10, 16, 0.48); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--corporate-primary); padding: 0.75rem 1.5rem;
+            display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+            z-index: 1000; box-shadow: 0 4px 30px rgba(255, 215, 0, 0.15);
+        }
+        .nav-logo-block { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+        .khensani-nav-logo { height: 90px; width: auto; object-fit: contain; filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.5)); transition: all 0.3s ease; }
+        .khensani-nav-logo:hover { transform: scale(1.05); filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.9)); }
+        .brand-block { display: flex; align-items: center; gap: 0.6rem; }
+        .brand-icon-wrap { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--corporate-primary), var(--khensani-gold)); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 18px rgba(255, 215, 0, 0.6); }
+        .brand-icon-wrap i { color: #0a0a16; font-size: 1.2rem; }
+        .brand-text { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 1.1rem; letter-spacing: 2px; background: linear-gradient(135deg, var(--corporate-primary), var(--khensani-gold)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
+        .nav-actions { display: flex; align-items: center; gap: 0.75rem; }
+
+        .notif-bell { position: relative; width: 44px; height: 44px; border-radius: 50%; background: rgba(255, 215, 0, 0.12); border: 2px solid var(--corporate-primary); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; }
+        .notif-bell:hover { background: rgba(255, 215, 0, 0.28); transform: scale(1.08); box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+        .notif-bell i { color: var(--corporate-primary); font-size: 1.05rem; }
+        .notif-badge { position: absolute; top: -4px; right: -4px; background: var(--danger); color: #fff; font-size: 0.7rem; font-weight: 700; min-width: 20px; height: 20px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 5px; animation: pulse 2s infinite; box-shadow: 0 0 12px rgba(255, 51, 102, 0.8); }
+
+        .notif-panel { position: fixed; top: 0; right: -420px; width: 400px; max-width: 92vw; height: 100vh; background: rgba(10, 10, 26, 0.98); backdrop-filter: blur(25px); border-left: 2px solid var(--corporate-primary); z-index: 1200; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; padding: 1.5rem; box-shadow: -10px 0 40px rgba(0,0,0,0.6); }
+        .notif-panel.open { right: 0; }
+        .notif-panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255, 215, 0, 0.35); }
+        .notif-panel-head h3 { font-family: 'Space Mono', monospace; color: var(--corporate-primary); font-size: 1.1rem; letter-spacing: 2px; }
+        .notif-close { background: transparent; border: 1px solid var(--corporate-primary); color: var(--corporate-primary); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease; }
+        .notif-close:hover { background: var(--corporate-primary); color: #0a0a16; transform: rotate(90deg); }
+
+        .notif-item { background: rgba(255, 215, 0, 0.06); border-left: 4px solid var(--corporate-primary); border-radius: 8px; padding: 0.9rem 1rem; margin-bottom: 0.75rem; transition: all 0.3s ease; }
+        .notif-item:hover { transform: translateX(-5px); background: rgba(255, 215, 0, 0.14); }
+        .notif-item.critical { border-left-color: var(--creator-pink); background: rgba(255, 105, 180, 0.1); }
+        .notif-item.critical .notif-title { color: var(--creator-pink); }
+        .notif-item.warning { border-left-color: var(--warning); background: rgba(255, 170, 0, 0.1); }
+        .notif-title { font-weight: 600; color: var(--corporate-primary); font-size: 0.95rem; margin-bottom: 0.35rem; }
+        .notif-text { font-size: 0.85rem; color: var(--text-dim); line-height: 1.4; }
+        .notif-time { font-size: 0.72rem; color: var(--text-dim); margin-top: 0.5rem; font-family: 'Space Mono', monospace; opacity: 0.75; }
+
+        .back-pill { display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; border: 2px solid var(--corporate-primary); color: var(--corporate-primary); padding: 0.55rem 1.15rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem; letter-spacing: 1px; text-decoration: none; transition: all 0.3s ease; white-space: nowrap; }
+        .back-pill:hover { background: var(--corporate-primary); color: #0a0a16; box-shadow: 0 0 22px rgba(255, 215, 0, 0.75); transform: translateY(-2px); }
+
+        .portal-header { margin-top: 105px; background: rgba(10, 10, 10, 0.55); backdrop-filter: blur(10px); border-bottom: 2px solid var(--corporate-primary); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 900; box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); flex-wrap: wrap; gap: 1rem; }
+        .logo-container { display: flex; align-items: center; gap: 1rem; }
+        .logo { font-size: 2rem; color: var(--corporate-primary); animation: pulse 2s infinite; }
+        .portal-title { font-size: 1.5rem; font-weight: 600; color: white; }
+        .portal-subtitle { font-size: 0.85rem; color: var(--text-dim); font-family: 'Space Mono', monospace; letter-spacing: 1px; }
+
+        .quantum-line { text-align: center; font-size: 0.75rem; color: var(--khensani-gold); letter-spacing: 3px; font-family: 'Space Mono', monospace; padding: 0.6rem 1rem; background: rgba(200, 164, 80, 0.05); border-top: 1px solid rgba(200, 164, 80, 0.2); border-bottom: 1px solid rgba(200, 164, 80, 0.2); position: relative; z-index: 1; }
+
+        .main-content { padding: 2rem; max-width: 1600px; margin: 0 auto; position: relative; z-index: 1; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: rgba(15, 20, 35, 0.48); backdrop-filter: blur(3px); border: 2px solid var(--corporate-primary); border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s ease; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3); }
+        .stat-value { font-size: 2.5rem; font-weight: 700; color: var(--ai-gold); margin-bottom: 0.5rem; font-family: 'Space Mono', monospace; }
+        .stat-label { font-size: 1rem; color: var(--text-dim); }
+
+        .filter-bar { display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap; align-items: center; }
+        .filter-pill { background: rgba(255, 215, 0, 0.1); border: 1px solid var(--corporate-primary); color: var(--corporate-primary); padding: 0.55rem 1.15rem; border-radius: 999px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease; font-family: 'Exo 2', sans-serif; }
+        .filter-pill:hover, .filter-pill.active { background: var(--corporate-primary); color: #0a0a16; box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); }
+
+        .creators-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .creator-card { background: rgba(15, 20, 35, 0.48); backdrop-filter: blur(3px); border: 2px solid rgba(255, 105, 180, 0.4); border-radius: 12px; padding: 1.5rem; transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .creator-card:hover { border-color: var(--creator-pink); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3); }
+
+        .sponsor-pick-badge { position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, var(--ai-gold), var(--khensani-gold)); color: #0a0a16; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; font-family: 'Space Mono', monospace; letter-spacing: 1px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); animation: sponsorGlow 2s infinite; }
+
+        .creator-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+        .creator-avatar { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--creator-pink), var(--ai-gold)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.3rem; color: #0a0a16; flex-shrink: 0; box-shadow: 0 0 18px rgba(255, 105, 180, 0.5); }
+        .creator-info { flex: 1; }
+        .creator-name { font-size: 1.1rem; font-weight: 600; color: var(--ai-gold); }
+        .creator-category { font-size: 0.8rem; color: var(--creator-pink); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 1px; margin-top: 0.25rem; }
+
+        .creator-title { font-size: 0.95rem; font-weight: 500; color: var(--text); margin-bottom: 1rem; line-height: 1.4; }
+
+        .creator-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 1rem; }
+        .metric-box { background: rgba(255, 105, 180, 0.1); border: 1px solid rgba(255, 105, 180, 0.3); border-radius: 8px; padding: 0.6rem; text-align: center; }
+        .metric-value { font-size: 1.1rem; font-weight: 700; color: var(--creator-pink); font-family: 'Space Mono', monospace; }
+        .metric-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.25rem; }
+
+        .q-score-pill { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(0, 255, 136, 0.15); border: 1px solid var(--success); color: var(--success); padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; font-family: 'Space Mono', monospace; margin-bottom: 1rem; }
+        .q-score-pill.warn { background: rgba(255, 170, 0, 0.15); border-color: var(--warning); color: var(--warning); }
+
+        .creator-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+        .action-btn { flex: 1; background: rgba(255, 215, 0, 0.1); border: 1px solid var(--corporate-primary); color: var(--corporate-primary); padding: 0.6rem 0.85rem; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Exo 2', sans-serif; display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
+        .action-btn:hover { background: var(--corporate-primary); color: #0a0a16; transform: translateY(-2px); }
+        .action-btn.pink { background: rgba(255, 105, 180, 0.1); border-color: var(--creator-pink); color: var(--creator-pink); }
+        .action-btn.pink:hover { background: var(--creator-pink); color: #0a0a16; }
+
+        .empty-state { text-align: center; padding: 3rem 1.5rem; background: rgba(15, 20, 35, 0.48); backdrop-filter: blur(3px); border: 2px dashed rgba(255, 215, 0, 0.3); border-radius: 12px; grid-column: 1 / -1; }
+        .empty-state i { font-size: 3rem; color: var(--corporate-primary); margin-bottom: 1rem; opacity: 0.6; }
+        .empty-state h3 { font-size: 1.2rem; color: var(--ai-gold); margin-bottom: 0.5rem; }
+        .empty-state p { color: var(--text-dim); font-size: 0.9rem; }
+
+        .corporate-ad-center { background: linear-gradient(135deg, rgba(70,25,115,0.22), rgba(110,80,20,0.18)); border: 2px solid rgba(200,164,80,0.4); border-radius: 20px; padding: 1.5rem 2rem; margin: 2rem 0; display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; text-decoration: none; color: inherit; transition: all 0.3s ease; position: relative; overflow: hidden; min-height: 100px; }
+        .corporate-ad-center::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(200,164,80,0.08), transparent); animation: kd-shine 4s infinite; }
+        @keyframes kd-shine { 0% { left: -100%; } 100% { left: 100%; } }
+        .corporate-ad-center:hover { border-color: var(--khensani-gold); box-shadow: 0 0 40px rgba(200,164,80,0.3); transform: translateY(-3px); }
+        .corporate-ad-text { font-family: 'Space Mono', monospace; font-size: 0.95rem; color: var(--khensani-cream); letter-spacing: 1px; }
+        .corporate-ad-text strong { color: var(--khensani-gold); font-size: 1.15rem; display: block; margin-bottom: 4px; }
+        .kd-rotating-logo { height: 65px; width: 65px; object-fit: contain; flex-shrink: 0; opacity: 1 !important; filter: brightness(0.78) contrast(1.28) drop-shadow(0 0 7px rgba(80,20,135,0.98)) drop-shadow(0 0 16px rgba(138,43,226,0.95)) drop-shadow(0 0 25px rgba(200,164,80,0.72)) !important; transform-style: preserve-3d; animation: kd-superposition-visible 6s ease-in-out infinite !important; }
+        @keyframes kd-superposition-visible { 0%,100% { transform: perspective(600px) rotateY(0deg) rotateZ(0deg) scale(1); } 25% { transform: perspective(600px) rotateY(90deg) rotateZ(4deg) scale(1.08); } 50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); } 75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); } }
+
+        .floating-footer { background: transparent !important; border: none !important; box-shadow: none !important; padding: 2.5rem 1rem 1.5rem; text-align: center; margin-top: 2rem; }
+        .footer-logo-row { display: flex; justify-content: center; margin-bottom: 1rem; }
+        .footer-logo { height: 55px; width: auto; object-fit: contain; opacity: 0.85; transition: all 0.4s ease; filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4)); }
+        .footer-logo:hover { opacity: 1; transform: scale(1.05); filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.9)); }
+        .floating-footer .copyright { color: var(--text-dim); font-size: 0.85rem; font-family: 'Space Mono', monospace; letter-spacing: 1px; margin-bottom: 0.5rem; }
+        .floating-footer .copyright a { color: inherit; text-decoration: none; }
+        .mindtech-glitch { color: var(--corporate-primary); font-weight: bold; font-size: 0.9rem; display: inline-block; animation: mindtechGlitch 2s infinite; }
+        .footer-bottom { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--khensani-gold); letter-spacing: 1.5px; margin-top: 0.75rem; opacity: 0.85; }
+
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes sponsorGlow { 0%,100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); } 50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9); } }
+        @keyframes mindtechGlitch { 0% { text-shadow: 0 0 10px var(--corporate-primary), 0 0 20px #0066FF; } 50% { text-shadow: 0 0 15px var(--corporate-primary), 0 0 30px #0066FF, 0 0 40px #FFD700; } 100% { text-shadow: 0 0 10px var(--corporate-primary), 0 0 20px #0066FF; } }
+
+        @media (max-width: 900px) { .khensani-nav-logo { height: 60px; } .brand-text { font-size: 0.9rem; } }
+        @media (max-width: 768px) {
+            .tech-navbar { padding: 0.5rem 0.75rem; }
+            .khensani-nav-logo { height: 50px; }
+            .portal-header { padding: 1rem; flex-direction: column; align-items: flex-start; margin-top: 80px; }
+            .main-content { padding: 1rem; }
+            .creators-grid { grid-template-columns: 1fr; }
+            .notif-panel { width: 100%; right: -100%; }
+            .back-pill { padding: 0.45rem 0.85rem; font-size: 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+
+    <div class="content-layer">
+
+    <!-- CANONICAL TECH NAVBAR -->
+    <header class="tech-navbar">
+        <div class="nav-logo-block">
+            <a href="/portals/student-portal/mindflow-portal.html">
+                <img src="https://i.postimg.cc/RVnfKspQ/Khensani-Transparent-Logo.png"
+                     alt="Khensani AI"
+                     class="khensani-nav-logo"
+                     onerror="this.style.display='none'">
+            </a>
+            <div class="brand-block">
+                <div class="brand-icon-wrap"><i class="fas fa-handshake"></i></div>
+                <div class="brand-text">SPONSOR DASHBOARD</div>
+            </div>
+        </div>
+
+        <div class="nav-actions">
+            <div class="notif-bell" onclick="toggleNotifPanel()">
+                <i class="fas fa-bell"></i>
+                <span class="notif-badge" id="notifBadge">3</span>
+            </div>
+            <a href="/portals/coporate-portal/corporate1.html" class="back-pill">
+                <i class="fas fa-arrow-left"></i> Back to Corporate
+            </a>
+        </div>
+    </header>
+
+    <!-- SLIDE-IN NOTIFICATION PANEL -->
+    <aside class="notif-panel" id="notifPanel">
+        <div class="notif-panel-head">
+            <h3><i class="fas fa-star"></i> SPONSOR ALERTS</h3>
+            <button class="notif-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="notif-item critical">
+            <div class="notif-title"><i class="fas fa-fire"></i> New Top Creator!</div>
+            <div class="notif-text">A student creator just hit 100+ likes this week.</div>
+            <div class="notif-time">15 min ago</div>
+        </div>
+        <div class="notif-item warning">
+            <div class="notif-title"><i class="fas fa-check"></i> Quantum Screening Complete</div>
+            <div class="notif-text">3 new student videos passed quantum screening.</div>
+            <div class="notif-time">1 hour ago</div>
+        </div>
+        <div class="notif-item">
+            <div class="notif-title"><i class="fas fa-handshake"></i> Sponsor Interest Logged</div>
+            <div class="notif-text">Your interest in student creator was recorded.</div>
+            <div class="notif-time">2 hours ago</div>
+        </div>
+    </aside>
+
+    <!-- PORTAL HEADER -->
+    <header class="portal-header">
+        <div class="logo-container">
+            <div class="logo"><i class="fas fa-handshake"></i></div>
+            <div>
+                <div class="portal-title">Sponsor Dashboard</div>
+                <div class="portal-subtitle">Discover Top Student Creators · Verified Content</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- QUANTUM LINE -->
+    <div class="quantum-line">⚛️ QUANTUM-VERIFIED · CHSH S=2.8284 · SA PATENT 2026/05142</div>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- LIVE STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="statCreators">—</div>
+                <div class="stat-label">Top Creators</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statVideos">—</div>
+                <div class="stat-label">Approved Videos</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statEngagement">—</div>
+                <div class="stat-label">Total Engagement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statInterest">—</div>
+                <div class="stat-label">Your Interests</div>
+            </div>
+        </div>
+
+        <!-- CATEGORY FILTER -->
+        <div class="filter-bar">
+            <span style="color: var(--text-dim); font-size: 0.9rem; margin-right: 0.5rem;">Filter:</span>
+            <button class="filter-pill active" data-filter="all">All Categories</button>
+            <button class="filter-pill" data-filter="dance">🎵 Dance</button>
+            <button class="filter-pill" data-filter="song">🎤 Song</button>
+            <button class="filter-pill" data-filter="rap">🎧 Rap</button>
+            <button class="filter-pill" data-filter="animation">🎨 Animation</button>
+            <button class="filter-pill" data-filter="robotics">🤖 Robotics</button>
+            <button class="filter-pill" data-filter="art">🖌️ Art</button>
+            <button class="filter-pill" data-filter="drama">🎭 Drama</button>
+            <button class="filter-pill" data-filter="story">📖 Story</button>
+        </div>
+
+        <!-- CREATORS GRID -->
+        <div class="creators-grid" id="creatorsGrid">
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h3>Loading creators...</h3>
+                <p>Fetching top student creators from Firestore</p>
+            </div>
+        </div>
+
+        <!-- CANONICAL KD AD -->
+        <a href="https://kdconcepts.com" target="_blank" rel="noopener" id="corporate-ad-center" class="corporate-ad-center">
+            <img id="corporate-ad-logo" src="https://i.postimg.cc/T3ytnBqN/KD-LOGO-IMAGE-removebg-preview.png" class="kd-rotating-logo" onerror="this.style.display='none'">
+            <div class="corporate-ad-text">
+                <strong id="corporate-ad-title">Sponsor Dashboard Sponsored by KD Concepts</strong>
+                <span id="corporate-ad-tagline">Advertising · Platform Exposure · Circular Economy Partner</span>
+            </div>
+            <i class="fas fa-external-link-alt" style="color: var(--khensani-gold); font-size: 1.2rem;"></i>
+        </a>
+
+        <!-- FLOATING FOOTER -->
+        <footer class="floating-footer">
+            <div class="footer-logo-row">
+                <a href="https://mindtech.africa" target="_blank">
+                    <img src="https://i.postimg.cc/44m1NBFY/Entangle-Guard-New-Logo-image-3-removebg-preview.png"
+                         class="footer-logo"
+                         alt="EntangleGuard"
+                         onerror="this.style.display='none'">
+                </a>
+            </div>
+            <p class="copyright">© 2026 MindFlow · Khensani AI · Powered by <a href="https://mindtech.africa"><span class="mindtech-glitch">MindTech</span></a> · Transforming African education</p>
+            <div class="footer-bottom">⚛️ CHSH S=2.8284 · SA Patent 2026/05142 · IBM Jobs db6h46o4qg6s73c4q1n0 · db6h3eslf4us73c5c80g</div>
+        </footer>
+
+    </main>
+
+    </div><!-- /content-layer -->
+
+    <!-- FIREBASE 10.8.0 MODULAR -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, collection, query, where, orderBy, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD5OB59lG6bAsmQ7A97zXP_MfQ5AM3BYaw",
+            authDomain: "mindflow-ai-education.firebaseapp.com",
+            projectId: "mindflow-ai-education",
+            storageBucket: "mindflow-ai-education.firebasestorage.app",
+            messagingSenderId: "157615197603",
+            appId: "1:157615197603:web:540d67781fc55d04c11e16"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.__khensaniFirebase = { app, auth, db };
+        window.__khensaniFirestore = { collection, query, where, orderBy, getDocs, addDoc, serverTimestamp };
+
+        // Canonical KD Ad Loader
+        window.loadCorporateAds = async function() {
+            try {
+                const adsRef = collection(db, 'corporate_ads');
+                const q = query(adsRef, where('approved', '==', true), orderBy('tier', 'desc'));
+                const snap = await getDocs(q);
+                const now = new Date();
+
+                for (const docSnap of snap.docs) {
+                    const ad = docSnap.data();
+                    if (ad.endDate && new Date(ad.endDate.toDate ? ad.endDate.toDate() : ad.endDate) < now) continue;
+
+                    const logoEl = document.getElementById('corporate-ad-logo');
+                    const titleEl = document.getElementById('corporate-ad-title');
+                    const taglineEl = document.getElementById('corporate-ad-tagline');
+                    const linkEl = document.getElementById('corporate-ad-center');
+
+                    if (ad.logoUrl && logoEl) logoEl.src = ad.logoUrl;
+                    if (ad.title && titleEl) titleEl.textContent = ad.title;
+                    if (ad.tagline && taglineEl) taglineEl.textContent = ad.tagline;
+                    if (ad.linkUrl && linkEl) linkEl.href = ad.linkUrl;
+                    break;
+                }
+            } catch (e) { console.warn('Corporate ads loader (canonical fallback):', e.message); }
+        };
+
+        window.openKDConcepts = function() { window.open('https://kdconcepts.com', '_blank'); };
+
+        // Init Ads on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => window.loadCorporateAds());
+        } else {
+            window.loadCorporateAds();
+        }
+    </script>
+
+    <!-- PARTICLES CALM -->
+    <script>
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 55, density: { enable: true, value_area: 800 } },
+                color: { value: ["#00B4D8", "#00F5D4"] },
+                shape: { type: "circle" },
+                opacity: { value: 0.2, random: true },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#00B4D8", opacity: 0.08, width: 1 },
+                move: { enable: true, speed: 0.8, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: false } }
+            }
+        });
+    </script>
+
+    <!-- SPONSOR DASHBOARD LOGIC -->
+    <script>
+        function toggleNotifPanel() {
+            document.getElementById('notifPanel').classList.toggle('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            const panel = document.getElementById('notifPanel');
+            const bell = document.querySelector('.notif-bell');
+            if (panel && bell && panel.classList.contains('open')) {
+                if (!panel.contains(e.target) && !bell.contains(e.target)) {
+                    panel.classList.remove('open');
+                }
+            }
+        });
+
+        const SponsorDashboard = {
+            allCreators: [],
+            currentFilter: 'all',
+
+            init: async function() {
+                const fs = window.__khensaniFirestore;
+                const fb = window.__khensaniFirebase;
+
+                if (!fs || !fb) {
+                    console.warn('Firestore not initialized');
+                    return;
+                }
+
+                // 1. Fetch approved student videos
+                try {
+                    const q = fs.query(
+                        fs.collection(fb.db, 'student_videos'),
+                        fs.where('approved', '==', true)
+                    );
+                    const snapshot = await fs.getDocs(q);
+                    
+                    // Group by student to find top creators
+                    const creatorMap = {};
+                    let totalVideos = 0;
+                    let totalEngagement = 0;
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        totalVideos++;
+                        totalEngagement += (data.likeCount || 0) + (data.commentCount || 0);
+
+                        if (!creatorMap[data.studentUid]) {
+                            creatorMap[data.studentUid] = {
+                                uid: data.studentUid,
+                                name: data.studentName || 'Student',
+                                category: data.creative_category || 'other',
+                                videos: 0,
+                                likes: 0,
+                                comments: 0,
+                                title: data.title || 'Untitled Video',
+                                score: data.quantum_score || 0,
+                                sponsor_flagged: data.sponsor_flagged || false,
+                                latestVideoId: doc.id
+                            };
+                        }
+                        creatorMap[data.studentUid].videos++;
+                        creatorMap[data.studentUid].likes += (data.likeCount || 0);
+                        creatorMap[data.studentUid].comments += (data.commentCount || 0);
+                    });
+
+                    this.allCreators = Object.values(creatorMap)
+                        .sort((a, b) => (b.likes + b.comments) - (a.likes + a.comments));
+                    
+                    // Update stats
+                    document.getElementById('statCreators').textContent = this.allCreators.length;
+                    document.getElementById('statVideos').textContent = totalVideos;
+                    document.getElementById('statEngagement').textContent = totalEngagement;
+
+                    this.renderCreators();
+
+                } catch (e) {
+                    console.error('Error fetching creators:', e);
+                    this.showError('Could not load creators. Check Firestore permissions.');
+                }
+            },
+
+            renderCreators: function() {
+                const grid = document.getElementById('creatorsGrid');
+                grid.innerHTML = '';
+
+                let filtered = this.allCreators;
+                if (this.currentFilter !== 'all') {
+                    filtered = this.allCreators.filter(c => c.category === this.currentFilter);
+                }
+
+                if (filtered.length === 0) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <h3>No creators found</h3>
+                            <p>Try a different category filter.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                filtered.slice(0, 20).forEach(creator => { // Show top 20
+                    const initials = creator.name.substring(0, 2).toUpperCase();
+                    const isSponsorPick = creator.sponsor_flagged || (creator.likes > 50); // Auto-flag for demo
+
+                    const card = document.createElement('div');
+                    card.className = 'creator-card';
+                    card.innerHTML = `
+                        ${isSponsorPick ? '<div class="sponsor-pick-badge">⭐ SPONSOR PICK</div>' : ''}
+                        <div class="creator-header">
+                            <div class="creator-avatar">${initials}</div>
+                            <div class="creator-info">
+                                <div class="creator-name">${creator.name}</div>
+                                <div class="creator-category">${creator.category}</div>
+                            </div>
+                        </div>
+                        <div class="creator-title">Latest: ${creator.title}</div>
+                        
+                        <div class="q-score-pill ${creator.score < 80 ? 'warn' : ''}">
+                            ⚛️ Q-Score: ${creator.score}/100
+                        </div>
+
+                        <div class="creator-metrics">
+                            <div class="metric-box">
+                                <div class="metric-value">${creator.videos}</div>
+                                <div class="metric-label">Videos</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-value">${creator.likes}</div>
+                                <div class="metric-label">Likes</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-value">${creator.comments}</div>
+                                <div class="metric-label">Comments</div>
+                            </div>
+                        </div>
+
+                        <div class="creator-actions">
+                            <button class="action-btn pink" onclick="SponsorDashboard.flagInterest('${creator.latestVideoId}', '${creator.uid}', 'view')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="action-btn" onclick="SponsorDashboard.flagInterest('${creator.latestVideoId}', '${creator.uid}', 'contact')">
+                                <i class="fas fa-envelope"></i> Contact
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            },
+
+            filter: function(category) {
+                this.currentFilter = category;
+                this.renderCreators();
+            },
+
+            flagInterest: async function(videoId, studentUid, action) {
+                const fs = window.__khensaniFirestore;
+                const fb = window.__khensaniFirebase;
+                
+                try {
+                    // Note: In production, use the Cloud Function `flagSponsorInterest` we deployed earlier.
+                    // For this dashboard demo, we'll log directly to Firestore if allowed, or call the function.
+                    
+                    // Using the deployed Cloud Function:
+                    if (window.firebase && window.firebase.functions) {
+                        const call = firebase.app().functions('africa-south1').httpsCallable('flagSponsorInterest');
+                        await call({ videoId, studentUid, action });
+                        alert(`✅ Interest logged: ${action.toUpperCase()}`);
+                    } else {
+                        // Fallback direct write
+                        await fs.addDoc(fs.collection(fb.db, 'sponsor_interest'), {
+                            sponsorUid: fb.auth.currentUser?.uid || 'demo-sponsor',
+                            sponsorName: 'Demo Sponsor',
+                            videoId, studentUid, action,
+                            createdAt: fs.serverTimestamp()
+                        });
+                        alert(`✅ Interest logged via fallback: ${action.toUpperCase()}`);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert('Error logging interest: ' + e.message);
+                }
+            },
+
+            showError: function(msg) {
+                document.getElementById('creatorsGrid').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i>
+                        <h3>Error</h3>
+                        <p>${msg}</p>
+                    </div>
+                `;
+            }
+        };
+
+        // Filter button listeners
+        document.querySelectorAll('.filter-pill').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                SponsorDashboard.filter(e.target.dataset.filter);
+            });
+        });
+
+        // Init on load
+        window.addEventListener('load', () => {
+            SponsorDashboard.init();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==== Helper functions ====
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // ==== Corporate ads — public read of approved ====
+    match /corporate_ads/{adId} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.token.role == 'admin';
+    }
+
+    // ==== Teacher videos — public read of approved ====
+    match /teacher_videos/{videoId} {
+      // Public read — approved only enforced at query level
+      allow read: if true;
+      allow create: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+      allow update, delete: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+    }
+
+    // ==== Student videos — public read of approved ====
+    match /student_videos/{videoId} {
+      allow read: if resource.data.approved == true || isSignedIn();
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (
+        resource.data.studentUid == request.auth.uid ||
+        request.auth.token.role in ['teacher', 'admin']
+      );
+    }
+
+    // ==== Video likes ====
+    match /video_likes/{likeId} {
+      allow read: if true;
+      allow create, delete: if isSignedIn();
+    }
+
+    // ==== Video comments ====
+    match /video_comments/{commentId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && resource.data.commenterUid == request.auth.uid;
+    }
+
+    // ==== Chess competitions ====
+    match /chess_competitions/{compId} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+    }
+
+    // ==== Chess matches ====
+    match /chess_matches/{matchId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn();
+    }
+
+    // ==== Sponsor interest ====
+    match /sponsor_interest/{interestId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+    }
+
+    // ==== Quantum screenings audit ====
+    match /quantum_screenings/{screenId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+    }
+
+    // ==== Emergency logs (existing collections) ====
+    match /emergencies/{emergencyId} {
+      allow read, write: if isSignedIn();
+    }
+    match /security_contacts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+    match /teacher_contacts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+    match /parent_contacts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+    match /medical_contacts/{docId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // ==== Navigation logs ====
+    match /navigation_logs/{logId} {
+      allow read: if isSignedIn() && request.auth.token.role in ['admin', 'security'];
+      allow create: if true;
+    }
+
+    // ==== Incident actions ====
+    match /incident_actions/{actionId} {
+      allow read: if isSignedIn() && request.auth.token.role in ['security', 'admin'];
+      allow create: if isSignedIn();
+    }
+  }
+}

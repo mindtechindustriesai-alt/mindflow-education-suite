@@ -196,3 +196,248 @@ exports.luvunoChat = onCall(
     return json;
   }
 );
+// ============================================================
+// KHENSANI CREATORS — Cloud Functions
+// ============================================================
+
+// 1. screenStudentVideo — Quantum screening via Luvuno
+exports.screenStudentVideo = onCall(
+  {
+    ...corsOptions,
+    secrets: [LUVUNO_URL, LUVUNO_SHARED_SECRET],
+    timeoutSeconds: 120,
+    memory: '512MiB',
+  },
+  async (request) => {
+    const { videoId, title, subject, curriculum_code, creative_category, transcript } = request.data || {};
+    if (!videoId || !title || !transcript) {
+      throw new HttpsError('invalid-argument', 'Missing required video fields');
+    }
+
+    const luvunoUrl = LUVUNO_URL.value();
+    const luvunoKey = (LUVUNO_SHARED_SECRET.value() || '').replace(/^\uFEFF/, '').trim();
+    if (!luvunoUrl) throw new HttpsError('failed-precondition', 'LUVUNO_URL not configured');
+
+    // Build screening prompt
+    const prompt = `You are a strict curriculum and safety screening AI for a South African school.
+Evaluate the following student video submission.
+
+Title: ${title}
+Subject: ${subject}
+Curriculum Code: ${curriculum_code}
+Creative Category: ${creative_category}
+Transcript: "${transcript}"
+
+Determine if this is safe and educational for a school platform.
+Respond strictly in JSON format:
+{
+  "pass": true/false,
+  "score": 0-100 (100 being perfectly safe and educational),
+  "reason": "brief explanation",
+  "flags": ["safety", "profanity", "off-topic", "none"]
+}
+Do not include any other text outside the JSON.`;
+
+    let res;
+    try {
+      res = await fetch(`${luvunoUrl}/api/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(luvunoKey ? { 'X-Luvuno-Key': luvunoKey } : {}),
+        },
+        body: JSON.stringify({
+          message: prompt,
+          portal: 'khensani',
+          response_style: 'json',
+          session_id: request.auth?.uid || 'anonymous'
+        }),
+      });
+    } catch (err) {
+      throw new HttpsError('internal', `Luvuno fetch failed: ${err.message}`);
+    }
+
+    if (!res.ok) throw new HttpsError('internal', `Luvuno returned ${res.status}`);
+    
+    const json = await res.json();
+    let screenResult = { pass: false, score: 0, reason: "Parse error", flags: ["system"] };
+    
+    try {
+      // Clean potential markdown blocks from LLM response
+      const rawReply = json.response || '{}';
+      const cleanJson = rawReply.replace(/```json/g, '').replace(/```/g, '').trim();
+      screenResult = JSON.parse(cleanJson);
+    } catch (e) {
+      console.warn('Failed to parse Luvuno response as JSON:', json.response);
+    }
+
+    // Determine DB status based on score
+    const approved = screenResult.pass === true && screenResult.score >= 80;
+    const status = approved ? 'approved' : (screenResult.score >= 50 ? 'review' : 'blocked');
+
+    // Write to quantum_screenings audit trail
+    await db.collection('quantum_screenings').add({
+      videoId,
+      videoType: 'student',
+      screenResult: status,
+      screenScore: screenResult.score,
+      reasons: screenResult.flags || [],
+      screenedAt: new Date().toISOString(),
+      rawLLM: json.response
+    });
+
+    // Update the student video document
+    await db.collection('student_videos').doc(videoId).update({
+      quantum_screen: status,
+      quantum_score: screenResult.score,
+      quantum_reason: screenResult.reason,
+      approved: approved,
+      reviewedAt: new Date().toISOString(),
+    });
+
+    return { status, score: screenResult.score, reason: screenResult.reason };
+  }
+);
+
+// 2. recordVideoLike
+exports.recordVideoLike = onCall(
+  { ...corsOptions },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Must be logged in to like');
+    const { videoId, videoType } = request.data || {};
+    if (!videoId || !['teacher', 'student'].includes(videoType)) {
+      throw new HttpsError('invalid-argument', 'Invalid videoId or videoType');
+    }
+
+    const likeId = `${request.auth.uid}_${videoId}`;
+    const likeRef = db.collection('video_likes').doc(likeId);
+    const videoRef = db.collection(`${videoType}_videos`).doc(videoId);
+
+    try {
+      await db.runTransaction(async (t) => {
+        const likeDoc = await t.get(likeRef);
+        if (likeDoc.exists) {
+          throw new HttpsError('already-exists', 'Already liked');
+        }
+        t.set(likeRef, {
+          videoId,
+          videoType,
+          userUid: request.auth.uid,
+          createdAt: new Date().toISOString(),
+        });
+        t.update(videoRef, {
+          likeCount: firestore.FieldValue.increment(1)
+        });
+      });
+      return { success: true };
+    } catch (err) {
+      if (err.code === 'already-exists') throw err;
+      throw new HttpsError('internal', err.message);
+    }
+  }
+);
+
+// 3. postVideoComment
+exports.postVideoComment = onCall(
+  {
+    ...corsOptions,
+    secrets: [LUVUNO_URL, LUVUNO_SHARED_SECRET],
+  },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Must be logged in');
+    const { videoId, videoType, text } = request.data || {};
+    if (!videoId || !text) throw new HttpsError('invalid-argument', 'Missing fields');
+
+    // Basic text screening via Luvuno (optional but recommended)
+    let qScreen = 'pass';
+    try {
+      const luvunoUrl = LUVUNO_URL.value();
+      const luvunoKey = (LUVUNO_SHARED_SECRET.value() || '').replace(/^\uFEFF/, '').trim();
+      if (luvunoUrl) {
+        const res = await fetch(`${luvunoUrl}/api/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(luvunoKey ? { 'X-Luvuno-Key': luvunoKey } : {}) },
+          body: JSON.stringify({ message: `Is this comment safe for a school platform? Reply exactly "SAFE" or "UNSAFE". Comment: "${text}"`, portal: 'khensani' }),
+        });
+        const data = await res.json();
+        if (data.response && data.response.includes('UNSAFE')) qScreen = 'fail';
+      }
+    } catch (e) { console.warn('Comment screening failed:', e.message); }
+
+    if (qScreen === 'fail') throw new HttpsError('permission-denied', 'Comment flagged as inappropriate');
+
+    const commentRef = await db.collection('video_comments').add({
+      videoId,
+      videoType,
+      commenterUid: request.auth.uid,
+      commenterName: request.auth.token.name || 'Student',
+      text,
+      quantum_screen: qScreen,
+      likes: 0,
+      createdAt: new Date().toISOString(),
+    });
+
+    await db.collection(`${videoType}_videos`).doc(videoId).update({
+      commentCount: firestore.FieldValue.increment(1)
+    });
+
+    return { commentId: commentRef.id, status: qScreen };
+  }
+);
+
+// 4. submitChessMove
+exports.submitChessMove = onCall(
+  { ...corsOptions },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Must be logged in');
+    const { competitionId, matchId, move } = request.data || {};
+    if (!competitionId || !matchId || !move) throw new HttpsError('invalid-argument', 'Missing fields');
+
+    const matchRef = db.collection('chess_matches').doc(matchId);
+    
+    await db.runTransaction(async (t) => {
+      const matchDoc = await t.get(matchRef);
+      if (!matchDoc.exists) throw new HttpsError('not-found', 'Match not found');
+      
+      const data = matchDoc.data();
+      if (data.result !== 'ongoing') throw new HttpsError('failed-precondition', 'Match is over');
+
+      // Validate it's their turn (simplified)
+      const isWhite = data.whiteUid === request.auth.uid;
+      const isBlack = data.blackUid === request.auth.uid;
+      if (!isWhite && !isBlack) throw new HttpsError('permission-denied', 'Not your match');
+
+      t.update(matchRef, {
+        moves: firestore.FieldValue.arrayUnion({
+          move,
+          uid: request.auth.uid,
+          timestamp: new Date().toISOString()
+        })
+      });
+    });
+
+    return { success: true };
+  }
+);
+
+// 5. flagSponsorInterest
+exports.flagSponsorInterest = onCall(
+  { ...corsOptions },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Must be a sponsor');
+    const { videoId, studentUid, action } = request.data || {};
+    if (!videoId || !studentUid || !action) throw new HttpsError('invalid-argument', 'Missing fields');
+
+    await db.collection('sponsor_interest').add({
+      sponsorUid: request.auth.uid,
+      sponsorName: request.auth.token.name || 'Corporate Sponsor',
+      videoId,
+      studentUid,
+      action, // 'view' | 'contact' | 'offer'
+      createdAt: new Date().toISOString(),
+    });
+
+    return { success: true };
+  }
+);
+

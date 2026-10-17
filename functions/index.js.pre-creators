@@ -1,0 +1,198 @@
+/**
+ * Khensani AI — Cloud Functions (v2 API, firebase-functions v7)
+ * Region: africa-south1 (Johannesburg)
+ * Patent: SA 2026/05142 · CHSH S=2.76 (Aer: 2.8284)
+ *
+ * Exports:
+ *   - mqosChsh   : Fetch live CHSH from MQOS TERERAI
+ *   - luvunoChat : Proxy chat to Luvuno Backend (DeepSeek/OpenRouter)
+ *
+ * Compatible with:
+ *   - firebase-functions@7.x
+ *   - firebase-admin@14.x (modular imports)
+ *   - Node.js 22 runtime
+ */
+
+const { onCall, HttpsError } = require('firebase-functions/v2/https');
+const { setGlobalOptions } = require('firebase-functions/v2');
+const { defineSecret } = require('firebase-functions/params');
+const { initializeApp } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
+const fetch = require('node-fetch');
+
+initializeApp();
+const db = getFirestore();
+
+setGlobalOptions({
+  region: 'africa-south1',
+  maxInstances: 10,
+});
+
+// CORS configuration for callable functions
+const corsOptions = {
+  cors: [
+    'https://mindflow-ai-education.web.app',
+    'https://mindflow-ai-education.firebaseapp.com',
+    'https://mindflow-ai-education.app',
+    'http://localhost:5000',
+    'http://localhost:3000',
+    'http://127.0.0.1:5000'
+  ]
+};
+
+
+// Declare secrets (read from Firebase Secret Manager at runtime)
+const MQOS_URL = defineSecret('MQOS_URL');
+const MQOS_SHARED_SECRET = defineSecret('MQOS_SHARED_SECRET');
+const LUVUNO_URL = defineSecret('LUVUNO_URL');
+const LUVUNO_SHARED_SECRET = defineSecret('LUVUNO_SHARED_SECRET');
+
+
+// ============================================================
+// mqosChsh — Khensani → MQOS TERERAI
+// ============================================================
+
+exports.mqosChsh = onCall(
+  {
+    ...corsOptions,
+    secrets: [MQOS_URL, MQOS_SHARED_SECRET],
+    timeoutSeconds: 120,
+    memory: '256MiB',
+  },
+  async (request) => {
+    const fresh = request.data && request.data.fresh === true;
+    const mqosUrl = MQOS_URL.value();
+    const mqosKey = (MQOS_SHARED_SECRET.value() || '').replace(/^\uFEFF/, '').trim(); // Sanitize secret
+
+    if (!mqosUrl) {
+      throw new HttpsError('failed-precondition', 'MQOS_URL not configured');
+    }
+
+    const url = fresh
+      ? `${mqosUrl}/api/v1/verify/chsh`
+      : `${mqosUrl}/api/v1/verify/chsh/cached`;
+
+    const fetchOpts = {
+      method: fresh ? 'POST' : 'GET',
+      headers: {},
+    };
+    if (mqosKey) fetchOpts.headers['X-MQOS-Key'] = mqosKey;
+    if (fresh) {
+      fetchOpts.headers['Content-Type'] = 'application/json';
+      fetchOpts.body = JSON.stringify({ backend: 'qiskit_aer', shots: 1024, runs: 1 });
+    }
+
+    let res;
+    try {
+      res = await fetch(url, fetchOpts);
+    } catch (err) {
+      console.error('[mqosChsh] fetch failed:', err);
+      throw new HttpsError('internal', `MQOS fetch failed: ${err.message}`);
+    }
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      console.error(`[mqosChsh] ${res.status} body:`, body.slice(0, 200));
+      throw new HttpsError('internal', `MQOS ${res.status}`);
+    }
+
+    const json = await res.json();
+
+    try {
+      await db.collection('quantum_verifications').add({
+        ...json,
+        source: 'mqos',
+        fetchedBy: request.auth?.uid || 'anonymous',
+        fetchedAt: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.warn('[mqosChsh] Firestore log failed:', err.message);
+    }
+
+    return json;
+  }
+);
+
+
+// ============================================================
+// luvunoChat — Khensani → Luvuno Backend Proxy
+// ============================================================
+
+exports.luvunoChat = onCall(
+  {
+    ...corsOptions,
+    secrets: [LUVUNO_URL, LUVUNO_SHARED_SECRET],
+    timeoutSeconds: 60,
+    memory: '256MiB',
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'Auth required');
+    }
+
+    const luvunoUrl = LUVUNO_URL.value();
+    const luvunoKey = (LUVUNO_SHARED_SECRET.value() || '').replace(/^\uFEFF/, '').trim(); // Sanitize secret
+
+    if (!luvunoUrl) {
+      throw new HttpsError('failed-precondition', 'LUVUNO_URL not configured');
+    }
+
+    const message = (request.data && request.data.message) ? String(request.data.message) : '';
+    if (!message) {
+      throw new HttpsError('invalid-argument', 'message required');
+    }
+
+    const payload = {
+      message,
+      portal: request.data.portal || 'khensani',
+      language: request.data.language || 'english',
+      session_id: request.auth.uid,
+      conversation_history: Array.isArray(request.data.history) ? request.data.history : [],
+      response_style: request.data.style || 'detailed',
+    };
+
+    let res;
+    try {
+      res = await fetch(`${luvunoUrl}/api/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(luvunoKey ? { 'X-Luvuno-Key': luvunoKey } : {}),
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (err) {
+      console.error('[luvunoChat] fetch failed:', err);
+      throw new HttpsError('internal', `Luvuno fetch failed: ${err.message}`);
+    }
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      console.error(`[luvunoChat] ${res.status} body:`, body.slice(0, 200));
+      throw new HttpsError('internal', `Luvuno ${res.status}`);
+    }
+
+    const json = await res.json();
+
+    try {
+      await db.collection('ai_conversations').add({
+        uid: request.auth.uid,
+        message: payload.message,
+        reply: json.response || '',
+        source: 'luvuno',
+        backend: json.backend || null,
+        model: json.model_used || null,
+        quantum_verified: json.quantum_verified || false,
+        chsh_score: json.chsh_score || null,
+        chsh_context: json.chsh_context || null,
+        language: payload.language,
+        portal: payload.portal,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.warn('[luvunoChat] Firestore log failed:', err.message);
+    }
+
+    return json;
+  }
+);

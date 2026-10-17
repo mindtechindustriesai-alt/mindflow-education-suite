@@ -2,102 +2,173 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ==== Helper functions ====
+    // =========================================================
+    // HELPER FUNCTIONS
+    // =========================================================
     function isSignedIn() {
       return request.auth != null;
     }
-    function isOwner(uid) {
-      return isSignedIn() && request.auth.uid == uid;
+
+    function uid() {
+      return request.auth.uid;
     }
 
-    // ==== Corporate ads — public read of approved ====
-    match /corporate_ads/{adId} {
-      allow read: if true;
-      allow write: if isSignedIn() && request.auth.token.role == 'admin';
+    function role() {
+      return get(/databases/$(database)/documents/users/$(uid())).data.role;
     }
 
-    // ==== Teacher videos — public read of approved ====
+    function isRole(r) {
+      return isSignedIn() && role() == r;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (role() == 'principal' || role() == 'hod');
+    }
+
+    function isStaff() {
+      return isSignedIn() && (role() == 'teacher' || role() == 'hod' || role() == 'principal');
+    }
+
+    // =========================================================
+    // CREATORS — Teacher Videos (public read, teacher write)
+    // =========================================================
     match /teacher_videos/{videoId} {
-      // Public read — approved only enforced at query level
-      allow read: if true;
-      allow create: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
-      allow update, delete: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+      allow read: if true; // Publicly visible to students/parents
+      allow create, update, delete: if isSignedIn() && (isStaff() || isRole('corporate'));
     }
 
-    // ==== Student videos — public read of approved ====
+    // =========================================================
+    // CREATORS — Student Videos (public read if approved)
+    // =========================================================
     match /student_videos/{videoId} {
-      allow read: if resource.data.approved == true || isSignedIn();
+      allow read: if resource.data.approved == true || isStaff() || isRole('corporate');
       allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && (
-        resource.data.studentUid == request.auth.uid ||
-        request.auth.token.role in ['teacher', 'admin']
+      allow update: if isSignedIn() && (
+        resource.data.studentUid == uid() || isStaff() || isRole('corporate')
       );
+      allow delete: if isAdmin();
     }
 
-    // ==== Video likes ====
+    // =========================================================
+    // CREATORS — Likes
+    // =========================================================
     match /video_likes/{likeId} {
       allow read: if true;
       allow create, delete: if isSignedIn();
     }
 
-    // ==== Video comments ====
+    // =========================================================
+    // CREATORS — Comments
+    // =========================================================
     match /video_comments/{commentId} {
       allow read: if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && resource.data.commenterUid == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.commenterUid == uid();
+      allow update, delete: if isSignedIn() && (resource.data.commenterUid == uid() || isStaff());
     }
 
-    // ==== Chess competitions ====
+    // =========================================================
+    // CREATORS — Chess Competitions
+    // =========================================================
     match /chess_competitions/{compId} {
       allow read: if true;
-      allow write: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+      allow write: if isStaff() || isAdmin();
     }
 
-    // ==== Chess matches ====
+    // =========================================================
+    // CREATORS — Chess Matches
+    // =========================================================
     match /chess_matches/{matchId} {
       allow read: if isSignedIn();
-      allow create, update: if isSignedIn();
-    }
-
-    // ==== Sponsor interest ====
-    match /sponsor_interest/{interestId} {
-      allow read: if isSignedIn();
       allow create: if isSignedIn();
+      allow update: if isSignedIn() && (
+        resource.data.whiteUid == uid() || resource.data.blackUid == uid()
+      );
+      allow delete: if isAdmin();
     }
 
-    // ==== Quantum screenings audit ====
+    // =========================================================
+    // CREATORS — Sponsor Interest
+    // =========================================================
+    match /sponsor_interest/{interestId} {
+      allow read: if isSignedIn() && (resource.data.sponsorUid == uid() || isStaff());
+      allow create: if isSignedIn() && isRole('corporate');
+      allow update, delete: if isSignedIn() && resource.data.sponsorUid == uid();
+    }
+
+    // =========================================================
+    // CREATORS — Quantum Screenings (Audit Trail)
+    // =========================================================
     match /quantum_screenings/{screenId} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn() && request.auth.token.role in ['teacher', 'admin'];
+      allow read: if isSignedIn() && (isStaff() || isAdmin());
+      allow write: if false; // Cloud Functions only
     }
 
-    // ==== Emergency logs (existing collections) ====
+    // =========================================================
+    // CORPORATE ADS — Public read (approved)
+    // =========================================================
+    match /corporate_ads/{adId} {
+      allow read: if true; // Approved ads visible to all
+      allow write: if isSignedIn() && isRole('corporate');
+    }
+
+    // =========================================================
+    // EMERGENCY & SAFETY (Secure)
+    // =========================================================
     match /emergencies/{emergencyId} {
       allow read, write: if isSignedIn();
     }
     match /security_contacts/{docId} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isSignedIn() && (isRole('security') || isAdmin());
     }
     match /teacher_contacts/{docId} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isSignedIn() && isStaff();
     }
     match /parent_contacts/{docId} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isSignedIn() && isRole('parent');
     }
     match /medical_contacts/{docId} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isSignedIn() && (isRole('security') || isAdmin());
     }
 
-    // ==== Navigation logs ====
+    // =========================================================
+    // USER PROFILES (Owner access)
+    // =========================================================
+    match /users/{userId} {
+      allow read: if isSignedIn() && (userId == uid() || isAdmin());
+      allow create: if isSignedIn() && userId == uid();
+      allow update: if isSignedIn() && (userId == uid() || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    // =========================================================
+    // STUDENT PROFILES
+    // =========================================================
+    match /student_profiles/{studentId} {
+      allow read: if isSignedIn() && (studentId == uid() || isStaff() || isRole('parent'));
+      allow write: if isSignedIn() && (studentId == uid() || isAdmin());
+    }
+
+    // =========================================================
+    // NAVIGATION LOGS (Cloud Functions only)
+    // =========================================================
     match /navigation_logs/{logId} {
-      allow read: if isSignedIn() && request.auth.token.role in ['admin', 'security'];
-      allow create: if true;
+      allow read: if isSignedIn() && isAdmin();
+      allow create: if isSignedIn(); // Fire from client
     }
 
-    // ==== Incident actions ====
-    match /incident_actions/{actionId} {
-      allow read: if isSignedIn() && request.auth.token.role in ['security', 'admin'];
-      allow create: if isSignedIn();
+    // =========================================================
+    // QUANTUM VERIFICATIONS
+    // =========================================================
+    match /quantum_verifications/{verifId} {
+      allow read: if true; // Publicly verified CHSH scores
+      allow write: if false; // Cloud Functions only
+    }
+
+    // =========================================================
+    // DEFAULT — DENY
+    // =========================================================
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
