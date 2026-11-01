@@ -7,7 +7,6 @@
     console.log("🛡️ [KhensaniOverride] Initializing master DOM interceptor...");
 
     window.addEventListener('DOMContentLoaded', () => executeOverride());
-    // Also run immediately in case DOM is already loaded
     if (document.readyState === 'complete' || document.readyState === 'interactive') {
         executeOverride();
     }
@@ -18,12 +17,10 @@
         const body = document.getElementById('khensani-chat-body') || document.getElementById('conversationPanel');
 
         if (!input || !body) {
-            console.warn("⚠️ [KhensaniOverride] Chat elements not found yet, retrying...");
             setTimeout(executeOverride, 1000);
             return;
         }
 
-        // Clone element to completely strip away all legacy event listeners & stubs
         const freshInput = input.cloneNode(true);
         input.parentNode.replaceChild(freshInput, input);
 
@@ -41,7 +38,6 @@
             if (!text) return;
             activeInput.value = '';
 
-            // 1. Render User Message
             const userMsg = document.createElement('div');
             userMsg.className = 'chat-msg chat-msg-user';
             userMsg.style.cssText = "margin: 8px 0; padding: 8px; border-radius: 8px; background: rgba(0,133,124,0.1); color: #fff;";
@@ -49,7 +45,6 @@
             body.appendChild(userMsg);
             body.scrollTop = body.scrollHeight;
 
-            // 2. Render Thinking State
             const aiMsg = document.createElement('div');
             aiMsg.className = 'chat-msg chat-msg-ai';
             aiMsg.style.cssText = "margin: 8px 0; padding: 8px; border-radius: 8px; background: rgba(0,255,170,0.05); color: #00FFAA;";
@@ -57,7 +52,6 @@
             body.appendChild(aiMsg);
             body.scrollTop = body.scrollHeight;
 
-            // 3. Fetch Sovereign Edge Intel (Luvuno Parity)
             let reply = "";
             const systemPrompt = "You are Khensani AI, an advanced educational intelligence powered by MindTech Industries (Patent SA 2026/05142). Provide elite, high-level academic guidance, deep conceptual explanations, and precise solutions across all subjects for African students. Strict Compliance: NEVER mention internal system names, project code names, or underlying third-party APIs.";
             const payload = `${systemPrompt}\n\nStudent Inquiry: ${text}\n\nKhensani AI Response:`;
@@ -75,7 +69,6 @@
 
             const verificationHash = "0x" + Math.random().toString(36).substring(2, 12).toUpperCase() + "_CHSH_S2.8284";
 
-            // 4. Render Final AI Response + Quantum Stamp
             aiMsg.style.color = "#fff";
             aiMsg.innerHTML = `<strong>Khensani AI:</strong> ${reply.replace(/\n/g, '<br>')}
                 <div style="font-size: 0.65rem; color: #00FFAA; margin-top: 6px; font-family: 'Space Mono', monospace;">
@@ -94,7 +87,7 @@
             }
         });
 
-        console.log("⚡ [KhensaniOverride] Active! Legacy stubs neutralized. Sovereign edge routing engaged.");
+        console.log("⚡ [KhensaniOverride] Active! Legacy stubs neutralized.");
     }
 
     function escapeHtml(str) {
