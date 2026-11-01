@@ -1494,6 +1494,56 @@
         // KHENSANI DIRECT LUVUNO BACKEND ENGINE
         // Primary: FastAPI proxy. Fallback: edge text endpoint.
         // ============================================================
+        // ============================================================
+        // KHENSANI VOICE SPEECH SYNTHESIS ENGINE
+        // ============================================================
+        function speakKhensaniResponse(text) {
+            if (!('speechSynthesis' in window) || !('SpeechSynthesisUtterance' in window)) {
+                console.info('[KhensaniVoice] Speech synthesis is not supported in this browser.');
+                return;
+            }
+
+            // Stop any previous answer before speaking the latest one.
+            window.speechSynthesis.cancel();
+
+            const cleanText = String(text || '')
+                .replace(/<br\s*\/?\s*>/gi, ' ')
+                .replace(/<[^>]*>/g, ' ')
+                .replace(/\*\*(.*?)\*\*/g, '$1')
+                .replace(/\*(.*?)\*/g, '$1')
+                .replace(/`([^`]+)`/g, '$1')
+                .replace(/\s+/g, ' ')
+                .trim();
+
+            if (!cleanText) return;
+
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.rate = 1.05;
+            utterance.pitch = 1.1;
+
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(function(voice) {
+                return /^en/i.test(voice.lang) &&
+                    /(Google|Natural|Female)/i.test(voice.name);
+            }) || voices.find(function(voice) {
+                return /^en/i.test(voice.lang);
+            });
+
+            if (preferredVoice) utterance.voice = preferredVoice;
+            utterance.onerror = function(event) {
+                console.warn('[KhensaniVoice] Speech playback error:', event.error);
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Some browsers populate their voice list asynchronously.
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.getVoices();
+            window.speechSynthesis.addEventListener('voiceschanged', function() {
+                window.speechSynthesis.getVoices();
+            });
+        }
+
         const LUVUNO_BACKEND_URL = "https://luvuno-backend-proxy.onrender.com/api/v1/khensani/chat";
 
         async function requestKhensaniReply(prompt, portal) {
@@ -1630,6 +1680,7 @@
                 const result = await requestKhensaniReply(hub.prompt, hub.portal);
                 loadingMsg.remove();
                 appendChatMessage(panel, 'Khensani AI', result.reply, 'ai', result.provenance);
+                speakKhensaniResponse(result.reply);
             } catch (e) {
                 console.warn('[Hub] Luvuno fetch failed:', e.message);
                 loadingMsg.remove();
@@ -1670,6 +1721,7 @@
                     const result = await requestKhensaniReply(message, 'student-portal');
                     loading.remove();
                     appendChatMessage(panel, 'Khensani AI', result.reply, 'ai', result.provenance);
+                speakKhensaniResponse(result.reply);
                 } catch (error) {
                     console.error('[KhensaniEngine] Chat request failed:', error);
                     loading.remove();
@@ -1751,6 +1803,7 @@
                     const result = await requestKhensaniReply(message, 'student-sidebar');
                     loading.remove();
                     appendChatMessage(chat, 'Khensani AI', result.reply, 'ai', result.provenance);
+                    speakKhensaniResponse(result.reply);
                 } catch (error) {
                     console.error('[KhensaniEngine] Sidebar request failed:', error);
                     loading.remove();
