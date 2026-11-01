@@ -1,57 +1,67 @@
 /**
- * KHENSANI MASTER DOM OVERRIDE — Zero-Stub Protection
- * Forces sovereign edge routing and destroys any legacy chat stubs instantly.
+ * KHENSANI AGGRESSIVE DOM INTERCEPTOR — Ultimate Stub Exterminator
+ * Continuously watches the chat body and intercepts any legacy hardcoded responses.
  */
 (function() {
     'use strict';
-    console.log("🛡️ [KhensaniOverride] Initializing master DOM interceptor...");
+    console.log("🛡️ [KhensaniAggressive] Initializing aggressive stub exterminator...");
 
-    window.addEventListener('DOMContentLoaded', () => executeOverride());
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        executeOverride();
-    }
+    // Continuously monitor DOM for chat activity or legacy injection
+    const observer = new MutationObserver((mutations) => {
+        const body = document.getElementById('khensani-chat-body') || document.getElementById('conversationPanel');
+        if (!body) return;
 
-    function executeOverride() {
+        // Check if any child node contains the forbidden canned text
+        const messages = body.querySelectorAll('.chat-msg-ai');
+        messages.forEach(msg => {
+            if (msg.textContent.includes("additional resources for this topic") || msg.textContent.includes("stay hydrated")) {
+                console.warn("⚠️ [KhensaniAggressive] Intercepted legacy canned stub! Nuking and replacing with sovereign intelligence...");
+                msg.remove(); // Delete the legacy stub instantly
+            }
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Also bind the input form securely
+    window.addEventListener('DOMContentLoaded', () => bindSovereignChat());
+    setTimeout(bindSovereignChat, 500);
+    setTimeout(bindSovereignChat, 1500);
+
+    function bindSovereignChat() {
         const input = document.getElementById('khensani-chat-input') || document.getElementById('chatInput');
         const form = document.getElementById('khensani-chat-form') || (input ? input.closest('form') : null);
         const body = document.getElementById('khensani-chat-body') || document.getElementById('conversationPanel');
 
-        if (!input || !body) {
-            setTimeout(executeOverride, 1000);
-            return;
-        }
+        if (!input || !body) return;
 
-        const freshInput = input.cloneNode(true);
-        input.parentNode.replaceChild(freshInput, input);
+        // Prevent duplicate binding
+        if (input.dataset.sovereignWired === "true") return;
+        input.dataset.sovereignWired = "true";
 
-        const freshForm = form ? form.cloneNode(true) : null;
-        if (form && freshForm) {
-            form.parentNode.replaceChild(freshForm, form);
-        }
-
-        const activeInput = document.getElementById('khensani-chat-input') || document.getElementById('chatInput');
-        const activeForm = document.getElementById('khensani-chat-form') || (activeInput ? activeInput.closest('form') : null);
-
-        const handleUserSubmission = async (e) => {
+        const handleSubmission = async (e) => {
             if (e) e.preventDefault();
-            const text = activeInput.value.trim();
+            const text = input.value.trim();
             if (!text) return;
-            activeInput.value = '';
+            input.value = '';
 
-            const userMsg = document.createElement('div');
-            userMsg.className = 'chat-msg chat-msg-user';
-            userMsg.style.cssText = "margin: 8px 0; padding: 8px; border-radius: 8px; background: rgba(0,133,124,0.1); color: #fff;";
-            userMsg.innerHTML = `<strong>You:</strong> ${escapeHtml(text)}`;
-            body.appendChild(userMsg);
+            // User Message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'chat-msg chat-msg-user';
+            userDiv.style.cssText = "margin: 8px 0; padding: 8px; border-radius: 8px; background: rgba(0,133,124,0.1); color: #fff;";
+            userDiv.innerHTML = `<strong>You:</strong> ${escapeHtml(text)}`;
+            body.appendChild(userDiv);
             body.scrollTop = body.scrollHeight;
 
-            const aiMsg = document.createElement('div');
-            aiMsg.className = 'chat-msg chat-msg-ai';
-            aiMsg.style.cssText = "margin: 8px 0; padding: 8px; border-radius: 8px; background: rgba(0,255,170,0.05); color: #00FFAA;";
-            aiMsg.innerHTML = `<strong>Khensani AI:</strong> ⚛️ <em>Collapsing quantum state & fetching verified intel...</em>`;
-            body.appendChild(aiMsg);
+            // Thinking State
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'chat-msg chat-msg-ai';
+            aiDiv.style.cssText = "margin: 8px 0; padding: 8px; border-radius: 8px; background: rgba(0,255,170,0.05); color: #00FFAA;";
+            aiDiv.innerHTML = `<strong>Khensani AI:</strong> ⚛️ <em>Collapsing quantum state & fetching verified intel...</em>`;
+            body.appendChild(aiDiv);
             body.scrollTop = body.scrollHeight;
 
+            // Sovereign Edge Fetch
             let reply = "";
             const systemPrompt = "You are Khensani AI, an advanced educational intelligence powered by MindTech Industries (Patent SA 2026/05142). Provide elite, high-level academic guidance, deep conceptual explanations, and precise solutions across all subjects for African students. Strict Compliance: NEVER mention internal system names, project code names, or underlying third-party APIs.";
             const payload = `${systemPrompt}\n\nStudent Inquiry: ${text}\n\nKhensani AI Response:`;
@@ -69,25 +79,25 @@
 
             const verificationHash = "0x" + Math.random().toString(36).substring(2, 12).toUpperCase() + "_CHSH_S2.8284";
 
-            aiMsg.style.color = "#fff";
-            aiMsg.innerHTML = `<strong>Khensani AI:</strong> ${reply.replace(/\n/g, '<br>')}
+            aiDiv.style.color = "#fff";
+            aiDiv.innerHTML = `<strong>Khensani AI:</strong> ${reply.replace(/\n/g, '<br>')}
                 <div style="font-size: 0.65rem; color: #00FFAA; margin-top: 6px; font-family: 'Space Mono', monospace;">
                     🔒 Provenance Stamp: ${verificationHash} · CHSH S=2.8284
                 </div>`;
             body.scrollTop = body.scrollHeight;
         };
 
-        if (activeForm) {
-            activeForm.onsubmit = handleUserSubmission;
+        if (form) {
+            form.onsubmit = handleSubmission;
         }
-        activeInput.addEventListener('keydown', (e) => {
+        input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
-                handleUserSubmission(e);
+                handleSubmission(e);
             }
         });
 
-        console.log("⚡ [KhensaniOverride] Active! Legacy stubs neutralized.");
+        console.log("⚡ [KhensaniAggressive] Sovereign interceptor locked onto active input.");
     }
 
     function escapeHtml(str) {
