@@ -987,7 +987,7 @@
             </div>
 
             <div class="chat-input-area">
-                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about mathematics, science, robotics, or anything else...">
+                <input type="text" class="chat-input" id="chatInput" autocomplete="off" placeholder="Ask Khensani about mathematics, science, robotics, or anything else...">
                 <button class="send-btn" onclick="EnhancedAI.sendMessage()">
                     <i class="fas fa-paper-plane"></i>
                     Send Message
@@ -1491,6 +1491,99 @@
         }
 
         // ============================================================
+        // KHENSANI DIRECT LUVUNO BACKEND ENGINE
+        // Primary: FastAPI proxy. Fallback: edge text endpoint.
+        // ============================================================
+        const LUVUNO_BACKEND_URL = "https://luvuno-backend-proxy.onrender.com/api/v1/khensani/chat";
+
+        async function requestKhensaniReply(prompt, portal) {
+            const studentUid = (auth && auth.currentUser && auth.currentUser.uid)
+                ? auth.currentUser.uid : 'demo-student';
+
+            try {
+                const response = await fetch(LUVUNO_BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        studentUid: studentUid,
+                        portal: portal || 'student-portal'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Backend returned HTTP ' + response.status);
+                }
+
+                const data = await response.json();
+                if (!data || typeof data.reply !== 'string' || !data.reply.trim()) {
+                    throw new Error('Backend response did not contain a non-empty reply field.');
+                }
+
+                return {
+                    reply: data.reply,
+                    provenance: data.telemetry && data.telemetry.provenance_stamp
+                        ? String(data.telemetry.provenance_stamp) : 'LUVUNO-BACKEND'
+                };
+            } catch (backendError) {
+                console.warn('[KhensaniEngine] FastAPI unavailable; trying edge fallback.', backendError);
+
+                const systemPrompt = 'You are Khensani AI, an educational assistant powered by MindTech Industries. Explain concepts clearly, accurately and at an appropriate academic level.';
+                const payload = systemPrompt + '\n\nStudent Inquiry: ' + prompt + '\n\nKhensani AI Response:';
+                const fallbackResponse = await fetch(
+                    'https://text.pollinations.ai/' + encodeURIComponent(payload) + '?model=openai'
+                );
+
+                if (!fallbackResponse.ok) {
+                    throw new Error('Both Khensani routes failed. Fallback HTTP ' + fallbackResponse.status);
+                }
+
+                return {
+                    reply: await fallbackResponse.text(),
+                    provenance: 'EDGE-FALLBACK'
+                };
+            }
+        }
+
+        function escapeChatHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function(character) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character];
+            });
+        }
+
+        function formatChatReply(value) {
+            return escapeChatHtml(value)
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/\n/g, '<br>');
+        }
+
+        function appendChatMessage(panel, sender, message, type, provenance) {
+            const bubble = document.createElement('div');
+            bubble.className = 'chat-message ' + (type === 'user' ? 'user-message' : 'ai-message');
+            const heading = document.createElement('strong');
+            heading.textContent = sender + ': ';
+            bubble.appendChild(heading);
+
+            const content = document.createElement('span');
+            content.innerHTML = type === 'thinking'
+                ? '<em>⚛️ Connecting to Khensani AI...</em>'
+                : formatChatReply(message);
+            bubble.appendChild(content);
+
+            if (provenance) {
+                const stamp = document.createElement('div');
+                stamp.style.cssText = 'font-size:.68rem;opacity:.7;margin-top:8px;border-top:1px solid rgba(0,255,170,.18);padding-top:5px;';
+                stamp.textContent = '🔒 Route: ' + provenance + ' · MindTech Industries';
+                bubble.appendChild(stamp);
+            }
+
+            panel.appendChild(bubble);
+            panel.scrollTop = panel.scrollHeight;
+            return bubble;
+        }
+
+        // ============================================================
         // AI LEARNING HUBS — live fetch from Luvuno
         // ============================================================
         const LEARNING_HUBS = {
@@ -1534,32 +1627,9 @@
             panel.scrollTop = panel.scrollHeight;
 
             try {
-                if (!functions) throw new Error('Firebase Functions not available');
-                const call = functions.httpsCallable('luvunoChat');
-                const res = await call({
-                    message: hub.prompt,
-                    portal: hub.portal,
-                    language: 'english',
-                    history: []
-                });
-
+                const result = await requestKhensaniReply(hub.prompt, hub.portal);
                 loadingMsg.remove();
-                const aiMsg = document.createElement('div');
-                aiMsg.className = 'chat-message ai-message';
-                aiMsg.innerHTML = '<strong>Khensani AI:</strong> ' + (res.data.response || 'Welcome to the ' + hub.title + ' hub!');
-                panel.appendChild(aiMsg);
-
-                // If backend returned URLs, render as buttons
-                if (res.data.urls && Array.isArray(res.data.urls) && res.data.urls.length > 0) {
-                    const linksDiv = document.createElement('div');
-                    linksDiv.className = 'chat-message ai-message';
-                    linksDiv.innerHTML = '<strong>Quick links:</strong><br>' + res.data.urls.map(u =>
-                        '<a href="' + u.url + '" target="_blank" rel="noopener" style="color:var(--secondary); text-decoration:none; display:block; margin-top:6px;">' +
-                        '<i class="' + (u.icon || 'fas fa-arrow-right') + '"></i> ' + u.label + '</a>'
-                    ).join('');
-                    panel.appendChild(linksDiv);
-                }
-                panel.scrollTop = panel.scrollHeight;
+                appendChatMessage(panel, 'Khensani AI', result.reply, 'ai', result.provenance);
             } catch (e) {
                 console.warn('[Hub] Luvuno fetch failed:', e.message);
                 loadingMsg.remove();
@@ -1582,40 +1652,32 @@
         };
 
         const EnhancedAI = {
-            sendMessage: function() {
+            isSending: false,
+            sendMessage: async function() {
+                if (this.isSending) return;
                 const input = document.getElementById('chatInput');
+                const panel = document.getElementById('conversationPanel');
+                if (!input || !panel) return;
                 const message = input.value.trim();
                 if (!message) return;
 
-                const panel = document.getElementById('conversationPanel');
-                const userMsg = document.createElement('div');
-                userMsg.className = 'chat-message user-message';
-                userMsg.innerHTML = '<strong>You:</strong> ' + message;
-                panel.appendChild(userMsg);
+                this.isSending = true;
                 input.value = '';
+                appendChatMessage(panel, 'You', message, 'user');
+                const loading = appendChatMessage(panel, 'Khensani AI', '', 'thinking');
 
-                setTimeout(() => {
-                    const aiMsg = document.createElement('div');
-                    aiMsg.className = 'chat-message ai-message';
-                    aiMsg.innerHTML = '<strong>Khensani AI:</strong> ' + this.generateResponse(message);
-                    panel.appendChild(aiMsg);
-                    panel.scrollTop = panel.scrollHeight;
-                }, 1000);
-
-                panel.scrollTop = panel.scrollHeight;
-            },
-            generateResponse: function(message) {
-                const lower = message.toLowerCase();
-                if (lower.includes('quadratic') || lower.includes('equation')) {
-                    return "Let's break this down. Standard form: ax² + bx + c = 0. Quadratic formula: x = [-b ± √(b² - 4ac)] / 2a. Would you like me to walk through a specific problem?";
+                try {
+                    const result = await requestKhensaniReply(message, 'student-portal');
+                    loading.remove();
+                    appendChatMessage(panel, 'Khensani AI', result.reply, 'ai', result.provenance);
+                } catch (error) {
+                    console.error('[KhensaniEngine] Chat request failed:', error);
+                    loading.remove();
+                    appendChatMessage(panel, 'Khensani AI', 'I could not reach the learning service just now. Please check your connection and try again.', 'ai', 'CONNECTION-ERROR');
+                } finally {
+                    this.isSending = false;
+                    input.focus();
                 }
-                if (lower.includes('calculus') || lower.includes('derivative')) {
-                    return "Derivatives measure rates of change. The derivative of x² is 2x. Would you like to practice some differentiation problems?";
-                }
-                if (lower.includes('physics') || lower.includes('motion')) {
-                    return "For motion problems, use kinematic equations: v = u + at, s = ut + ½at², v² = u² + 2as. Would you like to work through one?";
-                }
-                return "Great question! I'd be happy to help. Would you like step-by-step guidance or additional learning resources?";
             }
         };
 
@@ -1672,38 +1734,30 @@
         };
 
         const KhensaniAI = {
-            sendMessage: function() {
+            isSending: false,
+            sendMessage: async function() {
+                if (this.isSending) return;
                 const input = document.getElementById('sidebarChatInput');
+                const chat = document.getElementById('khensaniChat');
+                if (!input || !chat) return;
                 const message = input.value.trim();
                 if (!message) return;
 
-                const chat = document.getElementById('khensaniChat');
-                const userMsg = document.createElement('div');
-                userMsg.className = 'chat-message user-message';
-                userMsg.textContent = message;
-                chat.appendChild(userMsg);
+                this.isSending = true;
                 input.value = '';
-
-                setTimeout(() => {
-                    const aiMsg = document.createElement('div');
-                    aiMsg.className = 'chat-message ai-message';
-                    aiMsg.textContent = this.generateResponse();
-                    chat.appendChild(aiMsg);
-                    chat.scrollTop = chat.scrollHeight;
-                }, 1000);
-
-                chat.scrollTop = chat.scrollHeight;
-            },
-            generateResponse: function() {
-                const r = [
-                    "That's an excellent question! Let me help you understand this better.",
-                    "I can see you're making great progress in your studies!",
-                    "Would you like me to break this down into smaller steps?",
-                    "Remember to take breaks and stay hydrated while studying!",
-                    "I notice you're working hard — keep up the great work!",
-                    "Let me provide some additional resources for this topic."
-                ];
-                return r[Math.floor(Math.random() * r.length)];
+                appendChatMessage(chat, 'You', message, 'user');
+                const loading = appendChatMessage(chat, 'Khensani AI', '', 'thinking');
+                try {
+                    const result = await requestKhensaniReply(message, 'student-sidebar');
+                    loading.remove();
+                    appendChatMessage(chat, 'Khensani AI', result.reply, 'ai', result.provenance);
+                } catch (error) {
+                    console.error('[KhensaniEngine] Sidebar request failed:', error);
+                    loading.remove();
+                    appendChatMessage(chat, 'Khensani AI', 'I could not connect just now. Please try again.', 'ai', 'CONNECTION-ERROR');
+                } finally {
+                    this.isSending = false;
+                }
             },
             minimize: function() {
                 document.querySelector('.khensani-sidebar').style.transform = 'translateY(calc(100% - 60px))';
@@ -1756,12 +1810,12 @@
             }
         };
 
-        // Enter key handlers
-        document.getElementById('chatInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') EnhancedAI.sendMessage();
+        // Enter key handlers for both live Khensani chat inputs.
+        document.getElementById('chatInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); EnhancedAI.sendMessage(); }
         });
-        document.getElementById('sidebarChatInput').addEventListener('keypress', e => {
-            if (e.key === 'Enter') KhensaniAI.sendMessage();
+        document.getElementById('sidebarChatInput').addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); KhensaniAI.sendMessage(); }
         });
 
         // Close notification panel on outside click
@@ -1783,17 +1837,6 @@
                     await window.KhensaniQuantum.verify();
                     window.KhensaniQuantum.renderBadge('quantum-badge');
                 } catch(e) { console.warn('[Quantum] Verify failed:', e.message); }
-            }
-
-            // Chat widget
-            if (window.KhensaniChat) {
-                try {
-                    const chat = new window.KhensaniChat({
-                        studentUid: (auth && auth.currentUser) ? auth.currentUser.uid : 'demo-student',
-                        mountId: 'khensani-chat'
-                    });
-                    await chat.init();
-                } catch(e) { console.warn('[Chat] Mount failed:', e.message); }
             }
 
             // Load corporate ads (falls back to KD if none)
@@ -1827,6 +1870,5 @@
         window.handleSignOut = handleSignOut;
         window.markRead = markRead;
     </script>
-  <script src="../../assets/js/khensani-override.js?v=20261031"></script>
 </body>
 </html>
