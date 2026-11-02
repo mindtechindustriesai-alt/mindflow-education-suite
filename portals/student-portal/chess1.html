@@ -2412,7 +2412,38 @@
 
     // ============================================================
     // VIDEO HUB & CREATORS FEED
+    // Thumbnail handling: try YouTube's available thumbnail sizes, then
+    // use a local inline placeholder so failed thumbnails never cause 404s
+    // to repeat indefinitely or leave a broken-image icon.
     // ============================================================
+    function getSafeYoutubeThumbnail(videoId) {
+        const validId = /^[A-Za-z0-9_-]{11}$/.test(String(videoId || ''));
+        if (!validId) return '';
+        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+    }
+
+    function handleYoutubeThumbnailError(img) {
+        if (!img) return;
+        const videoId = img.dataset.youtubeId || '';
+        const stages = ['maxresdefault.jpg', 'sddefault.jpg', 'mqdefault.jpg', 'default.jpg'];
+        let attempt = Number(img.dataset.thumbnailAttempt || 0);
+        // First try the higher-resolution options, then fall back to a local
+        // inline SVG placeholder. Do not keep retrying a broken URL forever.
+        if (/^[A-Za-z0-9_-]{11}$/.test(videoId) && attempt < stages.length) {
+            img.dataset.thumbnailAttempt = String(attempt + 1);
+            img.src = `https://img.youtube.com/vi/${videoId}/${stages[attempt]}`;
+            return;
+        }
+        img.onerror = null;
+        img.removeAttribute('src');
+        img.alt = 'Video thumbnail unavailable';
+        img.style.objectFit = 'contain';
+        img.style.background = 'linear-gradient(135deg, #101827, #252044)';
+        img.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360"><rect width="480" height="360" fill="#151827"/><circle cx="240" cy="160" r="52" fill="#ff0033"/><path d="M225 132 L225 188 L270 160 Z" fill="#ffffff"/><text x="240" y="260" font-family="Arial,sans-serif" font-size="20" text-anchor="middle" fill="#d6d9e6">Thumbnail unavailable</text></svg>'
+        );
+    }
+
     const VideoHub = {
         allVideos: [],
         filter: 'all',
@@ -2479,7 +2510,13 @@
                 <div class="video-feed-card ${isStudent ? 'student-post' : ''} ${v.sponsor_flagged ? 'sponsor-flagged' : ''}" onclick="VideoHub.openModal('${v.id}')">
                     <div class="video-thumb">
                         ${badge}
-                        <img src="https://img.youtube.com/vi/${v.youtubeEmbedId}/mqdefault.jpg" alt="${v.title}">
+                        <img
+                            src="${getSafeYoutubeThumbnail(v.youtubeEmbedId) || ''}"
+                            data-youtube-id="${/^[A-Za-z0-9_-]{11}$/.test(String(v.youtubeEmbedId || '')) ? v.youtubeEmbedId : ''}"
+                            data-thumbnail-attempt="0"
+                            alt="${(v.title || 'Video').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}"
+                            loading="lazy"
+                            onerror="handleYoutubeThumbnailError(this)">
                         <div class="play-overlay"><i class="fas fa-play-circle"></i></div>
                     </div>
                     <div class="video-feed-body">
