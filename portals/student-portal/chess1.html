@@ -925,6 +925,27 @@
         @media (prefers-reduced-motion: reduce) {
             .kd-rotating-logo, .corporate-ad-center::before { animation: none; }
         }
+    /* ============================================================
+       AUDIO WAVE VISUALIZER STYLES
+       ============================================================ */
+    .audio-wave-visualizer {
+        display: none; align-items: center; gap: 4px; height: 24px;
+        padding: 0 10px; background: rgba(0, 255, 170, 0.1);
+        border: 1px solid var(--learning-green); border-radius: 12px; margin-top: 8px;
+    }
+    .audio-wave-visualizer.active { display: flex; }
+    .wave-bar {
+        width: 3px; height: 6px; background: var(--learning-green);
+        border-radius: 2px; animation: wavePulse 0.8s ease-in-out infinite alternate;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.4s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.1s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.3s; }
+    @keyframes wavePulse {
+        0% { height: 6px; opacity: 0.4; }
+        100% { height: 20px; opacity: 1; }
+    }
     </style>
 </head>
 <body>
@@ -969,6 +990,14 @@
                 </span>
             </p>
         </section>
+
+        <div id="audioWaveVisualizer" class="audio-wave-visualizer"
+             role="status" aria-label="Khensani AI is speaking" aria-live="polite">
+            <span class="wave-bar"></span><span class="wave-bar"></span>
+            <span class="wave-bar"></span><span class="wave-bar"></span>
+            <span class="wave-bar"></span>
+            <span style="font-size:0.75rem;color:var(--learning-green);margin-left:6px;">Khensani AI voice active</span>
+        </div>
 
         <div class="arena-tabs">
             <div class="arena-tab active" data-tab="play" onclick="Arena.switchTab('play')">
@@ -1439,6 +1468,10 @@
         db = firebase.firestore();
         auth = firebase.auth();
         functions = firebase.functions ? firebase.app().functions('africa-south1') : null;
+        // Shared Firebase handles for modules that use this page's initialized app.
+        window.db = db;
+        window.auth = auth;
+        window.functions = functions;
     } catch(e) { console.warn('[Firebase] Init error:', e.message); }
 
     // ============================================================
@@ -2599,6 +2632,210 @@
         VideoHub.loadFeed();
         addNotification('♟️ Welcome to Arena', 'Chess, 9x9 Sudoku, and Creators Hub online!', 'info');
     });
+// ============================================================
+    // PHASE 1: EDGE ROUTING WITH TIMEOUT & HONEST FAILOVER
+    // A 200 ms budget is aggressive for an internet request. Failures are
+    // reported as unavailable; they are never disguised as successful AI.
+    // ============================================================
+    async function robustEdgeFetch(endpoint, payload = {}) {
+        const startedAt = performance.now();
+        const timeoutMs = 200;
+        const controller = new AbortController();
+        let timeoutId;
+
+        try {
+            const safeEndpoint = String(endpoint || '');
+            if (!safeEndpoint.startsWith('/') || safeEndpoint.startsWith('//')) {
+                throw new Error('Endpoint must be a relative path beginning with one slash.');
+            }
+            timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+            const response = await fetch(`https://luvuno-backend-proxy.onrender.com${safeEndpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: controller.signal
+            });
+            const durationMs = performance.now() - startedAt;
+            const rawText = await response.text();
+            let data;
+            try { data = rawText ? JSON.parse(rawText) : {}; }
+            catch (_) { data = { text: rawText }; }
+
+            if (!response.ok) throw new Error(`Backend returned HTTP ${response.status}`);
+            if (durationMs > timeoutMs) {
+                console.warn(`[Edge Router] Response took ${durationMs.toFixed(1)} ms; exceeded ${timeoutMs} ms target.`);
+            }
+            return { status: 'success', source: 'luvuno-backend-proxy', durationMs: Number(durationMs.toFixed(1)), data };
+        } catch (error) {
+            const reason = error && error.name === 'AbortError'
+                ? `request timed out after ${timeoutMs} ms`
+                : (error && error.message ? error.message : 'unknown network error');
+            console.warn(`[Edge Router] Backend unavailable (${reason}). No successful AI response was produced.`);
+            return {
+                status: 'unavailable', source: 'none',
+                durationMs: Number((performance.now() - startedAt).toFixed(1)),
+                error: reason,
+                text: 'Khensani AI is temporarily unable to reach its service. Please try again shortly.'
+            };
+        } finally {
+            if (timeoutId) clearTimeout(timeoutId);
+        }
+    }
+
+    // ============================================================
+    // PHASE 2: MULTILINGUAL SPEECH ENGINE
+    // Uses installed browser voices; no unsupported phonetic adaptation claim.
+    // ============================================================
+    const KHENSANI_LANGUAGE_MAP = {
+        en: { tag: 'en-ZA', name: 'English' },
+        af: { tag: 'af-ZA', name: 'Afrikaans' },
+        zu: { tag: 'zu-ZA', name: 'isiZulu' },
+        xh: { tag: 'xh-ZA', name: 'isiXhosa' },
+        st: { tag: 'st-ZA', name: 'Sesotho' },
+        tn: { tag: 'tn-ZA', name: 'Setswana' },
+        ts: { tag: 'ts-ZA', name: 'itsonga' },
+        ss: { tag: 'ss-ZA', name: 'siSwati' },
+        ve: { tag: 've-ZA', name: 'Tshivenḓa' },
+        nso: { tag: 'nso-ZA', name: 'Sepedi' },
+        sn: { tag: 'sn-ZW', name: 'chiShona' },
+        ny: { tag: 'ny-MW', name: 'Chichewa' },
+        sw: { tag: 'sw-KE', name: 'Kiswahili' }
+    };
+
+    function speakKhensaniMultilingual(text, requestedLang = 'en') {
+        if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+            console.warn('[Speech] This browser does not support speech synthesis.');
+            return false;
+        }
+        const cleanText = String(text == null ? '' : text)
+            .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 450);
+        if (!cleanText) {
+            console.warn('[Speech] No text was supplied to speak.');
+            return false;
+        }
+
+        const langConfig = KHENSANI_LANGUAGE_MAP[requestedLang] || KHENSANI_LANGUAGE_MAP.en;
+        const voices = window.speechSynthesis.getVoices();
+        const targetTag = langConfig.tag.toLowerCase();
+        const targetPrefix = targetTag.split('-')[0];
+        const selectedVoice =
+            voices.find(v => String(v.lang || '').toLowerCase() === targetTag) ||
+            voices.find(v => String(v.lang || '').toLowerCase().split('-')[0] === targetPrefix);
+
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = langConfig.tag;
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+
+        if (selectedVoice) {
+            utterance.voice = selectedVoice;
+            console.info(`[Voice Engine] ${selectedVoice.name} (${selectedVoice.lang}) selected for ${langConfig.name}.`);
+        } else {
+            console.warn(`[Voice Engine] No installed voice matched ${langConfig.name} (${langConfig.tag}). Browser pronunciation may vary; install a supported voice for best results.`);
+        }
+
+        const waveContainer = document.getElementById('audioWaveVisualizer');
+        if (waveContainer) waveContainer.classList.add('active');
+        const clearVisualizer = () => { if (waveContainer) waveContainer.classList.remove('active'); };
+        utterance.onend = clearVisualizer;
+        utterance.onerror = event => {
+            clearVisualizer();
+            console.warn('[Speech] Speech synthesis error:', event && event.error ? event.error : 'unknown');
+        };
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(utterance);
+        return true;
+    }
+
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    // ============================================================
+    // PHASE 3: AUTHENTICATED REAL-TIME NOTIFICATION LISTENER
+    // Only a real Firebase-authenticated UID can start this listener.
+    // Firestore security rules remain the authorization boundary.
+    // ============================================================
+    let notificationUnsubscribe = null;
+
+    function initRealtimeNotificationListener(currentUserUid) {
+        if (typeof notificationUnsubscribe === 'function') {
+            notificationUnsubscribe();
+            notificationUnsubscribe = null;
+        }
+        if (!window.db || !currentUserUid) {
+            console.info('[Ecosystem Sync] Listener not started: Firebase user is not signed in.');
+            return null;
+        }
+
+        notificationUnsubscribe = window.db.collection('parent_teacher_notifications')
+            .where('targetUid', '==', currentUserUid)
+            .orderBy('createdAt', 'desc')
+            .limit(25)
+            .onSnapshot(snapshot => {
+                const remoteItems = snapshot.docs.map(doc => {
+                    const data = doc.data() || {};
+                    const createdAt = data.createdAt && typeof data.createdAt.toDate === 'function'
+                        ? data.createdAt.toDate()
+                        : (data.createdAt ? new Date(data.createdAt) : null);
+                    return {
+                        id: doc.id,
+                        title: String(data.title || data.heading || 'Notification'),
+                        desc: String(data.desc || data.message || data.body || ''),
+                        type: String(data.type || 'info'),
+                        time: createdAt && !Number.isNaN(createdAt.getTime()) ? createdAt.toLocaleString() : 'Recently',
+                        unread: data.read === true ? false : data.unread !== false
+                    };
+                });
+                const localItems = notifications.filter(item => !item.id);
+                notifications = [...remoteItems, ...localItems].slice(0, 30);
+                renderNotifications();
+                console.info(`[Ecosystem Sync] Received ${remoteItems.length} notification(s) for authenticated user.`);
+            }, error => {
+                console.warn('[Ecosystem Sync] Firestore listener denied or unavailable:', error.message);
+            });
+        return notificationUnsubscribe;
+    }
+
+    if (auth && typeof auth.onAuthStateChanged === 'function') {
+        auth.onAuthStateChanged(user => {
+            if (user && user.uid) {
+                initRealtimeNotificationListener(user.uid);
+            } else {
+                if (typeof notificationUnsubscribe === 'function') notificationUnsubscribe();
+                notificationUnsubscribe = null;
+                console.info('[Ecosystem Sync] NOT SIGNED IN; user-specific notifications are paused.');
+            }
+        }, error => console.warn('[Firebase Auth] Could not observe authentication state:', error.message));
+    } else {
+        console.warn('[Firebase Auth] Auth is not initialized; notification listener was not started.');
+    }
+
+    // ============================================================
+    // PHASE 4: CHSH REFERENCE CALCULATION (NOT EXPERIMENTAL VERIFICATION)
+    // Calculates the ideal mathematical reference only; it does not inspect
+    // hardware, quantum jobs, experimental data, or patent scope.
+    // ============================================================
+    function verifyQuantumTelemetry() {
+        const theta = Math.PI / 4;
+        const chshScore = (2 * Math.cos(theta) + 2 * Math.sin(theta)).toFixed(4);
+        const result = {
+            metric: 'Ideal CHSH reference calculation',
+            score: chshScore,
+            status: 'calculated-reference-only',
+            patentReference: 'SA 2026/05142',
+            timestamp: new Date().toISOString()
+        };
+        console.info(`[Quantum Telemetry] Ideal CHSH reference calculation S = ${chshScore}. This is not a hardware measurement or experimental verification.`);
+        return result;
+    }
+
+    window.robustEdgeFetch = robustEdgeFetch;
+    window.KHENSANI_LANGUAGE_MAP = KHENSANI_LANGUAGE_MAP;
+    window.speakKhensaniMultilingual = speakKhensaniMultilingual;
+    window.initRealtimeNotificationListener = initRealtimeNotificationListener;
+    window.verifyQuantumTelemetry = verifyQuantumTelemetry;
+    verifyQuantumTelemetry();
     </script>
 </body>
 </html>
