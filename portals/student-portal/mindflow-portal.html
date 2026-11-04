@@ -783,7 +783,205 @@
             50% { transform: perspective(600px) rotateY(180deg) rotateZ(0deg) scale(1); filter: brightness(0.78) contrast(1.28) drop-shadow(0 0 7px rgba(80, 20, 135, 0.98)) drop-shadow(0 0 16px rgba(138, 43, 226, 0.95)) drop-shadow(0 0 25px rgba(200, 164, 80, 0.72)); }
             75% { transform: perspective(600px) rotateY(270deg) rotateZ(-4deg) scale(1.08); filter: brightness(0.72) contrast(1.35) drop-shadow(0 0 10px rgba(80, 20, 135, 1)) drop-shadow(0 0 24px rgba(138, 43, 226, 1)) drop-shadow(0 0 36px rgba(200, 164, 80, 0.9)); }
         }
+    
+
+        /* ============================================================
+           MINDTECH SHARED KHENSANI CHAT SYSTEM — LUVUNO VISUAL STANDARD
+           Scoped palette copied from the Luvuno chat implementation.
+           Portal-wide MindFlow colours and layouts remain untouched.
+           ============================================================ */
+        :root {
+            --kh-chat-primary: #00B4D8;
+            --kh-chat-primary-dark: #0096C7;
+            --kh-chat-primary-glow: rgba(0,180,216,0.4);
+            --kh-chat-secondary: #00F5D4;
+            --kh-chat-quantum: #8A2BE2;
+            --kh-chat-quantum-glow: rgba(138,43,226,0.5);
+            --kh-chat-success: #00FF88;
+            --kh-chat-danger: #EF476F;
+            --kh-chat-dark-bg: #05080F;
+            --kh-chat-dark-card: #0A0F1A;
+            --kh-chat-glass-border: rgba(0,180,216,0.2);
+            --kh-chat-text: #E8EDF5;
+            --kh-chat-muted: #8A99B0;
+        }
+        .conversation-panel, .khensani-chat {
+            background: rgba(5,8,15,0.88) !important;
+            border: 1px solid var(--kh-chat-glass-border) !important;
+            color: var(--kh-chat-text);
+            scrollbar-width: thin;
+            scrollbar-color: var(--kh-chat-primary) rgba(255,255,255,.04);
+        }
+        .chat-message {
+            max-width: 88%;
+            padding: 12px 15px;
+            border-radius: 16px;
+            line-height: 1.65;
+            overflow-wrap: anywhere;
+            box-shadow: 0 4px 16px rgba(0,0,0,.16);
+            animation: khChatEnter .22s ease-out;
+        }
+        .chat-message.ai-message {
+            align-self: flex-start;
+            color: var(--kh-chat-text);
+            background: linear-gradient(145deg, rgba(10,15,26,.96), rgba(5,8,15,.94));
+            border: 1px solid var(--kh-chat-glass-border);
+            border-left: 3px solid var(--kh-chat-secondary);
+        }
+        .chat-message.user-message {
+            align-self: flex-end;
+            color: #fff;
+            background: linear-gradient(135deg, var(--kh-chat-quantum), var(--kh-chat-primary));
+            border: 1px solid rgba(0,180,216,.42);
+        }
+        .chat-message strong { color: var(--kh-chat-secondary); }
+        .chat-message.user-message strong { color: #fff; }
+        .chat-message .kh-chat-provenance {
+            margin-top: 9px;
+            padding-top: 6px;
+            border-top: 1px solid rgba(0,245,212,.18);
+            color: var(--kh-chat-muted);
+            font: 10px 'Space Mono', monospace;
+        }
+        .kh-chat-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 11px;
+            padding-top: 8px;
+            border-top: 1px solid var(--kh-chat-glass-border);
+        }
+        .kh-chat-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border: 1px solid transparent;
+            border-radius: 20px;
+            background: rgba(255,255,255,.035);
+            color: var(--kh-chat-muted);
+            font: 600 11px 'Exo 2', sans-serif;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+        .kh-chat-action:hover {
+            color: var(--kh-chat-secondary);
+            background: rgba(0,180,216,.1);
+            border-color: var(--kh-chat-primary-glow);
+        }
+        /* Luvuno Wave Collapse — shared Khensani greeting + live thinking indicator */
+        .kh-chat-wave-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 13px;
+            max-width: 100%;
+            padding: 11px 16px 11px 13px;
+            border: 1px solid var(--kh-chat-quantum-glow);
+            border-radius: 28px;
+            background: linear-gradient(135deg, rgba(138,43,226,.16), rgba(0,180,216,.11));
+            box-shadow: 0 0 22px rgba(138,43,226,.18);
+        }
+        .kh-chat-wave-svg { width: 76px; height: 34px; flex: 0 0 76px; overflow: visible; }
+        .kh-chat-wave-path {
+            fill: none; stroke: var(--kh-chat-secondary); stroke-width: 2.5;
+            stroke-linecap: round; filter: drop-shadow(0 0 6px var(--kh-chat-primary-glow));
+        }
+        .kh-chat-wave-label { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+        .kh-chat-wave-title {
+            font: 700 11px 'Space Mono', monospace; letter-spacing: 1px;
+            background: linear-gradient(90deg, var(--kh-chat-secondary), var(--kh-chat-primary), var(--kh-chat-quantum), var(--kh-chat-secondary));
+            background-size: 300% 100%; background-clip: text; -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; animation: khChatShimmer 3s ease-in-out infinite;
+        }
+        .kh-chat-wave-sub { color: var(--kh-chat-muted); font: 9px 'Space Mono', monospace; letter-spacing: .4px; }
+        .kh-chat-wave-dots::after { content: ''; animation: khChatDots 1.5s steps(4,end) infinite; }
+        .kh-chat-wave-card.collapsed {
+            border-color: rgba(0,255,136,.38);
+            background: linear-gradient(135deg, rgba(0,255,136,.08), rgba(0,180,216,.05));
+            box-shadow: 0 0 16px rgba(0,255,136,.08);
+        }
+        .kh-chat-greeting { display: flex; flex-direction: column; gap: 8px; }
+        .kh-chat-greeting-text { color: var(--kh-chat-text); font-weight: 600; line-height: 1.5; }
+        @keyframes khChatShimmer { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        .kh-chat-thinking-dots::after { content: '...'; animation: khChatDots 1.1s steps(4,end) infinite; }
+        @media (max-width: 480px) {
+            .kh-chat-wave-card { gap: 9px; padding: 9px 11px; }
+            .kh-chat-wave-svg { width: 62px; flex-basis: 62px; }
+            .kh-chat-wave-title { font-size: 10px; letter-spacing: .5px; }
+        }
+        .chat-input-area .chat-input, .khensani-sidebar .chat-input input {
+            border-color: var(--kh-chat-primary) !important;
+            box-shadow: inset 0 0 0 1px rgba(0,180,216,.08);
+        }
+        .chat-input-area .send-btn, .khensani-sidebar .sidebar-send-btn {
+            background: linear-gradient(135deg, var(--kh-chat-quantum), var(--kh-chat-primary)) !important;
+            color: #fff !important;
+        }
+        .chat-input-area .send-btn:hover, .khensani-sidebar .sidebar-send-btn:hover {
+            box-shadow: 0 5px 18px var(--kh-chat-quantum-glow);
+        }
+
+        /* Luvuno-style readable response typography and Markdown rhythm */
+        .chat-message { font-size: 1rem; line-height: 1.7; }
+        .chat-message > .kh-chat-message-content { display:block; margin-top: 5px; }
+        .kh-chat-message-content p { margin: 0 0 12px; line-height: 1.7; }
+        .kh-chat-message-content p:last-child { margin-bottom: 0; }
+        .kh-chat-message-content h1,
+        .kh-chat-message-content h2,
+        .kh-chat-message-content h3,
+        .kh-chat-message-content h4 { color: var(--kh-chat-secondary); line-height:1.3; margin: 18px 0 10px; font-weight:700; }
+        .kh-chat-message-content h1 { font-size:1.45rem; }
+        .kh-chat-message-content h2 { font-size:1.28rem; }
+        .kh-chat-message-content h3 { font-size:1.12rem; }
+        .kh-chat-message-content h4 { font-size:1.02rem; }
+        .kh-chat-message-content h1:first-child,
+        .kh-chat-message-content h2:first-child,
+        .kh-chat-message-content h3:first-child { margin-top:0; }
+        .kh-chat-message-content ul, .kh-chat-message-content ol { margin: 8px 0 14px 24px; padding:0; }
+        .kh-chat-message-content li { margin: 5px 0; padding-left:3px; line-height:1.65; }
+        .kh-chat-message-content li::marker { color:var(--kh-chat-secondary); }
+        .kh-chat-message-content blockquote { margin:12px 0; padding:9px 14px; border-left:3px solid var(--kh-chat-secondary); background:rgba(0,245,212,.055); color:#c8d8e5; border-radius:0 8px 8px 0; }
+        .kh-chat-message-content pre { margin:12px 0; padding:14px; overflow-x:auto; border-left:3px solid var(--kh-chat-secondary); border-radius:8px; background:rgba(0,0,0,.55); white-space:pre; }
+        .kh-chat-message-content code { font-family:'JetBrains Mono',monospace; font-size:.88em; color:var(--kh-chat-secondary); background:rgba(0,245,212,.09); padding:2px 5px; border-radius:4px; }
+        .kh-chat-message-content pre code { padding:0; background:transparent; color:#d9f7f2; }
+        .kh-chat-message-content a { color:var(--kh-chat-primary); text-decoration:underline; overflow-wrap:anywhere; }
+        .kh-chat-message-content strong { color:var(--kh-chat-primary); font-weight:700; }
+        .kh-chat-message-content hr { border:0; border-top:1px solid var(--kh-chat-glass-border); margin:16px 0; }
+        .kh-chat-message-content table { width:100%; border-collapse:collapse; display:block; overflow-x:auto; margin:12px 0; }
+        .kh-chat-message-content th,.kh-chat-message-content td { padding:8px 10px; border:1px solid var(--kh-chat-glass-border); text-align:left; }
+        .kh-chat-message-content th { color:var(--kh-chat-secondary); background:rgba(0,180,216,.08); }
+        .kh-chat-actions { gap:6px; }
+        .kh-chat-action { font-size:11px; padding:6px 10px; white-space:nowrap; }
+        .kh-chat-action:disabled { opacity:.45; cursor:not-allowed; }
+        .kh-chat-stop-btn {
+            display:none; align-items:center; justify-content:center; gap:6px;
+            border:1px solid rgba(239,71,111,.55); border-radius:20px;
+            padding:8px 13px; background:rgba(239,71,111,.14); color:#ff9caf;
+            font:600 12px 'Exo 2',sans-serif; cursor:pointer;
+        }
+        .kh-chat-stop-btn.is-active { display:inline-flex; }
+        .kh-chat-stop-btn:hover { background:rgba(239,71,111,.24); }
+        .kh-chat-sources { margin-top:9px; padding-top:7px; border-top:1px solid var(--kh-chat-glass-border); font-size:11px; }
+        .kh-chat-sources a { display:inline-block; margin:4px 8px 0 0; color:var(--kh-chat-primary); overflow-wrap:anywhere; }
+        @media(max-width:480px) {
+            .chat-message { font-size:.94rem; line-height:1.65; }
+            .kh-chat-message-content h1 { font-size:1.28rem; }
+            .kh-chat-message-content h2 { font-size:1.16rem; }
+            .kh-chat-message-content h3 { font-size:1.04rem; }
+            .kh-chat-action { font-size:10px; padding:6px 8px; }
+        }
+
+        @keyframes khChatEnter { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes khChatDots { 0%,20% { content: ''; } 40% { content: '.'; } 60% { content: '..'; } 80%,100% { content: '...'; } }
+        @media (max-width: 480px) {
+            .chat-message { max-width: 96%; padding: 10px 12px; font-size: .86rem; }
+            .kh-chat-action { min-height: 30px; }
+        }
+
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.2.6/purify.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="particles-js"></div>
@@ -944,14 +1142,8 @@
 
             <div class="chat-interface">
                 <div class="conversation-panel" id="conversationPanel">
-                    <div class="chat-message ai-message">
-                        <strong>Khensani AI:</strong> Hello Lerato! I see you've been working on quadratic equations. Would you like me to help you with today's math assignment, or shall we continue with the robotics project planning?
-                    </div>
-                    <div class="chat-message user-message">
-                        <strong>You:</strong> I'm struggling with the quadratic formula application in word problems. Can you walk me through an example?
-                    </div>
-                    <div class="chat-message ai-message">
-                        <strong>Khensani AI:</strong> Absolutely! Let's work through this step by step. Consider this problem: "A ball is thrown upward from a height of 5 feet with an initial velocity of 48 feet per second. When will it hit the ground?"
+                    <div class="chat-message ai-message kh-chat-greeting">
+                        <strong>Khensani AI:</strong><div class="kh-chat-greeting-text">Hi, I'm Khensani. How can I help you today?</div>
                     </div>
                 </div>
 
@@ -988,6 +1180,9 @@
 
             <div class="chat-input-area">
                 <input type="text" class="chat-input" id="chatInput" autocomplete="off" placeholder="Ask Khensani about mathematics, science, robotics, or anything else...">
+                <button type="button" class="kh-chat-stop-btn" id="mainChatStopBtn" onclick="stopKhensaniRequest('main')" aria-label="Stop generating">
+                    <i class="fas fa-stop"></i> Stop
+                </button>
                 <button class="send-btn" onclick="EnhancedAI.sendMessage()">
                     <i class="fas fa-paper-plane"></i>
                     Send Message
@@ -1175,12 +1370,14 @@
             </div>
         </div>
         <div class="khensani-chat" id="khensaniChat">
-            <div class="chat-message ai-message">
-                Hello Lerato! I'm Khensani, your AI learning assistant. How can I help you with your studies today?
+            <div class="chat-message ai-message kh-chat-greeting"><div class="kh-chat-greeting-text">Hi, I'm Khensani. How can I help you today?</div>
             </div>
         </div>
         <div class="chat-input">
             <input type="text" placeholder="Ask me anything..." id="sidebarChatInput">
+            <button type="button" class="kh-chat-stop-btn" id="sidebarChatStopBtn" onclick="stopKhensaniRequest('sidebar')" aria-label="Stop generating">
+                <i class="fas fa-stop"></i>
+            </button>
             <button class="sidebar-send-btn" onclick="KhensaniAI.sendMessage()">
                 <i class="fas fa-paper-plane"></i>
             </button>
@@ -1492,7 +1689,7 @@
 
         // ============================================================
         // KHENSANI DIRECT LUVUNO BACKEND ENGINE
-        // Primary: FastAPI proxy. Fallback: edge text endpoint.
+        // Primary: shared MindTech FastAPI gateway; all provider credentials remain server-side.
         // ============================================================
 
         // ============================================================
@@ -1514,49 +1711,84 @@
             'sw': 'sw-KE'   // Swahili
         };
 
+        let khensaniLastSpokenText = '';
+        let khensaniActiveUtterance = null;
+
+        function chooseKhensaniVoice(targetLangTag) {
+            const voices = window.speechSynthesis.getVoices() || [];
+            if (!voices.length) return null;
+            const lang = targetLangTag.toLowerCase();
+            const prefix = lang.split('-')[0];
+            const matching = voices.filter(v => (v.lang || '').toLowerCase() === lang);
+            const regional = matching.length ? matching : voices.filter(v => (v.lang || '').toLowerCase().startsWith(prefix));
+            const pool = regional.length ? regional : voices.filter(v => (v.lang || '').toLowerCase().startsWith('en'));
+            if (!pool.length) return voices.find(v => v.default) || voices[0];
+
+            // Voice names are the only portable hint exposed by the browser; prefer
+            // commonly labelled feminine voices, then the closest regional locale.
+            const feminine = /female|woman|samantha|ava|aria|jenny|zira|susan|karen| victoria|moira|tessa|google uk english female|google us english/i;
+            const ranked = pool.slice().sort((a, b) => {
+                const score = v => (feminine.test(v.name || '') ? 4 : 0) +
+                    ((v.lang || '').toLowerCase() === lang ? 3 : 0) +
+                    (v.localService ? 1 : 0) + (v.default ? 0.2 : 0);
+                return score(b) - score(a);
+            });
+            return ranked[0];
+        }
+
+        function cleanKhensaniSpeechText(value) {
+            return String(value || '')
+                .replace(/```[\s\S]*?```/g, ' ')
+                .replace(/<[^>]*>/g, ' ')
+                .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+                .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+                .replace(/^#{1,6}\s*/gm, '')
+                .replace(/\*\*(.*?)\*\*/g, '$1')
+                .replace(/[*_`~]/g, '')
+                .replace(/^\s*[-*+]\s+/gm, '')
+                .replace(/^\s*\d+[.)]\s+/gm, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
         function speakKhensaniMultilingual(text, requestedLang = 'en') {
             if (!('speechSynthesis' in window)) {
                 console.warn('[Speech] Web Speech API not supported on this client.');
-                return;
+                return false;
             }
+            const cleanText = cleanKhensaniSpeechText(text);
+            if (!cleanText) return false;
 
-            // Cancel any ongoing speech to prevent queue overlapping
             window.speechSynthesis.cancel();
-
-            const cleanText = String(text || '')
-                .replace(/<[^>]*>/g, '')         // Strip HTML tags
-                .replace(/\*\*(.*?)\*\*/g, '$1') // Strip markdown bold
-                .replace(/```[\s\S]*?```/g, 'Code block omitted for speech.') // Skip raw code dumps
-                .substring(0, 450);              // Optimized chunking for zero latency
-
+            khensaniLastSpokenText = cleanText;
             const utterance = new SpeechSynthesisUtterance(cleanText);
-            utterance.rate = 1.08;  // Crisp, professional cadence
-            utterance.pitch = 1.02; // Warm, approachable assistant tone
-
-            const targetLangTag = KHENSANI_LANGUAGE_MAP[requestedLang] || KHENSANI_LANGUAGE_MAP['en'];
+            const targetLangTag = KHENSANI_LANGUAGE_MAP[requestedLang] || KHENSANI_LANGUAGE_MAP.en;
             utterance.lang = targetLangTag;
-
-            const voices = window.speechSynthesis.getVoices();
-
-            // Tier 1: Exact locale match
-            let selectedVoice = voices.find(v => v.lang.toLowerCase() === targetLangTag.toLowerCase());
-
-            // Tier 2: Language prefix match (e.g., 'zu' for any Zulu variant)
-            if (!selectedVoice) {
-                const prefix = targetLangTag.split('-')[0].toLowerCase();
-                selectedVoice = voices.find(v => v.lang.toLowerCase().startsWith(prefix));
-            }
-
-            // Tier 3: South African English or general English fallback
-            if (!selectedVoice) {
-                selectedVoice = voices.find(v => v.lang.includes('en-ZA') || v.lang.includes('en'));
-            }
-
+            utterance.rate = 0.93;
+            utterance.pitch = 1.07;
+            utterance.volume = 1;
+            const selectedVoice = chooseKhensaniVoice(targetLangTag);
             if (selectedVoice) {
                 utterance.voice = selectedVoice;
+                console.info('[Khensani voice]', selectedVoice.name, selectedVoice.lang);
             }
-
+            utterance.onstart = () => { khensaniActiveUtterance = utterance; };
+            utterance.onend = () => { if (khensaniActiveUtterance === utterance) khensaniActiveUtterance = null; };
+            utterance.onerror = () => { if (khensaniActiveUtterance === utterance) khensaniActiveUtterance = null; };
+            khensaniActiveUtterance = utterance;
             window.speechSynthesis.speak(utterance);
+            return true;
+        }
+
+        function pauseKhensaniSpeech() {
+            if ('speechSynthesis' in window && window.speechSynthesis.speaking) window.speechSynthesis.pause();
+        }
+        function resumeKhensaniSpeech() {
+            if ('speechSynthesis' in window && window.speechSynthesis.paused) window.speechSynthesis.resume();
+        }
+        function stopKhensaniSpeech() {
+            if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+            khensaniActiveUtterance = null;
         }
 
         // Backwards compatibility alias for previous voice engine callers
@@ -1571,55 +1803,92 @@
             };
         }
 
-        const LUVUNO_BACKEND_URL = "https://luvuno-backend-proxy.onrender.com/api/v1/khensani/chat";
+        // Shared MindTech FastAPI gateway. Secrets remain server-side.
+        const KHENSANI_GATEWAY_URL = 'https://luvuno-backend-proxy.onrender.com/api/chat';
+        const KHENSANI_SYSTEM_PROMPT = [
+            'You are Khensani AI, the educational assistant for MindFlow by MindTech Industries.',
+            'Support school learners with accurate, age-appropriate explanations and step-by-step teaching.',
+            'Encourage learning rather than simply doing assessed work for the learner.',
+            'Use clear language, examples, and the learner’s language when they request it.',
+            'Do not invent live sources, school records, grades, or capabilities. Be transparent about uncertainty.'
+        ].join(' ');
+        const khensaniControllers = { main: null, sidebar: null, hub: null };
 
-        async function requestKhensaniReply(prompt, portal) {
-            const studentUid = (auth && auth.currentUser && auth.currentUser.uid)
-                ? auth.currentUser.uid : 'demo-student';
-
-            try {
-                const response = await fetch(LUVUNO_BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        prompt: prompt,
-                        studentUid: studentUid,
-                        portal: portal || 'student-portal'
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Backend returned HTTP ' + response.status);
-                }
-
-                const data = await response.json();
-                if (!data || typeof data.reply !== 'string' || !data.reply.trim()) {
-                    throw new Error('Backend response did not contain a non-empty reply field.');
-                }
-
-                return {
-                    reply: data.reply,
-                    provenance: data.telemetry && data.telemetry.provenance_stamp
-                        ? String(data.telemetry.provenance_stamp) : 'LUVUNO-BACKEND'
-                };
-            } catch (backendError) {
-                console.warn('[KhensaniEngine] FastAPI unavailable; trying edge fallback.', backendError);
-
-                const systemPrompt = 'You are Khensani AI, an educational assistant powered by MindTech Industries. Explain concepts clearly, accurately and at an appropriate academic level.';
-                const payload = systemPrompt + '\n\nStudent Inquiry: ' + prompt + '\n\nKhensani AI Response:';
-                const fallbackResponse = await fetch(
-                    'https://text.pollinations.ai/' + encodeURIComponent(payload) + '?model=openai'
-                );
-
-                if (!fallbackResponse.ok) {
-                    throw new Error('Both Khensani routes failed. Fallback HTTP ' + fallbackResponse.status);
-                }
-
-                return {
-                    reply: await fallbackResponse.text(),
-                    provenance: 'EDGE-FALLBACK'
-                };
+        function getKhensaniHistory(panel, currentPrompt) {
+            if (!panel) return [];
+            const history = Array.from(panel.querySelectorAll('.chat-message'))
+                .filter(node => !node.querySelector('.kh-chat-thinking'))
+                .map(node => {
+                    const role = node.classList.contains('user-message') ? 'user' : 'assistant';
+                    const content = node.querySelector('.kh-chat-message-content');
+                    return { role, content: (content ? content.innerText : node.innerText || '').trim().slice(0, 8000) };
+                })
+                .filter(item => item.content);
+            if (currentPrompt && history.length) {
+                const last = history[history.length - 1];
+                if (last.role === 'user' && last.content.trim() === String(currentPrompt).trim()) history.pop();
             }
+            return history.slice(-12);
+        }
+
+        function setKhensaniStopState(channel, active) {
+            const id = channel === 'sidebar' ? 'sidebarChatStopBtn' : 'mainChatStopBtn';
+            const button = document.getElementById(id);
+            if (button) button.classList.toggle('is-active', Boolean(active));
+        }
+
+        function stopKhensaniRequest(channel) {
+            const controller = khensaniControllers[channel];
+            if (controller) controller.abort();
+            if (channel === 'main' || channel === 'sidebar') setKhensaniStopState(channel, false);
+        }
+
+        async function requestKhensaniReply(prompt, portal, panel, signal) {
+            const response = await fetch(KHENSANI_GATEWAY_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    prompt: String(prompt || '').slice(0, 20000),
+                    history: getKhensaniHistory(panel, prompt),
+                    system_prompt: KHENSANI_SYSTEM_PROMPT + ' Current learning area: ' + String(portal || 'student-portal') + '.'
+                }),
+                signal
+            });
+            if (!response.ok) {
+                let detail = '';
+                try { const body = await response.json(); detail = body.detail || body.error || body.message || ''; } catch (_) {}
+                throw new Error('MindTech Gateway returned HTTP ' + response.status + (detail ? ': ' + detail : ''));
+            }
+            const data = await response.json();
+            if (data.success === false) throw new Error(data.error || data.message || 'The gateway could not complete this request.');
+            if (typeof data.reply !== 'string' || !data.reply.trim()) throw new Error('The gateway returned an empty response.');
+            return {
+                reply: data.reply,
+                provenance: data.has_live_context ? 'MINDTECH-GATEWAY · LIVE CONTEXT' : 'MINDTECH-GATEWAY',
+                sources: Array.isArray(data.sources) ? data.sources : []
+            };
+        }
+
+        function appendKhensaniSources(content, sources) {
+            if (!Array.isArray(sources) || !sources.length) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'kh-chat-sources';
+            const label = document.createElement('strong');
+            label.textContent = 'Sources';
+            wrap.appendChild(label);
+            sources.slice(0, 8).forEach(source => {
+                const url = typeof source === 'string' ? source : (source.url || source.link || '');
+                const title = typeof source === 'string' ? source : (source.title || source.name || url);
+                try {
+                    const parsed = new URL(url);
+                    if (!['http:', 'https:'].includes(parsed.protocol)) return;
+                    const a = document.createElement('a');
+                    a.href = parsed.href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+                    a.textContent = String(title || parsed.hostname).slice(0, 180);
+                    wrap.appendChild(a);
+                } catch (_) {}
+            });
+            if (wrap.querySelector('a')) content.appendChild(wrap);
         }
 
         function escapeChatHtml(value) {
@@ -1629,30 +1898,166 @@
         }
 
         function formatChatReply(value) {
-            return escapeChatHtml(value)
+            const source = String(value == null ? '' : value);
+            if (window.marked && typeof window.marked.parse === 'function') {
+                const html = window.marked.parse(source, { breaks: true, gfm: true });
+                return window.DOMPurify ? window.DOMPurify.sanitize(html) : escapeChatHtml(source).replace(/\n/g, '<br>');
+            }
+            // Readable fallback if the Markdown CDN is unavailable.
+            const escaped = escapeChatHtml(source);
+            return escaped
+                .replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
+                .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
+                .replace(/^#\s+(.+)$/gm, '<h1>$1</h1>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                .replace(/\n/g, '<br>');
+                .replace(/^&gt;\s?(.+)$/gm, '<blockquote>$1</blockquote>')
+                .replace(/^(?:- |\* )(.*)$/gm, '<li>$1</li>')
+                .replace(/(<li>[\s\S]*?<\/li>)/g, '<ul>$1</ul>')
+                .replace(/\n{2,}/g, '</p><p>')
+                .replace(/\n/g, '<br>')
+                .replace(/^(?!<h[1-3]>|<ul>|<blockquote>)([\s\S]+)$/, '<p>$1</p>');
+        }
+
+        async function streamKhensaniText(target, value) {
+            // Stream plain text first; apply the complete Markdown structure at the end.
+            const chars = Array.from(String(value || ''));
+            let rendered = '';
+            for (let i = 0; i < chars.length; i++) {
+                rendered += chars[i];
+                target.textContent = rendered + '▍';
+                const panel = target.closest('.conversation-panel, .khensani-chat');
+                if (panel) panel.scrollTop = panel.scrollHeight;
+                await new Promise(resolve => setTimeout(resolve, 1000 / 45));
+            }
+            target.innerHTML = formatChatReply(rendered);
+            const panel = target.closest('.conversation-panel, .khensani-chat');
+            if (panel) panel.scrollTop = panel.scrollHeight;
         }
 
         function appendChatMessage(panel, sender, message, type, provenance) {
             const bubble = document.createElement('div');
             bubble.className = 'chat-message ' + (type === 'user' ? 'user-message' : 'ai-message');
+            bubble.dataset.role = type === 'user' ? 'user' : 'assistant';
+            bubble.dataset.prompt = panel.dataset.lastPrompt || '';
+            bubble.dataset.portal = panel.dataset.lastPortal || 'student-portal';
+
             const heading = document.createElement('strong');
-            heading.textContent = sender + ': ';
+            heading.textContent = sender + ':';
             bubble.appendChild(heading);
 
-            const content = document.createElement('span');
-            content.innerHTML = type === 'thinking'
-                ? '<em>⚛️ Connecting to Khensani AI...</em>'
-                : formatChatReply(message);
+            const content = document.createElement('div');
+            content.className = 'kh-chat-message-content';
+            if (type === 'thinking') {
+                const thinking = document.createElement('div');
+                thinking.className = 'kh-chat-wave-card kh-chat-thinking';
+                thinking.innerHTML = `
+                    <svg class="kh-chat-wave-svg" viewBox="0 0 76 34" preserveAspectRatio="none" aria-hidden="true">
+                        <path class="kh-chat-wave-path" d="M 0 17 Q 19 0, 38 17 T 76 17">
+                            <animate attributeName="d" values="M 0 17 Q 19 0, 38 17 T 76 17;M 0 17 Q 19 34, 38 17 T 76 17;M 0 17 Q 19 0, 38 17 T 76 17" dur="1.2s" repeatCount="indefinite" />
+                        </path>
+                    </svg>
+                    <div class="kh-chat-wave-label">
+                        <div class="kh-chat-wave-title">⚛️ Connecting to Khensani AI<span class="kh-chat-wave-dots"></span></div>
+                        <div class="kh-chat-wave-sub">Khensani is thinking</div>
+                    </div>`;
+                content.appendChild(thinking);
+            } else if (type === 'ai') {
+                content.innerHTML = formatChatReply(message);
+            } else {
+                content.innerHTML = formatChatReply(message);
+            }
             bubble.appendChild(content);
 
             if (provenance) {
                 const stamp = document.createElement('div');
-                stamp.style.cssText = 'font-size:.68rem;opacity:.7;margin-top:8px;border-top:1px solid rgba(0,255,170,.18);padding-top:5px;';
+                stamp.className = 'kh-chat-provenance';
                 stamp.textContent = '🔒 Route: ' + provenance + ' · MindTech Industries';
                 bubble.appendChild(stamp);
+            }
+
+            if (type === 'ai' && message) {
+                let currentMessage = String(message);
+                const actions = document.createElement('div');
+                actions.className = 'kh-chat-actions';
+
+                const makeAction = (label, title, handler) => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'kh-chat-action';
+                    button.textContent = label;
+                    button.title = title;
+                    button.addEventListener('click', handler);
+                    actions.appendChild(button);
+                    return button;
+                };
+
+                makeAction('⧉ Copy', 'Copy this answer', async (event) => {
+                    const button = event.currentTarget;
+                    try {
+                        if (navigator.clipboard && window.isSecureContext) {
+                            await navigator.clipboard.writeText(currentMessage);
+                        } else {
+                            const temp = document.createElement('textarea');
+                            temp.value = currentMessage;
+                            temp.style.position = 'fixed'; temp.style.left = '-9999px';
+                            document.body.appendChild(temp); temp.select();
+                            const ok = document.execCommand('copy'); temp.remove();
+                            if (!ok) throw new Error('Clipboard copy failed');
+                        }
+                        button.textContent = '✓ Copied';
+                    } catch (err) {
+                        button.textContent = 'Copy unavailable';
+                    }
+                    setTimeout(() => { button.textContent = '⧉ Copy'; }, 1800);
+                });
+
+                makeAction('▶ Read Aloud', 'Read this answer aloud', (event) => {
+                    const button = event.currentTarget;
+                    const started = speakKhensaniMultilingual(currentMessage);
+                    button.textContent = started ? '↻ Replay' : 'Voice unavailable';
+                    if (started) {
+                        button.dataset.playing = 'true';
+                        setTimeout(() => { if (button.isConnected) button.dataset.playing = 'false'; }, 1000);
+                    }
+                });
+                makeAction('Ⅱ Pause', 'Pause speech', () => pauseKhensaniSpeech());
+                makeAction('▶ Resume', 'Resume paused speech', () => resumeKhensaniSpeech());
+                makeAction('■ Stop', 'Stop speech', () => stopKhensaniSpeech());
+
+                const regenerate = makeAction('↻ Regenerate', 'Generate a new answer to this question', async (event) => {
+                    const button = event.currentTarget;
+                    const prompt = bubble.dataset.prompt || '';
+                    const portal = bubble.dataset.portal || 'student-portal';
+                    if (!prompt || bubble.dataset.regenerating === 'true') {
+                        button.textContent = prompt ? '↻ Working...' : 'Prompt unavailable';
+                        return;
+                    }
+                    bubble.dataset.regenerating = 'true';
+                    button.disabled = true;
+                    button.textContent = '↻ Working...';
+                    const oldText = currentMessage;
+                    const regenerateController = new AbortController();
+                    try {
+                        stopKhensaniSpeech();
+                        const fresh = await requestKhensaniReply(prompt, portal, panel, regenerateController.signal);
+                        currentMessage = String(fresh.reply || '');
+                        content.innerHTML = formatChatReply(currentMessage);
+                        appendKhensaniSources(content, fresh.sources);
+                        bubble.dataset.prompt = prompt;
+                        const oldStamp = bubble.querySelector('.kh-chat-provenance');
+                        if (oldStamp) oldStamp.textContent = '🔒 Route: ' + fresh.provenance + ' · MindTech Industries';
+                        panel.scrollTop = panel.scrollHeight;
+                    } catch (err) {
+                        currentMessage = oldText;
+                        content.innerHTML = formatChatReply('I could not regenerate that response. Please try again.');
+                    } finally {
+                        bubble.dataset.regenerating = 'false';
+                        button.disabled = false;
+                        button.textContent = '↻ Regenerate';
+                    }
+                });
+                bubble.appendChild(actions);
             }
 
             panel.appendChild(bubble);
@@ -1692,24 +2097,25 @@
 
             // Show loading message in the conversation panel
             const panel = document.getElementById('conversationPanel');
-            const userMsg = document.createElement('div');
-            userMsg.className = 'chat-message user-message';
-            userMsg.innerHTML = '<strong>You:</strong> ' + hub.prompt;
-            panel.appendChild(userMsg);
+            panel.dataset.lastPrompt = hub.prompt;
+            panel.dataset.lastPortal = hub.portal;
+            appendChatMessage(panel, 'You', hub.prompt, 'user');
 
-            const loadingMsg = document.createElement('div');
-            loadingMsg.className = 'chat-message ai-message';
-            loadingMsg.innerHTML = '<strong>Khensani AI:</strong> Loading the ' + hub.title + ' hub...';
-            panel.appendChild(loadingMsg);
-            panel.scrollTop = panel.scrollHeight;
+            const loadingMsg = appendChatMessage(panel, 'Khensani AI', '', 'thinking');
+            const controller = new AbortController();
 
             try {
-                const result = await requestKhensaniReply(hub.prompt, hub.portal);
+                khensaniControllers.hub = controller;
+                const result = await requestKhensaniReply(hub.prompt, hub.portal, panel, controller.signal);
+                if (controller.signal.aborted) return;
                 loadingMsg.remove();
-                appendChatMessage(panel, 'Khensani AI', result.reply, 'ai', result.provenance);
-                speakKhensaniMultilingual(result.reply);
+                const answer = appendChatMessage(panel, 'Khensani AI', result.reply, 'ai', result.provenance);
+                appendKhensaniSources(answer.querySelector('.kh-chat-message-content'), result.sources);
+                if (khensaniControllers.hub === controller) khensaniControllers.hub = null;
             } catch (e) {
-                console.warn('[Hub] Luvuno fetch failed:', e.message);
+                if (khensaniControllers.hub === controller) khensaniControllers.hub = null;
+                if (e.name === 'AbortError') { loadingMsg.remove(); return; }
+                console.warn('[Hub] Khensani fetch failed:', e.message);
                 loadingMsg.remove();
                 const errMsg = document.createElement('div');
                 errMsg.className = 'chat-message ai-message';
@@ -1740,21 +2146,32 @@
                 if (!message) return;
 
                 this.isSending = true;
+                const controller = new AbortController();
+                khensaniControllers.main = controller;
+                setKhensaniStopState('main', true);
+                panel.dataset.lastPrompt = message;
+                panel.dataset.lastPortal = 'student-portal';
                 input.value = '';
                 appendChatMessage(panel, 'You', message, 'user');
                 const loading = appendChatMessage(panel, 'Khensani AI', '', 'thinking');
 
                 try {
-                    const result = await requestKhensaniReply(message, 'student-portal');
+                    const result = await requestKhensaniReply(message, 'student-portal', panel, controller.signal);
+                    if (controller.signal.aborted) return;
                     loading.remove();
-                    appendChatMessage(panel, 'Khensani AI', result.reply, 'ai', result.provenance);
-                    speakKhensaniMultilingual(result.reply);
-                } catch (error) {
-                    console.error('[KhensaniEngine] Chat request failed:', error);
-                    loading.remove();
-                    appendChatMessage(panel, 'Khensani AI', 'I could not reach the learning service just now. Please check your connection and try again.', 'ai', 'CONNECTION-ERROR');
+                    const answer = appendChatMessage(panel, 'Khensani AI', result.reply, 'ai', result.provenance);
+                    appendKhensaniSources(answer.querySelector('.kh-chat-message-content'), result.sources);
+                    } catch (error) {
+                    if (error.name === 'AbortError') { loading.remove(); appendChatMessage(panel, 'Khensani AI', 'Generation stopped.', 'ai', 'STOPPED'); }
+                    else {
+                        console.error('[KhensaniEngine] Chat request failed:', error);
+                        loading.remove();
+                        appendChatMessage(panel, 'Khensani AI', 'I could not reach the MindTech Gateway. ' + error.message + ' Please try again.', 'ai', 'CONNECTION-ERROR');
+                    }
                 } finally {
                     this.isSending = false;
+                    if (khensaniControllers.main === controller) khensaniControllers.main = null;
+                    setKhensaniStopState('main', false);
                     input.focus();
                 }
             }
@@ -1823,20 +2240,31 @@
                 if (!message) return;
 
                 this.isSending = true;
+                const controller = new AbortController();
+                khensaniControllers.sidebar = controller;
+                setKhensaniStopState('sidebar', true);
+                chat.dataset.lastPrompt = message;
+                chat.dataset.lastPortal = 'student-sidebar';
                 input.value = '';
                 appendChatMessage(chat, 'You', message, 'user');
                 const loading = appendChatMessage(chat, 'Khensani AI', '', 'thinking');
                 try {
-                    const result = await requestKhensaniReply(message, 'student-sidebar');
+                    const result = await requestKhensaniReply(message, 'student-sidebar', chat, controller.signal);
+                    if (controller.signal.aborted) return;
                     loading.remove();
-                    appendChatMessage(chat, 'Khensani AI', result.reply, 'ai', result.provenance);
-                    speakKhensaniMultilingual(result.reply);
-                } catch (error) {
-                    console.error('[KhensaniEngine] Sidebar request failed:', error);
-                    loading.remove();
-                    appendChatMessage(chat, 'Khensani AI', 'I could not connect just now. Please try again.', 'ai', 'CONNECTION-ERROR');
+                    const answer = appendChatMessage(chat, 'Khensani AI', result.reply, 'ai', result.provenance);
+                    appendKhensaniSources(answer.querySelector('.kh-chat-message-content'), result.sources);
+                    } catch (error) {
+                    if (error.name === 'AbortError') { loading.remove(); appendChatMessage(chat, 'Khensani AI', 'Generation stopped.', 'ai', 'STOPPED'); }
+                    else {
+                        console.error('[KhensaniEngine] Sidebar request failed:', error);
+                        loading.remove();
+                        appendChatMessage(chat, 'Khensani AI', 'I could not reach the MindTech Gateway. ' + error.message + ' Please try again.', 'ai', 'CONNECTION-ERROR');
+                    }
                 } finally {
                     this.isSending = false;
+                    if (khensaniControllers.sidebar === controller) khensaniControllers.sidebar = null;
+                    setKhensaniStopState('sidebar', false);
                 }
             },
             minimize: function() {
@@ -1950,8 +2378,12 @@
         window.closeMatchboxVideo = closeMatchboxVideo;
         window.handleSignOut = handleSignOut;
         window.markRead = markRead;
+        window.stopKhensaniRequest = stopKhensaniRequest;
         window.speakKhensaniMultilingual = speakKhensaniMultilingual;
         window.speakKhensaniResponse = speakKhensaniResponse;
+        window.pauseKhensaniSpeech = pauseKhensaniSpeech;
+        window.resumeKhensaniSpeech = resumeKhensaniSpeech;
+        window.stopKhensaniSpeech = stopKhensaniSpeech;
     </script>
 </body>
 </html>
